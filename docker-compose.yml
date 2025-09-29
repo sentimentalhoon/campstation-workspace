@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # Database
+  mariadb:
+    image: mariadb:10.11
+    container_name: campstation-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: qwer12#$
+      MYSQL_DATABASE: campstation
+      MYSQL_USER: campstation
+      MYSQL_PASSWORD: campstation123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - campstation-network
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: campstation-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - campstation-network
+
+  # Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: campstation-backend
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:mariadb://mariadb:3306/campstation?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8mb4
+      - DB_USERNAME=campstation
+      - DB_PASSWORD=campstation123
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=campstation-production-super-secret-key-for-jwt-token-generation-must-be-at-least-64-bytes-long-hs512
+      - JWT_EXPIRATION=900000
+      - JWT_REFRESH_EXPIRATION=604800000
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mariadb
+      - redis
+    volumes:
+      - ./backend/uploads:/app/uploads
+    networks:
+      - campstation-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: campstation-frontend
+    restart: unless-stopped
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - campstation-network
+
+volumes:
+  mariadb_data:
+  redis_data:
+
+networks:
+  campstation-network:
+    driver: bridge
+  redis_data:
