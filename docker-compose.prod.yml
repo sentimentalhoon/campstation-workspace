@@ -1,0 +1,104 @@
+services:
+  # ================================
+  # Frontend (Next.js → 빌드 후 정적 파일, Nginx 서빙)
+  # ================================
+  frontend:
+    image: nginx:alpine
+    container_name: campstation-frontend
+    volumes:
+      - ./frontend/out:/usr/share/nginx/html:ro # Next.js 빌드 결과물 (next build && next export)
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro # 커스텀 Nginx 설정
+    ports:
+      - "80:80" # 운영 환경은 80/443 포트 사용
+    depends_on:
+      - backend
+    networks:
+      - campstation-network
+    restart: unless-stopped
+
+  # ================================
+  # Backend (Spring Boot - JAR 실행)
+  # ================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: campstation-backend
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://db:5432/campstation
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DRIVER=org.postgresql.Driver
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET}
+      - FILE_UPLOAD_PATH=/app/uploads
+      - SERVER_PORT=8080
+    volumes:
+      - ./backend/uploads:/app/uploads # 업로드 파일 영속화
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - campstation-network
+    restart: unless-stopped
+
+  # ================================
+  # Database (PostgreSQL)
+  # ================================
+  db:
+    image: postgres:15-alpine
+    container_name: campstation-db
+    environment:
+      - POSTGRES_DB=campstation
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "5432:5432" # 필요 시 외부 접근 허용
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # 데이터 영속화
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d campstation"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - campstation-network
+    restart: unless-stopped
+
+  # ================================
+  # Cache (Redis)
+  # ================================
+  redis:
+    image: redis:7-alpine
+    container_name: campstation-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes # 운영 환경: AOF 활성화 (데이터 유실 방지)
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - campstation-network
+    restart: unless-stopped
+
+# ================================
+# Volumes (데이터 영속화)
+# ================================
+volumes:
+  postgres_data:
+  redis_data:
+
+# ================================
+# Networks (서비스 간 통신)
+# ================================
+networks:
+  campstation-network:
+    driver: bridge
