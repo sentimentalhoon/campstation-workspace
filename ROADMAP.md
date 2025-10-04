@@ -73,6 +73,36 @@ CampStation은 캠핑장 예약 및 관리 시스템으로, Spring Boot 백엔�
 - **테스트**: 컴파일 에러 및 런타임 에러 수정
 - **문서화**: 코드 변경사항 및 보안 개선사항 정리
 
+### ✅ 7. CampgroundsClient.tsx 무한 스크롤 구현 (2025-10-04)
+
+- **문제**: 캠핑장 목록 페이지에서 페이징 없이 모든 데이터를 로드하는 비효율성
+- **해결**:
+  - Intersection Observer API를 활용한 무한 스크롤 구현
+  - useLayoutEffect와 ref 콜백을 활용한 DOM 타이밍 문제 해결
+  - 초기 observer 설정 실패 문제 해결 (observerRef.current null 이슈)
+  - 디버깅 로그 정리 및 프로덕션 코드 최적화
+- **기술적 개선**:
+  - 안정적인 observer 생성 및 해제 로직
+  - 메모리 누수 방지 및 성능 최적화
+  - 사용자 경험 향상을 위한 로딩 상태 표시
+- **파일 변경**:
+  - \CampgroundsClient.tsx\: 무한 스크롤 로직 완전 구현
+  - \ROADMAP.md\: 작업 내용 문서화
+
+### ✅ 8. GitHub Repository 분리 및 Push (2025-10-04)
+
+- **완료**: Backend와 Frontend를 독립적인 GitHub Repository로 분리
+- **Backend Repository**: https://github.com/sentimentalhoon/campstation-backend
+  - Spring Boot 프로젝트 완전 이전
+  - Redis 설정 및 데이터 로더 개선
+  - Site 엔티티 및 설정 파일 최적화
+- **Frontend Repository**: https://github.com/sentimentalhoon/campstation-frontend
+  - Next.js 프로젝트 완전 이전
+  - 무한 스크롤 기능 포함
+  - 메인 페이지 컴포넌트 리팩토링
+  - ROADMAP.md 문서화 완료
+- **Workspace Repository**: 전체 프로젝트 구조 유지
+
 ## 🔧 기술 스택
 
 - **Backend**: Spring Boot 3.5.6, Java 21, JWT, Spring Security
