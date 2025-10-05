@@ -452,3 +452,77 @@ mail:
 ---
 
 _최종 업데이트: 2025년 10월 4일_
+
+---
+
+## 📅 2025-10-05 Development Session Summary
+
+### 🎯 Session Objectives
+- Fix email configuration to use MailHog instead of Gmail SMTP
+- Resolve frontend-backend API communication issues in Docker environment
+- Ensure proper service communication in containerized environment
+
+### ✅ Completed Tasks
+
+#### 1. Email Configuration Migration (MailHog Setup)
+- **Problem**: Application was connecting to Gmail SMTP instead of MailHog in Docker environment
+- **Root Cause**: docker-compose.dev.yml was overriding .env file settings with hardcoded Gmail SMTP configuration
+- **Solution**:
+  - Removed Gmail SMTP settings from docker-compose.dev.yml
+  - Updated application.yml default mail configuration to use MailHog
+  - Verified all environments (local, dev, docker) use MailHog
+- **Files Modified**:
+  - `docker-compose.dev.yml`: Removed MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD
+  - `backend/src/main/resources/application.yml`: Changed default mail host from smtp.gmail.com to mailhog
+  - `backend/src/main/resources/application-dev.yml`: Confirmed MailHog settings
+  - `backend/src/main/resources/application-docker.yml`: Confirmed MailHog settings
+- **Testing**: Successfully sent test email via `/api/test/mail` endpoint, confirmed receipt in MailHog
+
+#### 2. Frontend-Backend API Communication Fix
+- **Problem**: Frontend container showing `ECONNREFUSED` errors when proxying API requests
+- **Root Cause**: Next.js rewrites configuration using `localhost:8080` which doesn't work in Docker containers
+- **Solution**:
+  - Added `BACKEND_URL=http://backend:8080` environment variable for Next.js rewrites
+  - Updated `NEXT_PUBLIC_API_URL=http://backend:8080/api` for client-side API calls
+  - Modified Docker Compose environment variables
+- **Files Modified**:
+  - `docker-compose.dev.yml`: Added BACKEND_URL environment variable
+  - `frontend/.env.local`: Added BACKEND_URL=http://backend:8080
+  - `frontend/.env.docker`: Updated NEXT_PUBLIC_API_URL to use backend service
+- **Testing**: Confirmed API requests now successfully reach backend (200 status codes in logs)
+
+### 🔧 Technical Changes Made
+
+#### Environment Configuration
+- **Mail Settings**: All environments now use MailHog (localhost:1025) instead of Gmail SMTP
+- **API Communication**: Frontend properly communicates with backend using Docker service names
+- **Container Networking**: Proper service discovery in Docker Compose network
+
+#### Docker Compose Updates
+- Removed hardcoded Gmail credentials from development environment
+- Added proper environment variable precedence for API URLs
+- Ensured service dependencies and health checks work correctly
+
+### 📊 Current System Status
+- ✅ Backend API: Running on port 8080
+- ✅ Frontend App: Running on port 3000 with hot reload
+- ✅ MailHog: Running on port 1025 for email testing
+- ✅ Database: MariaDB running on port 3306
+- ✅ Redis: Running on port 6379
+- ✅ MinIO: Running on port 9000 for file storage
+- ✅ All services communicating properly in Docker network
+
+### 🎯 Next Steps
+1. **Testing Phase**: Comprehensive testing of all features with new configuration
+2. **Documentation**: Update README files with current setup instructions
+3. **CI/CD**: Consider adding automated tests for container communication
+4. **Monitoring**: Implement proper logging and health check monitoring
+
+### 📝 Notes
+- Docker Compose environment variables take precedence over .env files
+- In Docker containers, use service names for inter-service communication
+- Next.js rewrites configuration requires BACKEND_URL environment variable
+- Health checks are crucial for container orchestration systems
+
+---
+*This roadmap documents the development session on 2025-10-05 focusing on Docker environment configuration and service communication fixes.*
