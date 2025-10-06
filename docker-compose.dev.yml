@@ -71,10 +71,10 @@ services:
       - LOG_LEVEL=DEBUG
       - SECURITY_LOG_LEVEL=DEBUG
       - SQL_LOG_LEVEL=DEBUG
-      - DB_URL=jdbc:h2:mem:campstation;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      - DB_DRIVER=org.h2.Driver
-      - DB_USERNAME=sa
-      - DB_PASSWORD=
+      - DB_URL=jdbc:postgresql://db:5432/campstation
+      - DB_DRIVER=org.postgresql.Driver
+      - DB_USERNAME=campstation
+      - DB_PASSWORD=campstation2024
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - JWT_SECRET=campstation- dev-secret-key-this-is-only-for-development-environment-please-change-in-production-must-be-at-least-64-bytes-long-hs512
