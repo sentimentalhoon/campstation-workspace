@@ -690,18 +690,21 @@ _상태: 캠핑장 수정 기능 완전 구현 완료, 다음 단계 계획 수�
 ### ✅ 데이터베이스 마이그레이션 작업 완료
 
 #### 1. Reviews 테이블 images 컬럼 추가
+
 - **문제**: Review 엔티티에 images 필드가 있지만 reviews 테이블에 images 컬럼이 없어 SQL 오류 발생
 - **해결**: `V6__add_images_to_reviews.sql` 마이그레이션 파일 생성
 - **변경사항**: `ALTER TABLE reviews ADD COLUMN images JSON;`
 - **결과**: 리뷰 이미지 저장 기능 정상 작동
 
 #### 2. Favorites 테이블 updated_at 컬럼 추가
+
 - **문제**: Favorite 엔티티가 BaseEntity를 상속받아 updated_at 필드가 있지만 favorites 테이블에 해당 컬럼 누락
 - **해결**: `V7__add_updated_at_to_favorites.sql` 마이그레이션 파일 생성
 - **변경사항**: `ALTER TABLE favorites ADD COLUMN updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP;`
 - **결과**: BaseEntity 호환성 완전 확보
 
 #### 3. BaseEntity 호환성 강화 (V5 마이그레이션)
+
 - **적용 테이블**: sites, payments, site_amenities, favorites
 - **추가 컬럼**: latitude, longitude, status, deleted_at (sites), deleted_at (다른 테이블들)
 - **목적**: 모든 BaseEntity 하위 엔티티들의 데이터베이스 스키마 일관성 확보
@@ -709,12 +712,14 @@ _상태: 캠핑장 수정 기능 완전 구현 완료, 다음 단계 계획 수�
 ### ✅ DataLoader 트랜잭션 처리 개선
 
 #### @Transactional 어노테이션 추가
+
 - **문제**: 샘플 데이터 로딩 시 LazyInitializationException 발생 가능성
 - **해결**: DataLoader 클래스에 `@Transactional` 어노테이션 추가
 - **장점**: 엔티티 관계 로딩 시 세션 관리 자동화, 데이터 일관성 보장
 - **파일 변경**: `backend/src/main/java/com/campstation/camp/config/DataLoader.java`
 
 #### 샘플 데이터 생성 로직 개선
+
 - **사용자 데이터**: BCryptPasswordEncoder로 안전한 비밀번호 해싱
 - **캠핑장 데이터**: 다양한 지역 및 시설 정보 포함
 - **리뷰 데이터**: 실제 사용자-캠핑장 관계 기반 생성
@@ -723,11 +728,13 @@ _상태: 캠핑장 수정 기능 완전 구현 완료, 다음 단계 계획 수�
 ### ✅ 데이터 무결성 제약 조건 처리 강화
 
 #### GlobalExceptionHandler 개선
+
 - **예외 처리**: DataIntegrityViolationException 포괄적 처리
 - **에러 메시지**: PostgreSQL 제약 조건 위반 시 사용자 친화적 메시지 제공
 - **로깅**: 상세한 에러 정보 기록으로 디버깅 용이성 확보
 
 #### PostgreSQL 제약 조건 종류
+
 - **NOT NULL**: 필수 필드에 NULL 값 입력 시
 - **UNIQUE**: 중복 값 입력 시 (예: campground_images의 (campground_id, is_main) 복합 키)
 - **PRIMARY KEY**: 기본 키 중복 또는 NULL 입력 시
@@ -736,16 +743,16 @@ _상태: 캠핑장 수정 기능 완전 구현 완료, 다음 단계 계획 수�
 
 ### 📊 데이터베이스 스키마 현황
 
-| 테이블 | BaseEntity 호환 | 주요 제약 조건 | 상태 |
-|--------|------------------|----------------|------|
-| users | ✅ | UNIQUE(email), NOT NULL 필드들 | 완전 호환 |
-| campgrounds | ✅ | FOREIGN KEY(owner_id), NOT NULL 필드들 | 완전 호환 |
-| reviews | ✅ | FOREIGN KEY(user_id, campground_id), CHECK(rating) | 완전 호환 |
-| favorites | ✅ | FOREIGN KEY(user_id, campground_id), UNIQUE(user_id, campground_id) | 완전 호환 |
-| sites | ✅ | FOREIGN KEY(campground_id), NOT NULL 필드들 | 완전 호환 |
-| payments | ✅ | FOREIGN KEY(user_id, reservation_id), NOT NULL 필드들 | 완전 호환 |
-| reservations | ✅ | 복합 FOREIGN KEY, CHECK 제약 조건들 | 완전 호환 |
-| campground_images | ❌ | UNIQUE(campground_id, is_main) | BaseEntity 미사용 |
+| 테이블            | BaseEntity 호환 | 주요 제약 조건                                                      | 상태              |
+| ----------------- | --------------- | ------------------------------------------------------------------- | ----------------- |
+| users             | ✅              | UNIQUE(email), NOT NULL 필드들                                      | 완전 호환         |
+| campgrounds       | ✅              | FOREIGN KEY(owner_id), NOT NULL 필드들                              | 완전 호환         |
+| reviews           | ✅              | FOREIGN KEY(user_id, campground_id), CHECK(rating)                  | 완전 호환         |
+| favorites         | ✅              | FOREIGN KEY(user_id, campground_id), UNIQUE(user_id, campground_id) | 완전 호환         |
+| sites             | ✅              | FOREIGN KEY(campground_id), NOT NULL 필드들                         | 완전 호환         |
+| payments          | ✅              | FOREIGN KEY(user_id, reservation_id), NOT NULL 필드들               | 완전 호환         |
+| reservations      | ✅              | 복합 FOREIGN KEY, CHECK 제약 조건들                                 | 완전 호환         |
+| campground_images | ❌              | UNIQUE(campground_id, is_main)                                      | BaseEntity 미사용 |
 
 ### 🔧 기술적 개선사항
 
@@ -878,3 +885,52 @@ _최종 업데이트: 2025년 10월 6일_
 _최근 업데이트: 2025년 10월 6일 - 환경별 데이터베이스 설정 일관성 확보_
 _담당: GitHub Copilot_
 _상태: 환경변수 설정 최적화 및 데이터베이스 구성 표준화 완료_
+
+### ✅ 5. 소셜 로그인 지원을 위한 User 모델 및 서비스 확장 (2025-10-06)
+
+- **문제**: 기존 시스템이 이메일/비밀번호 기반 인증만 지원하여 소셜 로그인(Google, Facebook 등) 확장이 불가능
+- **해결**:
+  - User 엔티티의 username 필드를 nullable로 변경하여 소셜 로그인 시 선택적 사용 가능
+  - provider와 providerId 필드 추가로 소셜 로그인 제공자 정보 저장
+  - username 자동 생성 로직 구현 (이메일 기반 생성, 특수문자 처리, 중복 방지)
+  - UserService에 소셜 로그인 사용자 생성/조회 메소드 추가
+  - 데이터베이스 스키마 업데이트 스크립트 생성
+- **파일 변경**:
+  - `backend/src/main/java/com/campstation/camp/domain/User.java`: username nullable 변경, provider/providerId 필드 및 메소드 추가
+  - `backend/src/main/java/com/campstation/camp/service/UserService.java`: createSocialUser, findOrCreateSocialUser 메소드 추가
+  - `backend/add_social_login_support.sql`: 데이터베이스 스키마 업데이트 스크립트
+  - `backend/src/test/java/com/campstation/camp/domain/UserTest.java`: username 생성 메소드 단위 테스트
+- **성과**: 소셜 로그인 통합을 위한 기반 아키텍처 완성, 향후 OAuth2 제공자(Google, Facebook 등) 쉽게 추가 가능
+
+### 🔧 소셜 로그인 아키텍처 개요
+
+- **User 엔티티 확장**:
+  - `username`: nullable로 변경, 소셜 로그인 시 자동 생성
+  - `provider`: 소셜 로그인 제공자 (google, facebook, etc.)
+  - `providerId`: 제공자의 고유 사용자 ID
+
+- **자동 Username 생성 규칙**:
+  - 이메일의 로컬 파트 사용 (user@gmail.com → user)
+  - 특수문자는 언더스코어(_)로 변환
+  - 길이 제한: 최대 20자
+  - 중복 시 숫자 접미사 추가 (user, user1, user2, ...)
+
+- **서비스 메소드**:
+  - `createSocialUser()`: 신규 소셜 로그인 사용자 생성
+  - `findOrCreateSocialUser()`: 기존 사용자 조회 또는 자동 생성
+
+### 📊 소셜 로그인 준비 상태
+
+| 컴포넌트       | 상태 | 설명                          |
+| -------------- | ---- | ----------------------------- |
+| User 엔티티    | ✅   | provider/providerId 필드 추가 |
+| UserService    | ✅   | 소셜 사용자 생성 메소드 구현 |
+| 데이터베이스   | ✅   | 스키마 업데이트 스크립트 준비 |
+| 테스트 커버리지| ✅   | 단위 테스트 작성 완료         |
+| OAuth2 설정    | 🔄   | 다음 단계에서 구현 예정       |
+
+---
+
+_최근 업데이트: 2025년 10월 6일 - 소셜 로그인 지원을 위한 User 모델 및 서비스 확장 완료_
+_담당: GitHub Copilot_
+_상태: 소셜 로그인 기반 아키텍처 구축 완료, OAuth2 제공자 통합 준비_
