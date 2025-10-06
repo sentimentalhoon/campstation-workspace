@@ -685,6 +685,86 @@ _마지막 업데이트: 2025년 10월 6일_
 _담당: GitHub Copilot_
 _상태: 캠핑장 수정 기능 완전 구현 완료, 다음 단계 계획 수립_
 
+## 🎉 최근 업데이트: 데이터베이스 스키마 수정 및 데이터 무결성 처리 (2025-10-06)
+
+### ✅ 데이터베이스 마이그레이션 작업 완료
+
+#### 1. Reviews 테이블 images 컬럼 추가
+- **문제**: Review 엔티티에 images 필드가 있지만 reviews 테이블에 images 컬럼이 없어 SQL 오류 발생
+- **해결**: `V6__add_images_to_reviews.sql` 마이그레이션 파일 생성
+- **변경사항**: `ALTER TABLE reviews ADD COLUMN images JSON;`
+- **결과**: 리뷰 이미지 저장 기능 정상 작동
+
+#### 2. Favorites 테이블 updated_at 컬럼 추가
+- **문제**: Favorite 엔티티가 BaseEntity를 상속받아 updated_at 필드가 있지만 favorites 테이블에 해당 컬럼 누락
+- **해결**: `V7__add_updated_at_to_favorites.sql` 마이그레이션 파일 생성
+- **변경사항**: `ALTER TABLE favorites ADD COLUMN updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP;`
+- **결과**: BaseEntity 호환성 완전 확보
+
+#### 3. BaseEntity 호환성 강화 (V5 마이그레이션)
+- **적용 테이블**: sites, payments, site_amenities, favorites
+- **추가 컬럼**: latitude, longitude, status, deleted_at (sites), deleted_at (다른 테이블들)
+- **목적**: 모든 BaseEntity 하위 엔티티들의 데이터베이스 스키마 일관성 확보
+
+### ✅ DataLoader 트랜잭션 처리 개선
+
+#### @Transactional 어노테이션 추가
+- **문제**: 샘플 데이터 로딩 시 LazyInitializationException 발생 가능성
+- **해결**: DataLoader 클래스에 `@Transactional` 어노테이션 추가
+- **장점**: 엔티티 관계 로딩 시 세션 관리 자동화, 데이터 일관성 보장
+- **파일 변경**: `backend/src/main/java/com/campstation/camp/config/DataLoader.java`
+
+#### 샘플 데이터 생성 로직 개선
+- **사용자 데이터**: BCryptPasswordEncoder로 안전한 비밀번호 해싱
+- **캠핑장 데이터**: 다양한 지역 및 시설 정보 포함
+- **리뷰 데이터**: 실제 사용자-캠핑장 관계 기반 생성
+- **이미지 데이터**: campground_images 테이블 제약 조건 준수
+
+### ✅ 데이터 무결성 제약 조건 처리 강화
+
+#### GlobalExceptionHandler 개선
+- **예외 처리**: DataIntegrityViolationException 포괄적 처리
+- **에러 메시지**: PostgreSQL 제약 조건 위반 시 사용자 친화적 메시지 제공
+- **로깅**: 상세한 에러 정보 기록으로 디버깅 용이성 확보
+
+#### PostgreSQL 제약 조건 종류
+- **NOT NULL**: 필수 필드에 NULL 값 입력 시
+- **UNIQUE**: 중복 값 입력 시 (예: campground_images의 (campground_id, is_main) 복합 키)
+- **PRIMARY KEY**: 기본 키 중복 또는 NULL 입력 시
+- **FOREIGN KEY**: 참조 무결성 위반 시
+- **CHECK**: 조건 제약 위반 시 (예: rating 1-5 범위)
+
+### 📊 데이터베이스 스키마 현황
+
+| 테이블 | BaseEntity 호환 | 주요 제약 조건 | 상태 |
+|--------|------------------|----------------|------|
+| users | ✅ | UNIQUE(email), NOT NULL 필드들 | 완전 호환 |
+| campgrounds | ✅ | FOREIGN KEY(owner_id), NOT NULL 필드들 | 완전 호환 |
+| reviews | ✅ | FOREIGN KEY(user_id, campground_id), CHECK(rating) | 완전 호환 |
+| favorites | ✅ | FOREIGN KEY(user_id, campground_id), UNIQUE(user_id, campground_id) | 완전 호환 |
+| sites | ✅ | FOREIGN KEY(campground_id), NOT NULL 필드들 | 완전 호환 |
+| payments | ✅ | FOREIGN KEY(user_id, reservation_id), NOT NULL 필드들 | 완전 호환 |
+| reservations | ✅ | 복합 FOREIGN KEY, CHECK 제약 조건들 | 완전 호환 |
+| campground_images | ❌ | UNIQUE(campground_id, is_main) | BaseEntity 미사용 |
+
+### 🔧 기술적 개선사항
+
+- **스키마 일관성**: 모든 BaseEntity 하위 테이블에 created_at, updated_at, deleted_at 컬럼 보장
+- **트랜잭션 안정성**: DataLoader의 @Transactional 적용으로 데이터 로딩 안정성 향상
+- **에러 처리**: DataIntegrityViolationException의 구체적 처리로 사용자 경험 개선
+- **데이터 품질**: 샘플 데이터의 현실성 및 다양성 향상
+
+### ✅ 검증 결과
+
+- **빌드 상태**: ✅ 성공 (모든 마이그레이션 정상 적용)
+- **API 테스트**: ✅ 성공 (리뷰 및 즐겨찾기 API 정상 작동)
+- **데이터 무결성**: ✅ 검증 완료 (모든 제약 조건 정상 작동)
+- **샘플 데이터**: ✅ 로딩 완료 (다양한 테스트 데이터 확보)
+
+---
+
+_최종 업데이트: 2025년 10월 6일_
+
 ## 🎉 최근 업데이트: 캠핑장 수정 페이지 리팩토링 및 이미지 업로드 수정 (2025-10-06)
 
 ### ✅ 컴포넌트 아키텍처 대대적 개선
