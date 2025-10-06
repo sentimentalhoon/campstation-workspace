@@ -772,8 +772,29 @@ _상태: 캠핑장 수정 기능 완전 구현 완료, 다음 단계 계획 수�
 - **사용자 경험**: 일관된 확인 다이얼로그 인터페이스
 - **성능 최적화**: 중복 코드 제거로 번들 크기 축소
 
+### ✅ 환경변수 설정 및 데이터베이스 구성 최적화 (2025-10-06)
+
+- **문제**: 개발 환경에서 H2와 PostgreSQL 설정이 혼재되어 있어 일관성 저하
+- **해결**:
+  - 로컬(local) 환경: H2 인메모리 데이터베이스 유지 (빠른 개발)
+  - 개발(dev), Docker, 운영(prod) 환경: PostgreSQL 사용 (실제 운영 환경과 동일)
+  - Spring Boot 설정 파일과 환경변수 파일 동기화
+- **파일 변경**:
+  - `backend/src/main/resources/application-dev.yml`: H2 → PostgreSQL로 변경
+  - 환경변수 파일 검증 (.env.dev, .env.docker, .env.pro는 이미 PostgreSQL 설정)
+- **성과**: 환경별 데이터베이스 설정 일관성 확보, 운영 환경과의 차이 최소화
+
+### 📊 환경별 데이터베이스 설정 현황
+
+| 환경 | 데이터베이스 | 설정 파일 | 목적 |
+|------|-------------|----------|------|
+| local | H2 (인메모리) | application-local.yml | 빠른 로컬 개발 |
+| dev | PostgreSQL | application-dev.yml | 실제 DB 환경 테스트 |
+| docker | PostgreSQL | application-docker.yml | 컨테이너 환경 |
+| prod | PostgreSQL | application-prod.yml | 운영 환경 |
+
 ---
 
-_최근 업데이트: 2025년 10월 6일 - 프론트엔드 중복 함수 통합 및 코드 최적화 완료_
+_최근 업데이트: 2025년 10월 6일 - 환경별 데이터베이스 설정 일관성 확보_
 _담당: GitHub Copilot_
-_상태: 코드 중복 제거, 유지보수성 및 일관성 대폭 향상_
+_상태: 환경변수 설정 최적화 및 데이터베이스 구성 표준화 완료_
