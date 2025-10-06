@@ -40,6 +40,25 @@ NEXT_PUBLIC_KAKAO_MAP_API_KEY=your-kakao-map-api-key
 BACKEND_URL=https://api.yourdomain.com
 ```
 
+### OAuth2 소셜 로그인 (선택사항)
+
+```bash
+# Google OAuth2 (소셜 로그인용)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:8080/login/oauth2/code/google
+
+# GitHub OAuth2 (소셜 로그인용)
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+GITHUB_REDIRECT_URI=http://localhost:8080/login/oauth2/code/github
+
+# Facebook OAuth2 (선택사항)
+FACEBOOK_CLIENT_ID=your-facebook-client-id
+FACEBOOK_CLIENT_SECRET=your-facebook-client-secret
+FACEBOOK_REDIRECT_URI=http://localhost:8080/login/oauth2/code/facebook
+```
+
 ## 🛠️ **개발 환경 설정**
 
 ### 1. Frontend 개발 환경
@@ -78,6 +97,19 @@ export KAKAO_MAP_API_KEY=your-kakao-map-api-key
 set KAKAO_MAP_API_KEY=your-kakao-map-api-key  # Windows
 ```
 
+## 🐳 **Docker 환경변수 설정**
+
+### 개발 환경 (docker-compose.dev.yml)
+
+이미 설정되어 있으므로 추가 설정이 필요하지 않습니다.
+카카오 API 키만 환경변수로 설정하면 됩니다:
+
+```bash
+export KAKAO_MAP_API_KEY=your-kakao-map-api-key
+# 또는
+set KAKAO_MAP_API_KEY=your-kakao-map-api-key  # Windows
+```
+
 ### 운영 환경
 
 `.env.prod` 파일을 생성하거나 시스템 환경변수로 설정:
@@ -88,6 +120,12 @@ JWT_SECRET=your-production-jwt-secret
 DB_PASSWORD=your-production-db-password
 CORS_ALLOWED_ORIGINS=https://yourdomain.com
 KAKAO_MAP_API_KEY=your-kakao-map-api-key
+
+# OAuth2 소셜 로그인 (운영 환경)
+GOOGLE_CLIENT_ID=your-production-google-client-id
+GOOGLE_CLIENT_SECRET=your-production-google-client-secret
+GITHUB_CLIENT_ID=your-production-github-client-id
+GITHUB_CLIENT_SECRET=your-production-github-client-secret
 ```
 
 ## 🔧 **환경변수 검증**
@@ -150,6 +188,8 @@ frontend/
 - [ ] DB_PASSWORD 설정 확인
 - [ ] CORS_ALLOWED_ORIGINS 설정 확인
 - [ ] KAKAO_MAP_API_KEY 설정 확인
+- [ ] GOOGLE_CLIENT_ID 및 GOOGLE_CLIENT_SECRET 설정 확인 (소셜 로그인 사용 시)
+- [ ] GITHUB_CLIENT_ID 및 GITHUB_CLIENT_SECRET 설정 확인 (소셜 로그인 사용 시)
 - [ ] 모든 하드코딩된 값 제거 확인
 - [ ] 환경변수 파일 보안 설정 확인
 
@@ -187,3 +227,107 @@ export CORS_ALLOWED_ORIGINS=https://yourdomain.com
 1. 이 문서의 예시를 따라 설정
 2. 환경변수가 올바르게 로드되는지 확인
 3. 로그에서 구체적인 오류 메시지 확인
+
+---
+
+# 🔐 OAuth2 소셜 로그인 앱 등록 가이드
+
+## 📋 **Google OAuth2 앱 등록**
+
+### 1. Google Cloud Console 접속
+1. [Google Cloud Console](https://console.cloud.google.com/)에 접속
+2. 새 프로젝트 생성 또는 기존 프로젝트 선택
+
+### 2. OAuth2 클라이언트 ID 생성
+1. **API 및 서비스 > 사용자 인증 정보** 메뉴 선택
+2. **+ 사용자 인증 정보 만들기 > OAuth 2.0 클라이언트 ID** 선택
+3. 애플리케이션 유형: **웹 애플리케이션** 선택
+4. 이름: `CampStation` 입력
+5. **승인된 리다이렉션 URI**에 다음 URI 추가:
+   - 개발: `http://localhost:8080/login/oauth2/code/google`
+   - 운영: `https://yourdomain.com/login/oauth2/code/google`
+6. 생성 완료 후 **클라이언트 ID**와 **클라이언트 보안 비밀** 저장
+
+### 3. 환경변수 설정
+```bash
+export GOOGLE_CLIENT_ID=your-google-client-id
+export GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
+## 📋 **GitHub OAuth2 앱 등록**
+
+### 1. GitHub Developer Settings 접속
+1. GitHub에 로그인
+2. 우상단 프로필 > **Settings** > **Developer settings** > **OAuth Apps**
+3. **New OAuth App** 클릭
+
+### 2. OAuth App 설정
+- **Application name**: `CampStation`
+- **Homepage URL**: 
+  - 개발: `http://localhost:3000`
+  - 운영: `https://yourdomain.com`
+- **Authorization callback URL**:
+  - 개발: `http://localhost:8080/login/oauth2/code/github`
+  - 운영: `https://yourdomain.com/login/oauth2/code/github`
+- **Description**: `CampStation 캠핑장 예약 시스템`
+
+### 3. 앱 생성 및 정보 저장
+1. **Register application** 클릭
+2. **Client ID** 저장
+3. **Generate a new client secret** 클릭 후 **Client Secret** 저장
+
+### 4. 환경변수 설정
+```bash
+export GITHUB_CLIENT_ID=your-github-client-id
+export GITHUB_CLIENT_SECRET=your-github-client-secret
+```
+
+## ⚠️ **보안 주의사항**
+
+### OAuth2 앱 설정 시 주의사항
+- **리다이렉션 URI**: 정확한 도메인과 경로 설정
+- **클라이언트 시크릿**: 절대 공개 저장소에 커밋하지 말 것
+- **환경별 앱**: 개발/운영 환경 분리 권장
+- **권한 범위**: 필요한 최소 권한만 요청
+
+### 개발 환경에서만 사용
+- 실제 운영 시 별도의 OAuth2 앱 등록 권장
+- 개발용 앱은 개인 토큰으로 제한
+
+## 🧪 **테스트 방법**
+
+### 1. 환경변수 설정 확인
+```bash
+# 설정된 환경변수 확인
+echo $GOOGLE_CLIENT_ID
+echo $GITHUB_CLIENT_ID
+```
+
+### 2. 애플리케이션 재시작
+```bash
+# Backend 재시작
+./gradlew bootRun
+
+# Frontend 재시작
+npm run dev
+```
+
+### 3. 소셜 로그인 테스트
+1. `http://localhost:3000/login` 접속
+2. Google/GitHub 버튼 클릭
+3. OAuth2 제공자 로그인
+4. 콜백 처리 및 홈페이지 리다이렉트 확인
+
+## 🔧 **문제 해결**
+
+### "Invalid client" 오류
+- 클라이언트 ID와 시크릿이 올바른지 확인
+- 앱이 승인되었는지 확인
+
+### "Redirect URI mismatch" 오류
+- application.yml의 redirect-uri와 앱 설정이 일치하는지 확인
+- 프로토콜(http/https)과 포트가 정확한지 확인
+
+### "Access denied" 오류
+- OAuth2 앱 권한 설정 확인
+- 사용자 동의 화면에서 권한 승인했는지 확인
