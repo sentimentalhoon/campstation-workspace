@@ -786,12 +786,12 @@ _상태: 캠핑장 수정 기능 완전 구현 완료, 다음 단계 계획 수�
 
 ### 📊 환경별 데이터베이스 설정 현황
 
-| 환경 | 데이터베이스 | 설정 파일 | 목적 |
-|------|-------------|----------|------|
-| local | H2 (인메모리) | application-local.yml | 빠른 로컬 개발 |
-| dev | PostgreSQL | application-dev.yml | 실제 DB 환경 테스트 |
-| docker | PostgreSQL | application-docker.yml | 컨테이너 환경 |
-| prod | PostgreSQL | application-prod.yml | 운영 환경 |
+| 환경   | 데이터베이스  | 설정 파일              | 목적                |
+| ------ | ------------- | ---------------------- | ------------------- |
+| local  | H2 (인메모리) | application-local.yml  | 빠른 로컬 개발      |
+| dev    | PostgreSQL    | application-dev.yml    | 실제 DB 환경 테스트 |
+| docker | PostgreSQL    | application-docker.yml | 컨테이너 환경       |
+| prod   | PostgreSQL    | application-prod.yml   | 운영 환경           |
 
 ---
 
