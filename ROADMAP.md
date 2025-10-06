@@ -919,21 +919,66 @@ _상태: 환경변수 설정 최적화 및 데이터베이스 구성 표준화 �
   - `createSocialUser()`: 신규 소셜 로그인 사용자 생성
   - `findOrCreateSocialUser()`: 기존 사용자 조회 또는 자동 생성
 
-### 📊 소셜 로그인 준비 상태
+### ✅ 6. Backend OAuth2 소셜 로그인 설정 및 Spring Security 통합 (2025-10-06)
 
-| 컴포넌트       | 상태 | 설명                          |
-| -------------- | ---- | ----------------------------- |
-| User 엔티티    | ✅   | provider/providerId 필드 추가 |
-| UserService    | ✅   | 소셜 사용자 생성 메소드 구현 |
-| 데이터베이스   | ✅   | 스키마 업데이트 스크립트 준비 |
-| 테스트 커버리지| ✅   | 단위 테스트 작성 완료         |
-| OAuth2 설정    | ✅   | Spring Security OAuth2 통합   |
+- **문제**: 소셜 로그인 기반 아키텍처는 구축되었으나 실제 OAuth2 인증 플로우가 구현되지 않아 소셜 로그인을 사용할 수 없음
+- **해결**:
+  - Spring Boot OAuth2 Client 의존성 추가 및 설정
+  - OAuth2Config 클래스 구현 (사용자 정보 처리, 성공/실패 핸들러)
+  - CustomOAuth2User 클래스 생성 (OAuth2User 인터페이스 구현)
+  - Spring Security에 OAuth2 로그인 통합 (JwtSecurityConfig 수정)
+  - JWT 토큰 자동 생성 및 리다이렉트 처리
+  - Google, GitHub OAuth2 클라이언트 설정 (application.yml)
+- **파일 변경**:
+  - `backend/build.gradle.kts`: spring-boot-starter-oauth2-client 의존성 추가
+  - `backend/src/main/java/com/campstation/camp/config/OAuth2Config.java`: OAuth2 설정 클래스 신규 생성
+  - `backend/src/main/java/com/campstation/camp/security/CustomOAuth2User.java`: OAuth2User 구현체 신규 생성
+  - `backend/src/main/java/com/campstation/camp/config/JwtSecurityConfig.java`: OAuth2 로그인 경로 허용 및 설정 추가
+  - `backend/src/main/resources/application.yml`: Google/GitHub OAuth2 클라이언트 설정 추가
+- **성과**: 완전한 OAuth2 소셜 로그인 시스템 구축, Google/GitHub 로그인을 통한 사용자 인증 및 JWT 토큰 발급 가능
+
+### � OAuth2 소셜 로그인 아키텍처 상세
+
+- **OAuth2 설정 컴포넌트**:
+  - `OAuth2Config`: OAuth2 사용자 서비스 및 핸들러 빈 설정
+  - `CustomOAuth2User`: 소셜 로그인 사용자 정보를 Spring Security와 통합
+  - `JwtSecurityConfig`: OAuth2 로그인 경로 허용 및 인증 플로우 설정
+
+- **인증 플로우**:
+  1. 사용자가 소셜 로그인 버튼 클릭 (프론트엔드)
+  2. OAuth2 제공자 인증 페이지로 리다이렉트
+  3. 인증 성공 시 OAuth2Config에서 사용자 정보 처리
+  4. UserService를 통해 DB에 사용자 생성/조회
+  5. JWT 토큰 생성 및 프론트엔드로 리다이렉트
+
+- **지원 제공자**:
+  - **Google OAuth2**: 이메일, 이름, 프로필 정보 획득
+  - **GitHub OAuth2**: 이메일, 사용자명, 프로필 정보 획득
+  - **Facebook OAuth2**: 설정 준비 완료 (필요시 활성화)
+
+- **보안 및 사용자 경험**:
+  - 기존 JWT 토큰 시스템과 완전 호환
+  - 소셜 로그인 시 자동 username 생성 (중복 처리)
+  - 로그인 성공/실패에 따른 적절한 리다이렉트 처리
+  - CORS 및 CSRF 보안 설정 유지
+
+### 📊 Backend OAuth2 통합 현황
+
+| 컴포넌트           | 상태 | 설명                              |
+| ------------------ | ---- | --------------------------------- |
+| OAuth2 의존성      | ✅   | spring-boot-starter-oauth2-client |
+| OAuth2Config       | ✅   | 사용자 서비스 및 핸들러 구현      |
+| CustomOAuth2User   | ✅   | OAuth2User 인터페이스 구현        |
+| Security 통합      | ✅   | JwtSecurityConfig OAuth2 설정     |
+| JWT 토큰 통합      | ✅   | OAuth2 성공 시 자동 토큰 생성     |
+| 클라이언트 설정    | ✅   | application.yml OAuth2 설정       |
+| 환경변수 설정      | 🔄   | Google/GitHub 앱 등록 필요        |
 
 ---
 
-_최근 업데이트: 2025년 10월 6일 - 소셜 로그인 지원을 위한 User 모델 및 서비스 확장 완료_
+_최근 업데이트: 2025년 10월 6일 - Backend OAuth2 소셜 로그인 설정 및 Spring Security 통합 완료_
 _담당: GitHub Copilot_
-_상태: 소셜 로그인 기반 아키텍처 구축 완료, OAuth2 제공자 통합 준비_
+_상태: 완전한 OAuth2 소셜 로그인 시스템 구축 완료, 프론트엔드 연동 및 환경 설정만 남음_
 
 ---
 
