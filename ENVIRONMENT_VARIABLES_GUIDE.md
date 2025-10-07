@@ -235,10 +235,12 @@ export CORS_ALLOWED_ORIGINS=https://yourdomain.com
 ## 📋 **Google OAuth2 앱 등록**
 
 ### 1. Google Cloud Console 접속
+
 1. [Google Cloud Console](https://console.cloud.google.com/)에 접속
 2. 새 프로젝트 생성 또는 기존 프로젝트 선택
 
 ### 2. OAuth2 클라이언트 ID 생성
+
 1. **API 및 서비스 > 사용자 인증 정보** 메뉴 선택
 2. **+ 사용자 인증 정보 만들기 > OAuth 2.0 클라이언트 ID** 선택
 3. 애플리케이션 유형: **웹 애플리케이션** 선택
@@ -249,6 +251,7 @@ export CORS_ALLOWED_ORIGINS=https://yourdomain.com
 6. 생성 완료 후 **클라이언트 ID**와 **클라이언트 보안 비밀** 저장
 
 ### 3. 환경변수 설정
+
 ```bash
 export GOOGLE_CLIENT_ID=your-google-client-id
 export GOOGLE_CLIENT_SECRET=your-google-client-secret
@@ -257,13 +260,15 @@ export GOOGLE_CLIENT_SECRET=your-google-client-secret
 ## 📋 **GitHub OAuth2 앱 등록**
 
 ### 1. GitHub Developer Settings 접속
+
 1. GitHub에 로그인
 2. 우상단 프로필 > **Settings** > **Developer settings** > **OAuth Apps**
 3. **New OAuth App** 클릭
 
 ### 2. OAuth App 설정
+
 - **Application name**: `CampStation`
-- **Homepage URL**: 
+- **Homepage URL**:
   - 개발: `http://localhost:3000`
   - 운영: `https://yourdomain.com`
 - **Authorization callback URL**:
@@ -272,11 +277,13 @@ export GOOGLE_CLIENT_SECRET=your-google-client-secret
 - **Description**: `CampStation 캠핑장 예약 시스템`
 
 ### 3. 앱 생성 및 정보 저장
+
 1. **Register application** 클릭
 2. **Client ID** 저장
 3. **Generate a new client secret** 클릭 후 **Client Secret** 저장
 
 ### 4. 환경변수 설정
+
 ```bash
 export GITHUB_CLIENT_ID=your-github-client-id
 export GITHUB_CLIENT_SECRET=your-github-client-secret
@@ -285,18 +292,21 @@ export GITHUB_CLIENT_SECRET=your-github-client-secret
 ## ⚠️ **보안 주의사항**
 
 ### OAuth2 앱 설정 시 주의사항
+
 - **리다이렉션 URI**: 정확한 도메인과 경로 설정
 - **클라이언트 시크릿**: 절대 공개 저장소에 커밋하지 말 것
 - **환경별 앱**: 개발/운영 환경 분리 권장
 - **권한 범위**: 필요한 최소 권한만 요청
 
 ### 개발 환경에서만 사용
+
 - 실제 운영 시 별도의 OAuth2 앱 등록 권장
 - 개발용 앱은 개인 토큰으로 제한
 
 ## 🧪 **테스트 방법**
 
 ### 1. 환경변수 설정 확인
+
 ```bash
 # 설정된 환경변수 확인
 echo $GOOGLE_CLIENT_ID
@@ -304,6 +314,7 @@ echo $GITHUB_CLIENT_ID
 ```
 
 ### 2. 애플리케이션 재시작
+
 ```bash
 # Backend 재시작
 ./gradlew bootRun
@@ -313,6 +324,7 @@ npm run dev
 ```
 
 ### 3. 소셜 로그인 테스트
+
 1. `http://localhost:3000/login` 접속
 2. Google/GitHub 버튼 클릭
 3. OAuth2 제공자 로그인
@@ -321,13 +333,16 @@ npm run dev
 ## 🔧 **문제 해결**
 
 ### "Invalid client" 오류
+
 - 클라이언트 ID와 시크릿이 올바른지 확인
 - 앱이 승인되었는지 확인
 
 ### "Redirect URI mismatch" 오류
+
 - application.yml의 redirect-uri와 앱 설정이 일치하는지 확인
 - 프로토콜(http/https)과 포트가 정확한지 확인
 
 ### "Access denied" 오류
+
 - OAuth2 앱 권한 설정 확인
 - 사용자 동의 화면에서 권한 승인했는지 확인
