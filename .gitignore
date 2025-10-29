@@ -78,3 +78,5 @@ uploads/
 # Temporary files
 tmp/
 temp/
+
+.terraform/
