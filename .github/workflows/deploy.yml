@@ -13,6 +13,8 @@ env:
   ECS_CLUSTER: campstation-cluster
   ECS_SERVICE_FRONTEND: campstation-frontend-service
   ECS_SERVICE_BACKEND: campstation-backend-service
+  ECS_TASKDEF_BACKEND: campstation-backend-task
+  ECS_TASKDEF_FRONTEND: campstation-frontend
 
 jobs:
   build-and-deploy:
@@ -73,10 +75,10 @@ jobs:
       - name: Update ECS task definition
         run: |
           # Backend 작업 정의 업데이트
-          aws ecs describe-task-definition --task-definition $ECS_SERVICE_BACKEND --query taskDefinition > backend-task-definition.json
+          aws ecs describe-task-definition --task-definition $ECS_TASKDEF_BACKEND --query taskDefinition > backend-task-definition.json
 
           # Frontend 작업 정의 업데이트
-          aws ecs describe-task-definition --task-definition $ECS_SERVICE_FRONTEND --query taskDefinition > frontend-task-definition.json
+          aws ecs describe-task-definition --task-definition $ECS_TASKDEF_FRONTEND --query taskDefinition > frontend-task-definition.json
 
           # 새로운 이미지 URI로 업데이트
           jq --arg image "${{ steps.build-backend.outputs.backend-image }}" '.containerDefinitions[0].image = $image' backend-task-definition.json > backend-task-definition-updated.json
