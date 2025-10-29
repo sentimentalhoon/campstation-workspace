@@ -14,12 +14,28 @@ out/
 build/
 dist/
 
-# Environment variables
+# Environment variables (ALL variants - never commit secrets!)
+# Allow .example files for templates
 .env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+.env.prod
+.env.pro
+.env.dev
+.env.docker
+backend/.env
+backend/.env.local
+backend/.env.prod
+backend/.env.production
+frontend/.env
+frontend/.env.local
+frontend/.env.prod
+frontend/.env.production
 
 # Debug
 npm-debug.log*
@@ -79,4 +95,8 @@ uploads/
 tmp/
 temp/
 
+.terraform/infrastructure/.terraform/
+infrastructure/terraform.tfstate*
+infrastructure/.terraform.lock.hcl
+terraform.tfstate*
 .terraform/
