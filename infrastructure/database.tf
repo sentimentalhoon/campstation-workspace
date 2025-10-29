@@ -12,7 +12,7 @@ resource "aws_db_subnet_group" "campstation_db" {
 resource "aws_db_instance" "campstation_db" {
   identifier             = "campstation-db"
   engine                 = "postgres"
-  engine_version         = "15.4"
+  engine_version         = "15.8"
   instance_class         = "db.t3.micro"  # 프리 티어 사용
   allocated_storage      = 20
   storage_type           = "gp2"

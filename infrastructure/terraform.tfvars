@@ -3,9 +3,9 @@ aws_region = "ap-northeast-2"
 environment = "prod"
 project_name = "campstation"
 
-# 데이터베이스 설정 (실제 값으로 변경 필요)
+# 데이터베이스 설정
 db_username = "campstation_user"
-db_password = "CHANGE_THIS_PASSWORD_IN_PRODUCTION"
+db_password = "FgSfRlYaKjrZrNm1KKZNFhEc/Nd8/nHTXnahiJA+vTw="
 
 # Redis 설정
 redis_password = ""

@@ -33,10 +33,11 @@ output "s3_bucket_name" {
   value       = aws_s3_bucket.campstation_files.bucket
 }
 
-output "cloudfront_distribution_url" {
-  description = "CloudFront distribution URL"
-  value       = aws_cloudfront_distribution.campstation_files.domain_name
-}
+# CloudFront output - 주석 처리 (계정 검증 후 활성화)
+# output "cloudfront_distribution_url" {
+#   description = "CloudFront distribution URL"
+#   value       = aws_cloudfront_distribution.campstation_files.domain_name
+# }
 
 output "ecs_cluster_name" {
   description = "ECS cluster name"

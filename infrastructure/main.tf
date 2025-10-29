@@ -5,6 +5,7 @@ terraform {
       version = "~> 5.0"
     }
   }
+  required_version = ">= 1.0"
 }
 
 provider "aws" {
@@ -13,7 +14,8 @@ provider "aws" {
 
 # VPC 및 네트워킹
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.16.0"
 
   name = "campstation-vpc"
   cidr = "10.0.0.0/16"
