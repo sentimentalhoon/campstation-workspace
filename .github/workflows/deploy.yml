@@ -84,9 +84,9 @@ jobs:
           jq --arg image "${{ steps.build-backend.outputs.backend-image }}" '.containerDefinitions[0].image = $image' backend-task-definition.json > backend-task-definition-updated.json
           jq --arg image "${{ steps.build-frontend.outputs.frontend-image }}" '.containerDefinitions[0].image = $image' frontend-task-definition.json > frontend-task-definition-updated.json
 
-          # 불필요한 필드 제거
-          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' backend-task-definition-updated.json > backend-final.json
-          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' frontend-final.json > frontend-final.json
+          # 불필요한 필드 제거 및 전체 객체 출력
+          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) | .' backend-task-definition-updated.json > backend-final.json
+          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) | .' frontend-task-definition-updated.json > frontend-final.json
 
       # 새로운 작업 정의 등록
       - name: Register new task definitions
