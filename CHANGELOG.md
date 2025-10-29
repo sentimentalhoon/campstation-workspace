@@ -16,6 +16,7 @@
 #### 1. 하드코딩된 localhost 제거 및 환경별 URL 설정
 
 **프론트엔드 API 설정 개선**
+
 - `src/lib/api/config.ts` 수정
   - `DEFAULT_API_BASE`를 환경별로 동적 설정
   - localhost는 로컬 개발용, 호스트 IP는 dev/docker 환경용
@@ -24,6 +25,7 @@
   - CSP(Content Security Policy) 설정에 호스트 IP 포함
 
 **백엔드 설정 개선**
+
 - `S3FileService.java` 수정
   - 하드코딩된 localhost를 `externalEndpoint` 변수로 변경
 - `OAuth2AuthenticationSuccessHandler.java` 수정
@@ -34,6 +36,7 @@
   - 서버 URL을 `SERVER_URL` 환경 변수로 동적 설정
 
 **환경 설정 파일 추가**
+
 - `.env.dev`: 개발 환경용 URL 설정
 - `.env.docker`: Docker 환경용 URL 설정
 - `docker-compose.dev.yml`: API URL을 호스트 IP로 변경
@@ -41,6 +44,7 @@
 #### 2. 외부 네트워크 접근 설정
 
 **호스트 IP 기반 접근**
+
 - 개발/도커 환경에서 `192.168.31.107` 호스트 IP 사용
 - 로컬 개발은 여전히 localhost 유지
 - 포트 포워딩을 통한 외부 접근 가능
@@ -48,12 +52,14 @@
 #### 3. AWS 비용 분석 및 최적화
 
 **S3 프리 티어 활용**
+
 - 5GB 표준 스토리지 무료
 - 월 20,000건 GET 요청 무료
 - 월 100GB 데이터 전송 무료
 - Glacier로 장기 보관 시 추가 비용 절감
 
 **전체 AWS 비용 예측**
+
 - ECS Fargate: 프리 티어 2개월 후 월 $10-20
 - RDS PostgreSQL: 프리 티어 750시간 후 월 $15
 - ElastiCache Redis: 프리 티어 750시간 후 월 $10
@@ -65,12 +71,14 @@
 #### 4. GitHub Actions CI/CD 파이프라인 구축
 
 **자동화된 배포 워크플로우**
+
 - `.github/workflows/deploy.yml` 생성
 - main/master 브랜치 푸시 시 자동 배포 트리거
 - Docker 이미지 빌드 및 ECR 푸시 자동화
 - ECS 작업 정의 업데이트 및 롤링 배포
 
 **워크플로우 기능**
+
 - AWS 자격 증명으로 ECR 로그인
 - 프론트엔드/백엔드 이미지 병렬 빌드
 - ECS 서비스 강제 새 배포
@@ -79,6 +87,7 @@
 #### 5. Terraform을 사용한 AWS 인프라 구축
 
 **완전한 인프라 as Code**
+
 - `infrastructure/` 디렉토리 생성
 - VPC, 서브넷, 보안 그룹 자동 구성
 - RDS PostgreSQL, ElastiCache Redis 생성
@@ -87,6 +96,7 @@
 - S3 버킷 및 CloudFront CDN 설정
 
 **주요 Terraform 파일들**
+
 - `main.tf`: VPC 및 기본 리소스
 - `database.tf`: RDS 및 Redis
 - `ecs.tf`: ECS 클러스터 및 ECR
@@ -97,12 +107,14 @@
 #### 6. 프로덕션 환경 설정
 
 **환경 변수 체계**
+
 - `.env.prod` 파일 생성
 - AWS 리소스 엔드포인트 설정
 - 데이터베이스, Redis, S3 연결 정보
 - JWT 및 OAuth 시크릿 키 설정
 
 **보안 고려사항**
+
 - 민감 정보 환경 변수화
 - IAM 최소 권한 원칙 적용
 - VPC 보안 그룹으로 네트워크 격리
@@ -110,12 +122,14 @@
 #### 7. 배포 문서화 및 가이드
 
 **포괄적인 배포 가이드**
+
 - `aws-deployment-plan.md` 완전 업데이트
 - ECS Fargate 기반 아키텍처 다이어그램
 - 단계별 배포 절차 설명
 - 비용 최적화 및 모니터링 가이드
 
 **인프라 설정 가이드**
+
 - `infrastructure/README.md` 생성
 - Terraform 명령어 및 변수 설명
 - 문제 해결 및 모니터링 방법
@@ -123,21 +137,25 @@
 ### 🔧 기술적 개선사항
 
 #### 환경별 설정 관리
+
 - 개발/도커/프로덕션 환경 완전 분리
 - 환경 변수 기반 동적 구성
 - 하드코딩 제거로 유연성 향상
 
 #### CI/CD 자동화
+
 - GitHub Actions로 완전 자동화
 - Docker 빌드 및 배포 자동화
 - 롤링 업데이트로 무중단 배포
 
 #### 인프라 자동화
+
 - Terraform으로 인프라 코드화
 - 재현 가능한 환경 구축
 - 비용 효율적인 리소스 구성
 
 #### 모니터링 및 로깅
+
 - CloudWatch 로그 그룹 설정
 - ALB 헬스 체크 구성
 - ECS 서비스 모니터링
@@ -145,16 +163,19 @@
 ### 📊 영향 및 이점
 
 #### 개발 효율성 향상
+
 - 환경별 설정 자동화로 개발 속도 향상
 - 외부 접근으로 모바일 테스트 용이
 - CI/CD로 배포 자동화
 
 #### 비용 최적화
+
 - AWS 프리 티어 최대 활용
 - Fargate Spot 및 예약 인스턴스 고려
 - CloudFront로 전송 비용 절감
 
 #### 운영 안정성
+
 - 인프라 as Code로 재현성 확보
 - 자동화된 배포로 휴먼 에러 감소
 - 모니터링 체계 구축
