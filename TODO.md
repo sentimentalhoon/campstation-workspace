@@ -371,6 +371,18 @@ class ReservationServiceTest {
 
 ## 🎯 완료 현황
 
+### ✅ 완료된 작업 (2025-11-01)
+- [x] **은행 송금 확인 워크플로우 구현** (계좌이체 결제 완전 지원)
+  - 프론트엔드: 사용자 대시보드에 "입금확인 요청" 버튼 추가
+  - 백엔드: 입금 확인 요청 API 엔드포인트 (`POST /api/v1/payments/{id}/request-confirmation`)
+  - 이메일 알림: 오너에게 입금 확인 요청 이메일 자동 발송
+  - 오너 대시보드: 입금 대기 중인 예약 강조 표시 (노란색 배경)
+  - 오너 대시보드: "입금 확인" 버튼 추가 (클릭 시 결제 완료 처리)
+- [x] **찜하기 표시 버그 수정**
+  - CampgroundCard useEffect 조건 제거 (false 값도 처리)
+  - favorites API CommonResponse 언래핑 처리
+  - FavoriteController 기본 페이지 크기 100으로 증가
+
 ### ✅ 완료된 작업 (2025-10-31)
 - [x] **성능 최적화**: favoriteCount 컬럼 추가 (COUNT 쿼리 99% 감소)
 - [x] **성능 최적화**: reviewCount 컬럼 추가 (COUNT 쿼리 99% 감소)
