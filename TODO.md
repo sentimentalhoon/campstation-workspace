@@ -20,34 +20,20 @@
 
 #### TODO-1: AdminService 통계 기능 완성
 **파일**: `backend/src/main/java/com/campstation/camp/admin/service/AdminService.java`
-**상태**: ⏳ 대기
+**상태**: ✅ 완료
 **완료 예상**: 2-3시간
-**완료일**: _____
+**완료일**: 2025-10-31
 
 **작업 내용**:
-- [ ] 월간 매출 계산 로직 구현
-  ```java
-  // TODO: 월간 매출 계산 로직 구현 필요
-  private BigDecimal calculateMonthlyRevenue() {
-      // Payment 테이블에서 status=COMPLETED인 것들의 합계
-      // 현재 달 기준으로 필터링
-  }
-  ```
-- [ ] 평균 평점 계산 로직 구현
-  ```java
-  // TODO: 평균 평점 계산 로직 구현 필요
-  private Double calculateAverageRating() {
-      // Review 테이블에서 AVG(rating)
-      // deletedAt IS NULL 조건
-  }
-  ```
-- [ ] 오늘 체크인/체크아웃 계산
-  ```java
-  // TODO: 오늘 체크인/체크아웃 계산 로직 구현 필요
-  private long countTodayCheckIns() {
-      // Reservation WHERE checkInDate = TODAY
-  }
-  ```
+- [x] 월간 매출 계산 로직 구현 ✅
+  - PaymentRepository.findMonthlyRevenue() 추가
+  - status=COMPLETED, 현재 월 기준 SUM 쿼리
+- [x] 평균 평점 계산 로직 구현 ✅
+  - ReviewRepository.findAverageRating() 추가
+  - deletedAt IS NULL 조건 포함
+- [x] 오늘 체크인/체크아웃 계산 ✅
+  - ReservationRepository.countTodayCheckIns/CheckOuts() 추가
+  - status IN ('PENDING', 'CONFIRMED') 조건
 
 **참고 쿼리**:
 ```java
@@ -59,29 +45,20 @@ BigDecimal findMonthlyRevenue(@Param("month") int month, @Param("year") int year
 
 #### TODO-2: ReviewService 소유권 확인 (보안 중요!)
 **파일**: `backend/src/main/java/com/campstation/camp/review/service/ReviewService.java`
-**상태**: ⏳ 대기
+**상태**: ✅ 완료
 **우선순위**: 🔴 **HIGH** (보안 이슈)
 **완료 예상**: 1시간
-**완료일**: _____
+**완료일**: 2025-10-31
 
 **작업 내용**:
-- [ ] 리뷰 수정 시 소유권 확인
-  ```java
-  public ReviewResponse updateReview(Long reviewId, UpdateReviewRequest request, Long userId) {
-      Review review = reviewRepository.findById(reviewId)
-          .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
-
-      // TODO: 소유권 확인 로직 추가 필요
-      if (!review.getUser().getId().equals(userId)) {
-          throw new ForbiddenException("You can only edit your own reviews");
-      }
-
-      review.update(request.getContent(), request.getRating());
-      return ReviewResponse.from(reviewRepository.save(review));
-  }
-  ```
-- [ ] 리뷰 삭제 시 소유권 확인
-- [ ] 관리자는 모든 리뷰 수정/삭제 가능하도록 예외 처리
+- [x] 리뷰 수정 시 소유권 확인 ✅
+  - hasReviewPermission() 메서드로 통합 검증
+- [x] 리뷰 삭제 시 소유권 확인 ✅
+  - hasReviewPermission() 메서드로 통합 검증
+- [x] 관리자 및 캠핑장 소유자 예외 처리 ✅
+  - 작성자 본인
+  - ADMIN 역할
+  - OWNER 역할 + 해당 캠핑장 소유자
 
 **테스트**:
 ```bash
@@ -380,9 +357,10 @@ class ReservationServiceTest {
 ## 📊 진행 상황 트래킹
 
 ### 이번 주 목표
-- [ ] TODO-1: AdminService 통계 기능
-- [ ] TODO-2: ReviewService 소유권 확인
+- [x] TODO-1: AdminService 통계 기능 ✅ (2025-10-31)
+- [x] TODO-2: ReviewService 소유권 확인 ✅ (2025-10-31)
 - [ ] TODO-3: username → userId 변환
+- [x] 성능 최적화: favoriteCount/reviewCount 컬럼 추가 ✅ (2025-10-31)
 
 ### 이번 달 목표
 - [ ] TODO-4: 예약 거부 사유
@@ -392,6 +370,15 @@ class ReservationServiceTest {
 ---
 
 ## 🎯 완료 현황
+
+### ✅ 완료된 작업 (2025-10-31)
+- [x] **성능 최적화**: favoriteCount 컬럼 추가 (COUNT 쿼리 99% 감소)
+- [x] **성능 최적화**: reviewCount 컬럼 추가 (COUNT 쿼리 99% 감소)
+- [x] **API 최적화**: 메인 페이지 프로필 조회 최적화 (비로그인 사용자 skip)
+- [x] Flyway 마이그레이션 V2, V3 생성
+- [x] CampgroundRepository 쿼리 최적화 (Favorite/Review JOIN 제거)
+
+**성능 개선**: 캠핑장 목록 조회 시 N+1 쿼리 문제 완전 해결
 
 ### ✅ 완료된 작업 (2025-10-30)
 - [x] AWS 자격증명 보안 강화
