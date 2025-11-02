@@ -12,8 +12,14 @@
 - 지구의 곡률을 고려한 정확한 거리 계산
 - 소수점 첫째자리까지 표시 (예: 12.5km)
 
-### 2. 메모리 캐싱
+### 2. 예상 소요 시간 계산
+- **평균 속도**: 고속도로 기준 80km/h
+- **자동 계산**: 거리 기반 자동 계산
+- **포맷**: "2시간 30분" 또는 "45분"
+
+### 3. 메모리 캐싱
 - **TTL (Time To Live)**: 5분
+- **캐시 데이터**: 거리 + 예상 소요 시간
 - **캐시 키 전략**: `dist_{campgroundId}_{roundedLat}_{roundedLon}`
   - 사용자 위치를 소수점 3자리로 반올림 (약 100m 정확도)
   - 캐시 히트율 향상을 위한 최적화
@@ -57,7 +63,13 @@ frontend/
 // 두 좌표 간의 거리 계산 (Haversine 공식)
 calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number
 
-// 캠핑장과 사용자 간의 거리 계산 (캐시 활용)
+// 거리 기반 예상 소요 시간 계산 (80km/h 기준)
+calculateTravelTime(distanceKm: number): string
+
+// 캠핑장과 사용자 간의 거리 + 소요 시간 계산 (캐시 활용)
+getDistanceAndTimeToCampground(campground: CampgroundLocation, userLat: number, userLon: number): { distance: number; travelTime: string }
+
+// 캠핑장과 사용자 간의 거리만 계산 (캐시 활용) - 하위 호환성
 getDistanceToCampground(campground: CampgroundLocation, userLat: number, userLon: number): number
 
 // 여러 캠핑장의 거리를 일괄 계산
@@ -73,8 +85,9 @@ formatDistance(distanceKm: number): string
 // 캐시 구조
 interface DistanceCache {
   [key: string]: {
-    distance: number;    // 킬로미터
-    timestamp: number;   // 캐시 저장 시간
+    distance: number;     // 킬로미터
+    travelTime: string;   // 예상 소요 시간 (예: "2시간 30분")
+    timestamp: number;    // 캐시 저장 시간
   };
 }
 
@@ -84,6 +97,13 @@ function getCacheKey(campgroundId: number, userLat: number, userLon: number): st
   const roundedLon = Math.round(userLon * 1000) / 1000;
   return `dist_${campgroundId}_${roundedLat}_${roundedLon}`;
 }
+
+// 캐시 저장
+setDistanceAndTimeToCache(campgroundId, userLat, userLon, distance, travelTime);
+
+// 캐시 조회
+const cached = getDistanceAndTimeFromCache(campgroundId, userLat, userLon);
+// 반환: { distance: number, travelTime: string } | null
 ```
 
 #### 자동 캐시 정리
@@ -144,6 +164,33 @@ const distanceMap = useMemo(() => {
 />
 ```
 
+#### KakaoMap (거리 + 소요 시간)
+
+```tsx
+import {
+  calculateDistance,
+  calculateTravelTime,
+  getDistanceAndTimeFromCache,
+  setDistanceAndTimeToCache,
+} from "@/utils/distanceCalculator";
+
+// 캐시 확인
+const cached = getDistanceAndTimeFromCache(tempId, userLat, userLng);
+
+if (cached) {
+  // 캐시된 데이터 사용
+  setDistance(formatDistance(cached.distance));
+  setTravelTime(cached.travelTime);
+} else {
+  // 새로 계산
+  const distanceKm = calculateDistance(userLat, userLng, campLat, campLng);
+  const timeString = calculateTravelTime(distanceKm);
+  
+  // 캐시에 저장
+  setDistanceAndTimeToCache(tempId, userLat, userLng, distanceKm, timeString);
+}
+```
+
 #### HeroSection (위치 요청 버튼)
 
 ```tsx
@@ -169,21 +216,24 @@ const { userLocation, isLoading, error, requestLocation } = useUserLocation(fals
 // Haversine 공식 - 한 번만 계산
 const distance = calculateDistance(lat1, lon1, lat2, lon2);  // ~0.1ms
 
-// 캐시 조회 - 즉시 반환
-const cached = getDistanceFromCache(campgroundId, lat, lon);  // ~0.01ms
+// 소요 시간 계산 - 간단한 수식
+const travelTime = calculateTravelTime(distance);  // ~0.01ms
+
+// 캐시 조회 - 즉시 반환 (거리 + 소요 시간)
+const cached = getDistanceAndTimeFromCache(campgroundId, lat, lon);  // ~0.01ms
 ```
 
 ### 배치 처리
 
 ```typescript
-// 여러 캠핑장 거리 일괄 계산
+// 여러 캠핑장 거리 + 소요 시간 일괄 계산
 const distances = calculateDistancesForCampgrounds(
   campgrounds,  // 10개 캠핑장
   userLat,
   userLon
 );
-// 첫 실행: ~1ms (10개 계산)
-// 캐시 히트: ~0.1ms (10개 조회)
+// 첫 실행: ~1.5ms (10개 계산: 거리 + 소요 시간)
+// 캐시 히트: ~0.1ms (10개 조회: 거리 + 소요 시간)
 ```
 
 ## 🎨 UI/UX
@@ -278,30 +328,32 @@ case GeolocationPositionError.TIMEOUT:
   setError("위치 요청 시간이 초과되었습니다.");
 ```
 
-## 📈 성능 지표
+### 성능 지표
 
-### 거리 계산
+### 거리 + 소요 시간 계산
 
 | 작업 | 시간 | 설명 |
 |-----|-----|-----|
-| Haversine 계산 | ~0.1ms | 첫 계산 |
-| 캐시 조회 | ~0.01ms | 캐시 히트 |
-| 10개 배치 계산 | ~1ms | 첫 실행 |
-| 10개 배치 조회 | ~0.1ms | 캐시 히트 |
+| Haversine 계산 | ~0.1ms | 거리 계산 |
+| 소요 시간 계산 | ~0.01ms | 시간 계산 |
+| 캐시 조회 | ~0.01ms | 거리 + 시간 캐시 히트 |
+| 10개 배치 계산 | ~1.5ms | 첫 실행 (거리 + 시간) |
+| 10개 배치 조회 | ~0.1ms | 캐시 히트 (거리 + 시간) |
 
 ### 메모리 사용
 
-- 캠핑장 1개당 캐시 크기: ~50 bytes
-- 100개 캠핑장 캐시: ~5KB
+- 캠핑장 1개당 캐시 크기: ~60 bytes (거리 + 소요 시간 포함)
+- 100개 캠핑장 캐시: ~6KB
 - 만료된 캐시 자동 정리로 메모리 효율성 유지
 
 ## 🚀 향후 개선 사항
 
 1. **거리 기반 정렬**: 가까운 순으로 캠핑장 정렬
 2. **거리 필터**: "5km 이내" 등의 필터 추가
-3. **지도 통합**: 지도에 거리 정보 표시
+3. **지도 통합**: 지도에 거리 정보 표시 ✅ (완료: KakaoMap 통합)
 4. **최적 경로**: Google Maps 연동으로 실제 이동 시간 표시
 5. **IndexedDB 활용**: 더 긴 TTL의 영구 캐시
+6. **교통 상황 반영**: 실시간 교통 정보 기반 소요 시간 계산
 
 ## 📝 참고사항
 
