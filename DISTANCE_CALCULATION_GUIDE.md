@@ -8,16 +8,19 @@
 ## 🎯 핵심 기능
 
 ### 1. 거리 계산
+
 - **Haversine 공식** 사용하여 두 좌표 간의 거리 계산
 - 지구의 곡률을 고려한 정확한 거리 계산
 - 소수점 첫째자리까지 표시 (예: 12.5km)
 
 ### 2. 예상 소요 시간 계산
+
 - **평균 속도**: 고속도로 기준 80km/h
 - **자동 계산**: 거리 기반 자동 계산
 - **포맷**: "2시간 30분" 또는 "45분"
 
 ### 3. 메모리 캐싱
+
 - **TTL (Time To Live)**: 5분
 - **캐시 데이터**: 거리 + 예상 소요 시간
 - **캐시 키 전략**: `dist_{campgroundId}_{roundedLat}_{roundedLon}`
@@ -26,6 +29,7 @@
 - **자동 정리**: 5분마다 만료된 캐시 자동 삭제
 
 ### 3. 사용자 위치 관리
+
 - **sessionStorage 캐시**: 페이지 새로고침 시에도 위치 유지
 - **위치 캐시 TTL**: 10분
 - **자동 fetch 옵션**: 필요시 자동으로 위치 가져오기
@@ -85,15 +89,19 @@ formatDistance(distanceKm: number): string
 // 캐시 구조
 interface DistanceCache {
   [key: string]: {
-    distance: number;     // 킬로미터
-    travelTime: string;   // 예상 소요 시간 (예: "2시간 30분")
-    timestamp: number;    // 캐시 저장 시간
+    distance: number; // 킬로미터
+    travelTime: string; // 예상 소요 시간 (예: "2시간 30분")
+    timestamp: number; // 캐시 저장 시간
   };
 }
 
 // 캐시 키 생성
-function getCacheKey(campgroundId: number, userLat: number, userLon: number): string {
-  const roundedLat = Math.round(userLat * 1000) / 1000;  // 소수점 3자리
+function getCacheKey(
+  campgroundId: number,
+  userLat: number,
+  userLon: number
+): string {
+  const roundedLat = Math.round(userLat * 1000) / 1000; // 소수점 3자리
   const roundedLon = Math.round(userLon * 1000) / 1000;
   return `dist_${campgroundId}_${roundedLat}_${roundedLon}`;
 }
@@ -117,7 +125,8 @@ setInterval(clearExpiredDistanceCache, 5 * 60 * 1000);
 
 ```typescript
 // 사용 예시
-const { userLocation, isLoading, error, requestLocation } = useUserLocation(autoFetch);
+const { userLocation, isLoading, error, requestLocation } =
+  useUserLocation(autoFetch);
 
 // userLocation: { lat: number, lng: number } | null
 // isLoading: boolean - 위치 요청 중 여부
@@ -149,9 +158,13 @@ const { userLocation } = useUserLocation(false);
 // 거리 계산 (캐시 활용)
 const distanceMap = useMemo(() => {
   if (!userLocation) return null;
-  
+
   return calculateDistancesForCampgrounds(
-    campgrounds.map(c => ({ id: c.id, latitude: c.latitude, longitude: c.longitude })),
+    campgrounds.map((c) => ({
+      id: c.id,
+      latitude: c.latitude,
+      longitude: c.longitude,
+    })),
     userLocation.lat,
     userLocation.lng
   );
@@ -161,7 +174,7 @@ const distanceMap = useMemo(() => {
 <CampgroundCard
   campground={campground}
   distance={distanceMap?.get(campground.id)}
-/>
+/>;
 ```
 
 #### KakaoMap (거리 + 소요 시간)
@@ -185,7 +198,7 @@ if (cached) {
   // 새로 계산
   const distanceKm = calculateDistance(userLat, userLng, campLat, campLng);
   const timeString = calculateTravelTime(distanceKm);
-  
+
   // 캐시에 저장
   setDistanceAndTimeToCache(tempId, userLat, userLng, distanceKm, timeString);
 }
@@ -194,7 +207,8 @@ if (cached) {
 #### HeroSection (위치 요청 버튼)
 
 ```tsx
-const { userLocation, isLoading, error, requestLocation } = useUserLocation(false);
+const { userLocation, isLoading, error, requestLocation } =
+  useUserLocation(false);
 
 // 위치 없을 때: "내 위치에서 거리 보기" 버튼
 // 위치 있을 때: "거리 표시 중" 배지
@@ -214,13 +228,13 @@ const { userLocation, isLoading, error, requestLocation } = useUserLocation(fals
 
 ```typescript
 // Haversine 공식 - 한 번만 계산
-const distance = calculateDistance(lat1, lon1, lat2, lon2);  // ~0.1ms
+const distance = calculateDistance(lat1, lon1, lat2, lon2); // ~0.1ms
 
 // 소요 시간 계산 - 간단한 수식
-const travelTime = calculateTravelTime(distance);  // ~0.01ms
+const travelTime = calculateTravelTime(distance); // ~0.01ms
 
 // 캐시 조회 - 즉시 반환 (거리 + 소요 시간)
-const cached = getDistanceAndTimeFromCache(campgroundId, lat, lon);  // ~0.01ms
+const cached = getDistanceAndTimeFromCache(campgroundId, lat, lon); // ~0.01ms
 ```
 
 ### 배치 처리
@@ -228,7 +242,7 @@ const cached = getDistanceAndTimeFromCache(campgroundId, lat, lon);  // ~0.01ms
 ```typescript
 // 여러 캠핑장 거리 + 소요 시간 일괄 계산
 const distances = calculateDistancesForCampgrounds(
-  campgrounds,  // 10개 캠핑장
+  campgrounds, // 10개 캠핑장
   userLat,
   userLon
 );
@@ -242,33 +256,37 @@ const distances = calculateDistancesForCampgrounds(
 
 ```typescript
 // 1km 미만: 미터로 표시
-formatDistance(0.5) // "500m"
+formatDistance(0.5); // "500m"
 
 // 1km 이상 10km 미만: 소수점 첫째자리
-formatDistance(5.8) // "5.8km"
+formatDistance(5.8); // "5.8km"
 
 // 10km 이상: 반올림
-formatDistance(12.7) // "13km"
+formatDistance(12.7); // "13km"
 ```
 
 ### 캠핑장 카드
 
 ```tsx
-{distance !== undefined && (
-  <p className="mt-0.5 text-xs font-semibold text-success">
-    📍 {formatDistance(distance)} 거리
-  </p>
-)}
+{
+  distance !== undefined && (
+    <p className="mt-0.5 text-xs font-semibold text-success">
+      📍 {formatDistance(distance)} 거리
+    </p>
+  );
+}
 ```
 
 ### Featured 섹션 카드
 
 ```tsx
-{distance !== undefined && (
-  <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-semibold text-white">
-    📍 {formatDistance(distance)}
-  </span>
-)}
+{
+  distance !== undefined && (
+    <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-semibold text-white">
+      📍 {formatDistance(distance)}
+    </span>
+  );
+}
 ```
 
 ## 🔍 사용 시나리오
@@ -332,13 +350,13 @@ case GeolocationPositionError.TIMEOUT:
 
 ### 거리 + 소요 시간 계산
 
-| 작업 | 시간 | 설명 |
-|-----|-----|-----|
-| Haversine 계산 | ~0.1ms | 거리 계산 |
-| 소요 시간 계산 | ~0.01ms | 시간 계산 |
-| 캐시 조회 | ~0.01ms | 거리 + 시간 캐시 히트 |
-| 10개 배치 계산 | ~1.5ms | 첫 실행 (거리 + 시간) |
-| 10개 배치 조회 | ~0.1ms | 캐시 히트 (거리 + 시간) |
+| 작업           | 시간    | 설명                    |
+| -------------- | ------- | ----------------------- |
+| Haversine 계산 | ~0.1ms  | 거리 계산               |
+| 소요 시간 계산 | ~0.01ms | 시간 계산               |
+| 캐시 조회      | ~0.01ms | 거리 + 시간 캐시 히트   |
+| 10개 배치 계산 | ~1.5ms  | 첫 실행 (거리 + 시간)   |
+| 10개 배치 조회 | ~0.1ms  | 캐시 히트 (거리 + 시간) |
 
 ### 메모리 사용
 
@@ -372,14 +390,14 @@ d = R · c
 
 ### 좌표 정확도
 
-| 소수점 자리 | 정확도 |
-|-----------|-------|
-| 0 | ~111km |
-| 1 | ~11km |
-| 2 | ~1.1km |
-| 3 | ~110m ✅ (사용) |
-| 4 | ~11m |
-| 5 | ~1.1m |
+| 소수점 자리 | 정확도          |
+| ----------- | --------------- |
+| 0           | ~111km          |
+| 1           | ~11km           |
+| 2           | ~1.1km          |
+| 3           | ~110m ✅ (사용) |
+| 4           | ~11m            |
+| 5           | ~1.1m           |
 
 ### 브라우저 지원
 
