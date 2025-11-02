@@ -915,6 +915,99 @@ First Load JS: 155 kB
 
 ---
 
+## 버그 수정 및 개선 사항
+
+### 1. 사이트 관리 페이지에 요금제 관리 버튼 추가 (2025-11-02)
+
+**문제:**
+- 요금제 관리 페이지는 만들어졌지만 접근 경로가 없어 직접 URL을 입력해야 함
+- 사용자 편의성 저하
+
+**해결:**
+- `SiteSection.tsx` 컴포넌트 수정
+- 각 사이트 카드에 "요금제 관리" 버튼 추가
+- 버튼 위치: 수정/삭제 버튼 아래에 전체 너비로 배치
+- 버튼 스타일: 녹색 (success) 테마, 통화 아이콘 포함
+- 링크: `/campgrounds/[campgroundId]/sites/[siteId]/pricing`
+
+**변경 파일:**
+```
+frontend/src/components/campground-edit/SiteSection.tsx
+frontend/.prettierrc (중복 설정 제거)
+```
+
+**커밋:**
+```
+feat: 사이트 관리 페이지에 요금제 관리 버튼 추가
+- SiteSection 컴포넌트에 요금제 관리 링크 추가
+- 각 사이트 카드에서 직접 요금제 관리 페이지로 이동 가능
+```
+
+---
+
+### 2. SitePricingController Authentication 처리 버그 수정 (2025-11-02)
+
+**문제:**
+- API 호출 시 400 Bad Request 에러 발생
+- 에러 메시지: `"For input string: \"com.campstation.camp.user.domain.User@5e967115\""`
+- 원인: `authentication.getPrincipal().toString()`를 `Long.parseLong()`으로 파싱 시도
+- `Principal`이 User 객체를 반환하는데, 이를 문자열로 변환하면 객체의 toString() 결과가 나옴
+
+**해결:**
+1. `UserService` 의존성 주입 추가
+2. `authentication.getName()`으로 사용자 email 추출
+3. `userService.findByEmail(email)`로 User 객체 조회
+4. `user.getId()`로 Long 타입의 ownerId 추출
+
+**수정 전 코드:**
+```java
+String email = authentication.getName();
+Long ownerId = Long.parseLong(authentication.getPrincipal().toString()); // ❌ 에러 발생
+```
+
+**수정 후 코드:**
+```java
+String email = authentication.getName();
+User user = userService.findByEmail(email)
+        .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+Long ownerId = user.getId(); // ✅ 정상 작동
+```
+
+**적용된 메서드 (5개):**
+- `createSitePricing()` - POST /api/v1/owner/sites/{siteId}/pricing
+- `getSitePricings()` - GET /api/v1/owner/sites/{siteId}/pricing
+- `updateSitePricing()` - PUT /api/v1/owner/sites/{siteId}/pricing/{pricingId}
+- `deleteSitePricing()` - DELETE /api/v1/owner/sites/{siteId}/pricing/{pricingId}
+- `getAllOwnerPricings()` - GET /api/v1/owner/pricing
+
+**변경 파일:**
+```java
+backend/src/main/java/com/campstation/camp/pricing/controller/SitePricingController.java
+```
+
+**추가 import:**
+```java
+import com.campstation.camp.user.domain.User;
+import com.campstation.camp.user.service.UserService;
+```
+
+**커밋:**
+```
+fix: SitePricingController Authentication Principal 처리 수정
+- authentication.getPrincipal().toString()를 Long.parseLong() 시도 시 발생하는 에러 수정
+- UserService 주입받아 email로 User 조회 후 ID 추출하도록 변경
+- 모든 Owner 전용 API 엔드포인트에 적용
+```
+
+**테스트 결과:**
+- ✅ 요금제 목록 조회 성공
+- ✅ 요금제 생성 가능
+- ✅ 요금제 수정 가능
+- ✅ 요금제 삭제 가능
+
+---
+
 **작성일**: 2025-11-02  
-**버전**: 1.0  
-**상태**: ✅ 완료
+**최종 수정일**: 2025-11-02  
+**버전**: 1.1  
+**상태**: ✅ 완료 및 버그 수정
