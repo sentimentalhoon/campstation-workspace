@@ -22,11 +22,13 @@
 ## 개요
 
 ### 문제점
+
 - `ReservationService`에서 요금이 `BASE_PRICE_PER_NIGHT = 50000`으로 하드코딩됨
 - 시즌별, 요일별, 인원별 차등 요금 불가능
 - 할인 정책(장기 할인, 조기 예약 할인 등) 미구현
 
 ### 해결 방안
+
 - 사이트별 다중 요금제 시스템 구축
 - 우선순위 기반 요금제 적용 로직
 - 복잡한 할인 정책 지원
@@ -39,7 +41,9 @@
 ### 1. Enum 정의
 
 #### SeasonType.java
+
 계절별 시즌 구분
+
 ```java
 public enum SeasonType {
     PEAK,    // 성수기 (7~8월)
@@ -50,7 +54,9 @@ public enum SeasonType {
 ```
 
 #### DiscountType.java
+
 할인 정책 타입
+
 ```java
 public enum DiscountType {
     LONG_STAY,      // 장기 할인
@@ -63,7 +69,9 @@ public enum DiscountType {
 ```
 
 #### PricingRuleType.java
+
 요금제 규칙 타입 및 기본 우선순위
+
 ```java
 public enum PricingRuleType {
     BASE(0),           // 기본 요금제
@@ -76,9 +84,11 @@ public enum PricingRuleType {
 ### 2. 엔티티 설계
 
 #### SitePricing.java
+
 사이트별 요금제 엔티티 (20+ 필드)
 
 **기본 정보**
+
 - `pricingName`: 요금제 이름
 - `description`: 설명
 - `ruleType`: 요금제 규칙 타입
@@ -86,21 +96,25 @@ public enum PricingRuleType {
 - `isActive`: 활성화 여부
 
 **요금 설정**
+
 - `basePrice`: 기본 요금 (1박)
 - `weekendPrice`: 주말 요금 (금토)
 - `dayMultipliers`: 요일별 가격 배율 (JSON)
 
 **인원 설정**
+
 - `baseGuests`: 기준 인원
 - `maxGuests`: 최대 인원
 - `extraGuestFee`: 추가 인원 요금
 
 **기간 설정**
+
 - `seasonType`: 시즌 타입
 - `startDate`: 시작 날짜
 - `endDate`: 종료 날짜
 
 **할인 정책**
+
 - `longStayDiscountRate`: 장기 할인율
 - `longStayMinNights`: 장기 할인 최소 숙박일
 - `extendedStayDiscountRate`: 연박 할인율
@@ -109,6 +123,7 @@ public enum PricingRuleType {
 - `earlyBirdMinDays`: 조기 예약 최소 사전 예약일
 
 **주요 메서드**
+
 - `isApplicableOn(LocalDate)`: 특정 날짜에 적용 가능 여부 확인
 - `matchesSeason(LocalDate)`: 시즌 매칭 확인
 - `getDailyRate(DayOfWeek)`: 요일별 1박 요금 계산
@@ -119,24 +134,25 @@ public enum PricingRuleType {
 ### 3. Repository
 
 #### SitePricingRepository.java
+
 ```java
 public interface SitePricingRepository extends JpaRepository<SitePricing, Long> {
     // 활성 요금제 조회 (우선순위 순)
     List<SitePricing> findBySiteIdAndIsActiveTrueOrderByPriorityDesc(Long siteId);
-    
+
     // 모든 요금제 조회 (우선순위 순)
     List<SitePricing> findBySiteIdOrderByPriorityDesc(Long siteId);
-    
+
     // 요금제 이름 중복 확인
     Optional<SitePricing> findBySiteIdAndPricingName(Long siteId, String pricingName);
-    
+
     // 특정 날짜에 적용 가능한 요금제 조회
     @Query("SELECT sp FROM SitePricing sp WHERE sp.site.id = :siteId ...")
     List<SitePricing> findApplicablePricings(...);
-    
+
     // 기간 겹침 확인
     List<SitePricing> findOverlappingPricings(...);
-    
+
     // Owner의 모든 요금제 조회
     @Query("SELECT sp FROM SitePricing sp WHERE sp.site.campground.owner.id = :ownerId ...")
     List<SitePricing> findByOwnerId(Long ownerId);
@@ -146,13 +162,17 @@ public interface SitePricingRepository extends JpaRepository<SitePricing, Long> 
 ### 4. DTO
 
 #### CreateSitePricingRequest.java
+
 요금제 생성/수정 요청 DTO (validation 포함)
 
 #### SitePricingResponse.java
+
 요금제 응답 DTO
 
 #### PriceBreakdown.java
+
 가격 계산 상세 내역 DTO
+
 ```java
 public record PriceBreakdown(
     Long siteId,
@@ -173,9 +193,11 @@ public record PriceBreakdown(
 ### 5. 핵심 서비스
 
 #### PricingCalculationService.java (235+ 라인)
+
 복잡한 요금 계산 로직의 핵심
 
 **주요 메서드**
+
 ```java
 public PriceBreakdown calculatePrice(
     Long siteId,
@@ -186,7 +208,7 @@ public PriceBreakdown calculatePrice(
     // 1. 사이트의 활성 요금제 조회 (우선순위 순)
     List<SitePricing> pricings = pricingRepository
         .findBySiteIdAndIsActiveTrueOrderByPriorityDesc(siteId);
-    
+
     // 2. 날짜별로 순회하며 적용 가능한 요금제 찾기
     // 3. 요일별 차등 요금 적용
     // 4. 추가 인원 요금 계산
@@ -197,6 +219,7 @@ public PriceBreakdown calculatePrice(
 ```
 
 **계산 로직 흐름**
+
 1. 날짜별 반복문으로 각 날짜에 적용 가능한 요금제 찾기
 2. 우선순위가 높은 요금제부터 확인
 3. 요일별 요금 적용 (주말/평일)
@@ -206,7 +229,9 @@ public PriceBreakdown calculatePrice(
 7. 상세 내역(DailyPriceDetail, AppliedDiscount) 포함하여 반환
 
 #### SitePricingService.java
+
 요금제 CRUD 비즈니스 로직
+
 - `createSitePricing()`: 요금제 생성 (Owner 권한 확인)
 - `getSitePricings()`: 사이트 요금제 목록 조회
 - `updateSitePricing()`: 요금제 수정
@@ -216,9 +241,11 @@ public PriceBreakdown calculatePrice(
 ### 6. REST API
 
 #### SitePricingController.java
+
 6개 API 엔드포인트 제공
 
 **Owner 전용 API**
+
 ```java
 POST   /api/v1/owner/sites/{siteId}/pricing           // 요금제 생성
 GET    /api/v1/owner/sites/{siteId}/pricing           // 사이트 요금제 목록
@@ -228,6 +255,7 @@ GET    /api/v1/owner/pricing                          // Owner 전체 요금제
 ```
 
 **공개 API**
+
 ```java
 GET    /api/v1/pricing/calculate                      // 요금 미리 계산
        ?siteId=1&checkInDate=2025-07-15&checkOutDate=2025-07-17&numberOfGuests=4
@@ -236,6 +264,7 @@ GET    /api/v1/pricing/calculate                      // 요금 미리 계산
 ### 7. ReservationService 리팩토링
 
 **변경 전**
+
 ```java
 private static final BigDecimal BASE_PRICE_PER_NIGHT = BigDecimal.valueOf(50000);
 
@@ -246,6 +275,7 @@ private BigDecimal calculateTotalAmount(LocalDate checkInDate, LocalDate checkOu
 ```
 
 **변경 후**
+
 ```java
 private final PricingCalculationService pricingCalculationService;
 
@@ -262,15 +292,17 @@ private BigDecimal calculateTotalAmount(
 ```
 
 **수정된 3곳**
+
 - `createReservation()`: 회원 예약 생성
 - `updateReservation()`: 예약 수정
 - `createGuestReservation()`: 비회원 예약 생성
 
 ### 8. 데이터베이스 마이그레이션
 
-#### V9__add_site_pricing_table.sql
+#### V9\_\_add_site_pricing_table.sql
 
 **테이블 생성**
+
 ```sql
 CREATE TABLE site_pricing (
     id BIGSERIAL PRIMARY KEY,
@@ -302,6 +334,7 @@ CREATE TABLE site_pricing (
 ```
 
 **인덱스 5개**
+
 ```sql
 CREATE INDEX idx_site_pricing_site_id ON site_pricing(site_id);
 CREATE INDEX idx_site_pricing_dates ON site_pricing(start_date, end_date);
@@ -311,6 +344,7 @@ CREATE INDEX idx_site_pricing_rule_type ON site_pricing(rule_type);
 ```
 
 **초기 데이터**
+
 - 모든 사이트에 기본 요금제 자동 생성 (50,000원/평일, 70,000원/주말)
 - 모든 사이트에 성수기 요금제 자동 생성 (80,000원/평일, 100,000원/주말, PEAK)
 
@@ -321,6 +355,7 @@ CREATE INDEX idx_site_pricing_rule_type ON site_pricing(rule_type);
 ### 1. 타입 정의
 
 #### types/index.ts
+
 ```typescript
 // 시즌 타입
 export type SeasonType = "PEAK" | "HIGH" | "NORMAL" | "LOW";
@@ -403,23 +438,24 @@ export interface AppliedDiscount {
 ### 2. API 모듈
 
 #### lib/api/pricing.ts
+
 ```typescript
 export const pricingApi = {
   // 요금제 생성
   createPricing: async (siteId: number, data: CreateSitePricingRequest): Promise<SitePricing>
-  
+
   // 요금제 목록 조회
   getSitePricings: async (siteId: number): Promise<SitePricing[]>
-  
+
   // 요금제 수정
   updatePricing: async (siteId: number, pricingId: number, data: CreateSitePricingRequest): Promise<SitePricing>
-  
+
   // 요금제 삭제
   deletePricing: async (siteId: number, pricingId: number): Promise<void>
-  
+
   // Owner 전체 요금제 조회
   getAllOwnerPricings: async (): Promise<SitePricing[]>
-  
+
   // 요금 미리 계산
   calculatePrice: async (
     siteId: number,
@@ -433,11 +469,13 @@ export const pricingApi = {
 ### 3. 페이지 구조
 
 #### 라우트
+
 ```
 /campgrounds/[id]/sites/[siteId]/pricing
 ```
 
 #### 컴포넌트 구조
+
 ```
 pricing/
 ├── page.tsx                        # 라우트 페이지
@@ -450,25 +488,30 @@ pricing/
 ### 4. 주요 컴포넌트
 
 #### PricingManagementClient.tsx
+
 **기능**
+
 - Owner 권한 확인
 - 요금제 목록 조회 및 상태 관리
 - 요금제 CRUD 작업 처리
 - 모달 상태 관리
 
 **주요 함수**
+
 ```typescript
-fetchPricings()         // 요금제 목록 조회
-handleSavePricing()     // 요금제 생성/수정
-handleDeletePricing()   // 요금제 삭제
-handleEditPricing()     // 수정 모달 열기
-handleAddPricing()      // 생성 모달 열기
+fetchPricings(); // 요금제 목록 조회
+handleSavePricing(); // 요금제 생성/수정
+handleDeletePricing(); // 요금제 삭제
+handleEditPricing(); // 수정 모달 열기
+handleAddPricing(); // 생성 모달 열기
 ```
 
 #### PricingList.tsx
+
 요금제 목록 카드 형식 표시
 
 **표시 정보**
+
 - 요금제 이름, 타입, 시즌
 - 활성화 상태, 우선순위
 - 기본 요금, 주말 요금
@@ -478,20 +521,23 @@ handleAddPricing()      // 생성 모달 열기
 - 수정/삭제 버튼
 
 #### PricingModal.tsx
+
 복잡한 요금제 생성/수정 폼 (10개 섹션)
 
 **섹션 구성**
+
 1. **기본 정보**: 이름, 타입, 설명
 2. **가격 설정**: 기본 요금, 주말 요금
 3. **인원 설정**: 기준/최대 인원, 추가 인원 요금
 4. **적용 기간**: 시즌 타입, 시작/종료 날짜
-5. **할인 설정**: 
+5. **할인 설정**:
    - 장기 할인 (할인율, 최소 숙박일)
    - 연박 할인 (할인율, 최소 숙박일)
    - 조기예약 할인 (할인율, 최소 사전 예약일)
 6. **설정**: 우선순위, 활성화 여부
 
 **폼 검증**
+
 - 필수 필드: 이름, 타입, 기본 요금, 기준 인원, 최대 인원
 - 숫자 검증: 요금(0+), 할인율(0-100%), 인원(1+)
 - 날짜 검증: 시작일 <= 종료일
@@ -503,21 +549,25 @@ handleAddPricing()      // 생성 모달 열기
 ### 1. 다양한 요금제 타입
 
 #### 기본 요금제 (BASE)
+
 - 우선순위: 0 (가장 낮음)
 - 항상 적용되는 기본 요금
 - 다른 요금제가 없을 때 폴백으로 사용
 
 #### 시즌별 요금제 (SEASONAL)
+
 - 우선순위: 10
 - 성수기/준성수기/일반/비수기 자동 매칭
 - 예: 7~8월 성수기 요금 80,000원
 
 #### 기간 지정 요금제 (DATE_RANGE)
+
 - 우선순위: 20
 - 특정 기간에만 적용
 - 예: 2025-12-24 ~ 2025-12-26 크리스마스 특가
 
 #### 특별 이벤트 요금제 (SPECIAL_EVENT)
+
 - 우선순위: 30 (가장 높음)
 - 특정 이벤트 기간 요금
 - 예: 벚꽃 축제 기간, 불꽃놀이 이벤트
@@ -525,6 +575,7 @@ handleAddPricing()      // 생성 모달 열기
 ### 2. 유연한 가격 설정
 
 #### 평일/주말 차등
+
 ```java
 basePrice = 50,000원      // 월~목
 weekendPrice = 70,000원   // 금~토
@@ -532,15 +583,17 @@ weekendPrice = 70,000원   // 금~토
 ```
 
 #### 요일별 배율
+
 ```json
 {
-  "FRIDAY": 1.2,      // 금요일 20% 할증
-  "SATURDAY": 1.5,    // 토요일 50% 할증
-  "SUNDAY": 0.9       // 일요일 10% 할인
+  "FRIDAY": 1.2, // 금요일 20% 할증
+  "SATURDAY": 1.5, // 토요일 50% 할증
+  "SUNDAY": 0.9 // 일요일 10% 할인
 }
 ```
 
 #### 인원 정책
+
 ```
 기준 인원: 2명
 최대 인원: 4명
@@ -552,24 +605,28 @@ weekendPrice = 70,000원   // 금~토
 ### 3. 할인 정책
 
 #### 장기 할인 (Long Stay)
+
 ```
 조건: 3박 이상
 할인율: 10%
 ```
 
 #### 연박 할인 (Extended Stay)
+
 ```
 조건: 7박 이상
 할인율: 20%
 ```
 
 #### 조기 예약 할인 (Early Bird)
+
 ```
 조건: 30일 전 예약
 할인율: 15%
 ```
 
 **할인 중복 적용**
+
 - 모든 조건을 만족하면 모든 할인 적용
 - 예: 7박 + 30일 전 예약 = 20% + 15% = 35% 할인
 
@@ -585,6 +642,7 @@ weekendPrice = 70,000원   // 금~토
 ```
 
 **적용 예시**
+
 - 2025-07-15 (토요일, 성수기)
 - SEASONAL 요금제: 80,000원 (우선순위 10)
 - SPECIAL_EVENT 요금제: 100,000원 (우선순위 30, 여름 특가 이벤트)
@@ -597,6 +655,7 @@ weekendPrice = 70,000원   // 금~토
 ### 1. 요금제 생성
 
 **Request**
+
 ```http
 POST /api/v1/owner/sites/{siteId}/pricing
 Authorization: Bearer {token}
@@ -622,6 +681,7 @@ Content-Type: application/json
 ```
 
 **Response**
+
 ```json
 {
   "success": true,
@@ -645,11 +705,13 @@ Content-Type: application/json
 ### 2. 요금 미리 계산
 
 **Request**
+
 ```http
 GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-07-17&numberOfGuests=3
 ```
 
 **Response**
+
 ```json
 {
   "success": true,
@@ -697,6 +759,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 ### 시나리오 1: 기본 요금제 생성
 
 **Owner 작업**
+
 1. 사이트 관리 페이지 접속
 2. "요금제 관리" 클릭
 3. "요금제 추가" 클릭
@@ -710,6 +773,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 5. 저장
 
 **결과**
+
 - 평일: 50,000원/1박
 - 주말: 70,000원/1박
 - 3명 예약 시: +10,000원
@@ -717,6 +781,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 ### 시나리오 2: 성수기 요금제 + 할인
 
 **Owner 작업**
+
 1. "요금제 추가" 클릭
 2. 폼 작성:
    - 이름: "여름 성수기"
@@ -732,6 +797,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 **고객 예약 케이스**
 
 **케이스 1**: 2박 (7/15-7/17), 2명, 10일 전 예약
+
 ```
 날짜별 요금:
 - 7/15 (화): 80,000원
@@ -742,6 +808,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 ```
 
 **케이스 2**: 4박 (7/15-7/19), 3명, 45일 전 예약
+
 ```
 날짜별 요금:
 - 7/15 (화): 80,000원
@@ -763,6 +830,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 ### 시나리오 3: 특별 이벤트 요금
 
 **Owner 작업**
+
 1. "요금제 추가" 클릭
 2. 폼 작성:
    - 이름: "크리스마스 특가"
@@ -773,6 +841,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 3. 저장
 
 **결과**
+
 - 12/24-12/26 기간에는 다른 모든 요금제보다 우선 적용
 - 150,000원/1박 (이벤트 특가)
 
@@ -781,6 +850,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 ## 다음 단계
 
 ### 1. 예약 페이지 요금 미리보기 (진행 예정)
+
 - [ ] 날짜 선택 시 실시간 요금 계산
 - [ ] PriceBreakdown 상세 내역 표시
 - [ ] dailyBreakdown (날짜별 요금) 테이블
@@ -788,12 +858,14 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 - [ ] 총액 강조 표시
 
 ### 2. Docker 및 마이그레이션
+
 - [ ] `docker-compose down && docker-compose up -d --build`
 - [ ] Flyway V9 마이그레이션 자동 실행 확인
 - [ ] site_pricing 테이블 생성 확인
 - [ ] 기존 사이트에 기본 요금제 자동 생성 확인
 
 ### 3. 테스트
+
 - [ ] 기본 요금제로 예약 생성 테스트
 - [ ] 성수기 날짜 선택 시 요금 확인
 - [ ] 3박 이상 장기 할인 적용 확인
@@ -802,6 +874,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 - [ ] Owner 요금제 생성/수정/삭제 테스트
 
 ### 4. 추가 기능 (향후)
+
 - [ ] 요금제 템플릿 제공 (빠른 설정)
 - [ ] 요금제 복사 기능
 - [ ] 요금제 적용 미리보기 (캘린더 뷰)
@@ -814,6 +887,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 ## 기술 스택
 
 ### 백엔드
+
 - **언어**: Java 21
 - **프레임워크**: Spring Boot 3.x
 - **ORM**: JPA (Hibernate)
@@ -822,6 +896,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 - **빌드 도구**: Gradle
 
 ### 프론트엔드
+
 - **언어**: TypeScript
 - **프레임워크**: Next.js 15.5.4
 - **UI 라이브러리**: React 18
@@ -833,6 +908,7 @@ GET /api/v1/pricing/calculate?siteId=5&checkInDate=2025-07-15&checkOutDate=2025-
 ## 파일 구조
 
 ### 백엔드
+
 ```
 backend/src/main/java/com/campstation/camp/pricing/
 ├── domain/
@@ -857,6 +933,7 @@ backend/src/main/resources/db/migration/
 ```
 
 ### 프론트엔드
+
 ```
 frontend/src/
 ├── types/
@@ -876,12 +953,14 @@ frontend/src/
 ## 빌드 결과
 
 ### 백엔드
+
 ```
 BUILD SUCCESSFUL in 5s
 5 actionable tasks: 4 executed, 1 up-to-date
 ```
 
 ### 프론트엔드
+
 ```
 ✓ Compiled successfully in 3.6s
 ✓ Linting and checking validity of types
@@ -905,9 +984,10 @@ First Load JS: 155 kB
 ✅ 복잡한 할인 정책 구현 (3가지)  
 ✅ 우선순위 기반 요금 적용 로직  
 ✅ Owner용 관리 UI 완성  
-✅ 상세한 가격 내역 제공  
+✅ 상세한 가격 내역 제공
 
 **비즈니스 임팩트**
+
 - Owner가 시즌별, 이벤트별로 자유롭게 요금 설정 가능
 - 다양한 할인 정책으로 고객 유치 전략 수립 가능
 - 투명한 가격 정보로 고객 신뢰 향상
@@ -920,10 +1000,12 @@ First Load JS: 155 kB
 ### 1. 사이트 관리 페이지에 요금제 관리 버튼 추가 (2025-11-02)
 
 **문제:**
+
 - 요금제 관리 페이지는 만들어졌지만 접근 경로가 없어 직접 URL을 입력해야 함
 - 사용자 편의성 저하
 
 **해결:**
+
 - `SiteSection.tsx` 컴포넌트 수정
 - 각 사이트 카드에 "요금제 관리" 버튼 추가
 - 버튼 위치: 수정/삭제 버튼 아래에 전체 너비로 배치
@@ -931,12 +1013,14 @@ First Load JS: 155 kB
 - 링크: `/campgrounds/[campgroundId]/sites/[siteId]/pricing`
 
 **변경 파일:**
+
 ```
 frontend/src/components/campground-edit/SiteSection.tsx
 frontend/.prettierrc (중복 설정 제거)
 ```
 
 **커밋:**
+
 ```
 feat: 사이트 관리 페이지에 요금제 관리 버튼 추가
 - SiteSection 컴포넌트에 요금제 관리 링크 추가
@@ -948,24 +1032,28 @@ feat: 사이트 관리 페이지에 요금제 관리 버튼 추가
 ### 2. SitePricingController Authentication 처리 버그 수정 (2025-11-02)
 
 **문제:**
+
 - API 호출 시 400 Bad Request 에러 발생
 - 에러 메시지: `"For input string: \"com.campstation.camp.user.domain.User@5e967115\""`
 - 원인: `authentication.getPrincipal().toString()`를 `Long.parseLong()`으로 파싱 시도
 - `Principal`이 User 객체를 반환하는데, 이를 문자열로 변환하면 객체의 toString() 결과가 나옴
 
 **해결:**
+
 1. `UserService` 의존성 주입 추가
 2. `authentication.getName()`으로 사용자 email 추출
 3. `userService.findByEmail(email)`로 User 객체 조회
 4. `user.getId()`로 Long 타입의 ownerId 추출
 
 **수정 전 코드:**
+
 ```java
 String email = authentication.getName();
 Long ownerId = Long.parseLong(authentication.getPrincipal().toString()); // ❌ 에러 발생
 ```
 
 **수정 후 코드:**
+
 ```java
 String email = authentication.getName();
 User user = userService.findByEmail(email)
@@ -974,6 +1062,7 @@ Long ownerId = user.getId(); // ✅ 정상 작동
 ```
 
 **적용된 메서드 (5개):**
+
 - `createSitePricing()` - POST /api/v1/owner/sites/{siteId}/pricing
 - `getSitePricings()` - GET /api/v1/owner/sites/{siteId}/pricing
 - `updateSitePricing()` - PUT /api/v1/owner/sites/{siteId}/pricing/{pricingId}
@@ -981,17 +1070,20 @@ Long ownerId = user.getId(); // ✅ 정상 작동
 - `getAllOwnerPricings()` - GET /api/v1/owner/pricing
 
 **변경 파일:**
+
 ```java
 backend/src/main/java/com/campstation/camp/pricing/controller/SitePricingController.java
 ```
 
 **추가 import:**
+
 ```java
 import com.campstation.camp.user.domain.User;
 import com.campstation.camp.user.service.UserService;
 ```
 
 **커밋:**
+
 ```
 fix: SitePricingController Authentication Principal 처리 수정
 - authentication.getPrincipal().toString()를 Long.parseLong() 시도 시 발생하는 에러 수정
@@ -1000,14 +1092,154 @@ fix: SitePricingController Authentication Principal 처리 수정
 ```
 
 **테스트 결과:**
+
 - ✅ 요금제 목록 조회 성공
 - ✅ 요금제 생성 가능
 - ✅ 요금제 수정 가능
 - ✅ 요금제 삭제 가능
 
+### 2. API 응답 형식 통일 (프로젝트 일관성 확보)
+
+**발견된 문제:**
+
+프론트엔드에서 "요금제 목록을 불러오는데 실패했습니다" 에러 발생
+
+```
+TypeError: Cannot read properties of undefined (reading 'length')
+```
+
+**원인 분석:**
+
+- 백엔드: 배열 직접 반환 `[{...}, {...}]`
+- 프론트엔드: CommonResponse 형식 기대 `{ success, message, data: [...] }`
+- `response.data`가 undefined → `data.length` 접근 시 에러
+
+**해결 방안 검토:**
+
+1. **첫 번째 시도**: 프론트엔드만 수정 (직접 반환 형태로 변경) → 사용자 피드백으로 재검토
+2. **최종 결정**: 백엔드를 CommonResponse로 리팩토링하여 프로젝트 일관성 확보
+
+**프로젝트 일관성 분석:**
+
+- CampgroundController, SiteController 등 모든 Controller가 CommonResponse 사용
+- 프로젝트 전체의 표준 응답 형식: `{ success: boolean, message: string, data: T }`
+- SitePricingController만 직접 반환 → 불일치 발생
+
+**수정 후 코드:**
+
+```java
+// CommonResponse import 추가
+import com.campstation.camp.shared.dto.CommonResponse;
+
+// 1. 조회 API
+@GetMapping("/owner/sites/{siteId}/pricing")
+public ResponseEntity<CommonResponse<List<SitePricingResponse>>> getSitePricings(...) {
+    List<SitePricingResponse> pricings = pricingService.getSitePricings(siteId, ownerId);
+    return ResponseEntity.ok(CommonResponse.success("요금제 목록 조회 성공", pricings));
+}
+
+// 2. 생성 API
+@PostMapping("/owner/sites/{siteId}/pricing")
+public ResponseEntity<CommonResponse<SitePricingResponse>> createSitePricing(...) {
+    SitePricingResponse response = pricingService.createSitePricing(siteId, request, ownerId);
+    return ResponseEntity.ok(CommonResponse.success("요금제가 생성되었습니다.", response));
+}
+
+// 3. 수정 API
+@PutMapping("/owner/sites/{siteId}/pricing/{pricingId}")
+public ResponseEntity<CommonResponse<SitePricingResponse>> updateSitePricing(...) {
+    SitePricingResponse response = pricingService.updateSitePricing(...);
+    return ResponseEntity.ok(CommonResponse.success("요금제가 수정되었습니다.", response));
+}
+
+// 4. 삭제 API (204 No Content → 200 OK + CommonResponse)
+@DeleteMapping("/owner/sites/{siteId}/pricing/{pricingId}")
+public ResponseEntity<CommonResponse<Void>> deleteSitePricing(...) {
+    pricingService.deleteSitePricing(pricingId, ownerId);
+    return ResponseEntity.ok(CommonResponse.success("요금제가 삭제되었습니다.", null));
+}
+
+// 5. Owner 전체 요금제 조회
+@GetMapping("/owner/pricing")
+public ResponseEntity<CommonResponse<List<SitePricingResponse>>> getAllOwnerPricings(...) {
+    List<SitePricingResponse> pricings = pricingService.getAllOwnerPricings(ownerId);
+    return ResponseEntity.ok(CommonResponse.success("전체 요금제 목록 조회 성공", pricings));
+}
+
+// 6. 요금 계산 API
+@GetMapping("/pricing/calculate")
+public ResponseEntity<CommonResponse<PriceBreakdown>> calculatePrice(...) {
+    PriceBreakdown breakdown = pricingCalculationService.calculatePrice(...);
+    return ResponseEntity.ok(CommonResponse.success("요금 계산 성공", breakdown));
+}
+```
+
+**프론트엔드 (pricing.ts):**
+
+CommonResponse 패턴으로 복원 (6개 API 함수)
+
+```typescript
+// 목록 조회
+getSitePricings: async (siteId: number): Promise<SitePricing[]> => {
+  const response = await apiRequest<{ data: SitePricing[] }>(
+    `/v1/owner/sites/${siteId}/pricing`,
+    { method: "GET" }
+  );
+  return response.data; // CommonResponse에서 data 추출
+};
+
+// 생성
+createPricing: async (
+  siteId: number,
+  data: CreateSitePricingRequest
+): Promise<SitePricing> => {
+  const response = await apiRequest<{ data: SitePricing }>(
+    `/v1/owner/sites/${siteId}/pricing`,
+    { method: "POST", body: JSON.stringify(data) }
+  );
+  return response.data;
+};
+```
+
+**변경 파일:**
+
+- `backend/.../pricing/controller/SitePricingController.java`
+- `frontend/src/lib/api/pricing.ts`
+
+**개선 효과:**
+
+1. **프로젝트 일관성**: 모든 API가 동일한 응답 형식 사용
+2. **유지보수성**: 표준 패턴으로 코드 가독성 향상
+3. **에러 처리**: success/message 필드로 명확한 상태 전달
+4. **사용자 경험**: 성공 메시지로 피드백 개선
+
+**커밋:**
+
+```
+refactor: SitePricingController를 CommonResponse 형태로 변경
+- 프로젝트 전체의 일관성을 위해 CommonResponse 도입
+- 모든 API 엔드포인트가 { success, message, data } 형태로 응답
+- CampgroundController 등 다른 컨트롤러와 동일한 패턴 적용
+- 성공 메시지 추가: 생성/조회/수정/삭제/계산
+- DELETE도 200 OK + CommonResponse로 변경 (204 No Content 대신)
+
+refactor: pricing API를 CommonResponse 형태로 복원
+- 프로젝트 표준 응답 형식으로 통일
+- apiRequest<{ data: T }> 패턴으로 복원
+- 모든 API 함수에 동일 패턴 적용
+```
+
+**테스트 결과:**
+
+- ✅ 백엔드 빌드 성공 (3s)
+- ✅ 프론트엔드 빌드 성공 (4.9s)
+- ✅ Docker 컨테이너 재시작 성공
+- ✅ 요금제 목록 정상 조회
+- ✅ 모든 CRUD 작업 정상 동작
+
 ---
 
 **작성일**: 2025-11-02  
 **최종 수정일**: 2025-11-02  
-**버전**: 1.1  
-**상태**: ✅ 완료 및 버그 수정
+**버전**: 1.2  
+**상태**: ✅ 완료 및 버그 수정 (프로젝트 일관성 확보)
