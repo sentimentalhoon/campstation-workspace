@@ -12,6 +12,7 @@
 ## 🎯 주요 목표 및 달성도
 
 ### 1. 예약 상세 페이지 생성 ✅
+
 - **목표**: 예약 정보를 종합적으로 표시하는 상세 페이지 구현
 - **달성**: `reservations/[id]/page.tsx` + `ReservationDetail.tsx` 컴포넌트 생성
 - **효과**:
@@ -20,6 +21,7 @@
   - 에러 상태 처리 및 폴백 UI
 
 ### 2. 상태별 정보 표시 ✅
+
 - **목표**: 예약 상태에 따른 차별화된 UI 제공
 - **달성**:
   - PENDING: 결제 대기 (노란색, Clock 아이콘)
@@ -33,6 +35,7 @@
   - 사용자 행동 유도 최적화
 
 ### 3. 종합 정보 섹션 구성 ✅
+
 - **목표**: 예약 관련 모든 정보를 체계적으로 표시
 - **달성**:
   - 캠핑장 정보 섹션 (이름, 사이트)
@@ -45,6 +48,7 @@
   - 모바일 친화적 레이아웃
 
 ### 4. 액션 버튼 구현 ✅
+
 - **목표**: 상태별 필요한 액션 제공
 - **달성**:
   - 결제하기 (PENDING 상태)
@@ -57,6 +61,7 @@
   - 명확한 네비게이션 경로
 
 ### 5. 포맷 유틸리티 생성 ✅
+
 - **목표**: 일관된 데이터 포맷팅
 - **달성**: `lib/utils/format.ts` 생성
   - `formatKRW(amount)`: 금액 한국어 포맷 (예: "50,000원")
@@ -72,9 +77,11 @@
 ## 📂 생성된 파일 목록
 
 ### 1. `frontend/src/app/reservations/[id]/page.tsx`
+
 **목적**: 예약 상세 페이지 래퍼 (서버 컴포넌트)
 
 **주요 코드**:
+
 ```tsx
 export default function ReservationDetailPage({ params }: PageProps) {
   return (
@@ -96,14 +103,17 @@ export default function ReservationDetailPage({ params }: PageProps) {
 ```
 
 **특징**:
+
 - MobileContainer로 컨텐츠 너비 제한 (max-w-[1024px])
 - Suspense로 비동기 로딩 처리
 - 반응형 패딩 (pb-24 sm:pb-28 md:pb-32)
 
 ### 2. `frontend/src/app/reservations/[id]/ReservationDetail.tsx`
+
 **목적**: 예약 상세 정보 표시 클라이언트 컴포넌트 (460줄)
 
 **상태 관리**:
+
 ```tsx
 const [reservation, setReservation] = useState<Reservation | null>(null);
 const [loading, setLoading] = useState(true);
@@ -121,6 +131,7 @@ useEffect(() => {
 ```
 
 **상태 설정 객체**:
+
 ```tsx
 const statusConfig = {
   PENDING: {
@@ -140,13 +151,14 @@ const statusConfig = {
 ```
 
 **헤더 구조**:
+
 ```tsx
 <div className="flex items-center gap-3 sm:gap-4">
   {/* 뒤로가기 버튼 - 44px 터치 타겟 */}
   <button className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-background transition-colors hover:bg-background-secondary active:scale-[0.98]">
     <ChevronLeft className="h-5 w-5" />
   </button>
-  
+
   {/* 제목 */}
   <div className="flex-1">
     <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
@@ -160,6 +172,7 @@ const statusConfig = {
 ```
 
 **캠핑장 정보 섹션**:
+
 ```tsx
 <div className="rounded-2xl bg-card p-4 shadow-sm sm:rounded-3xl sm:p-6">
   <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-foreground sm:text-xl">
@@ -187,6 +200,7 @@ const statusConfig = {
 ```
 
 **예약 정보 섹션** (날짜 계산 포함):
+
 ```tsx
 // 날짜 계산
 const checkIn = new Date(reservation.checkInDate);
@@ -220,6 +234,7 @@ const nights = Math.ceil(
 ```
 
 **결제 정보 섹션**:
+
 ```tsx
 <div className="rounded-2xl bg-card p-4 shadow-sm sm:rounded-3xl sm:p-6">
   <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-foreground sm:text-xl">
@@ -232,12 +247,15 @@ const nights = Math.ceil(
       <div className="flex justify-between">
         <span className="text-sm text-muted-foreground">결제 수단</span>
         <span className="text-sm font-medium text-foreground">
-          {reservation.paymentMethod === "CARD" ? "카드" : 
-           reservation.paymentMethod === "EASY_PAYMENT" ? "간편결제" : "계좌이체"}
+          {reservation.paymentMethod === "CARD"
+            ? "카드"
+            : reservation.paymentMethod === "EASY_PAYMENT"
+            ? "간편결제"
+            : "계좌이체"}
         </span>
       </div>
     )}
-    
+
     {/* 총 결제 금액 */}
     <div className="border-t border-border pt-3">
       <div className="flex justify-between">
@@ -254,11 +272,11 @@ const nights = Math.ceil(
 ```
 
 **액션 버튼 영역** (상태별 조건부 렌더링):
+
 ```tsx
 // 취소 가능 여부 판단
 const canCancel =
-  reservation.status === "CONFIRMED" ||
-  reservation.status === "PENDING";
+  reservation.status === "CONFIRMED" || reservation.status === "PENDING";
 const canReview = reservation.status === "COMPLETED";
 
 // 버튼 렌더링
@@ -313,17 +331,18 @@ const canReview = reservation.status === "COMPLETED";
   >
     예약 목록으로
   </Link>
-</div>
+</div>;
 ```
 
 **예약 취소 핸들러**:
+
 ```tsx
 const handleCancelReservation = async () => {
   if (!reservation) return;
 
   if (
     !window.confirm(
-      "정말 예약을 취소하시겠습니까? 취소 후에는 복구할 수 없습니다.",
+      "정말 예약을 취소하시겠습니까? 취소 후에는 복구할 수 없습니다."
     )
   ) {
     return;
@@ -344,21 +363,25 @@ const handleCancelReservation = async () => {
 ```
 
 **안내 메시지**:
+
 ```tsx
-{reservation.status === "CONFIRMED" && (
-  <div className="flex gap-3 rounded-xl bg-info/10 p-4">
-    <AlertCircle className="h-5 w-5 flex-shrink-0 text-info" />
-    <div className="text-sm text-foreground">
-      <p className="mb-1 font-semibold">예약 확정</p>
-      <p className="text-muted-foreground">
-        체크인 1일 전까지 예약을 취소할 수 있습니다.
-      </p>
+{
+  reservation.status === "CONFIRMED" && (
+    <div className="flex gap-3 rounded-xl bg-info/10 p-4">
+      <AlertCircle className="h-5 w-5 flex-shrink-0 text-info" />
+      <div className="text-sm text-foreground">
+        <p className="mb-1 font-semibold">예약 확정</p>
+        <p className="text-muted-foreground">
+          체크인 1일 전까지 예약을 취소할 수 있습니다.
+        </p>
+      </div>
     </div>
-  </div>
-)}
+  );
+}
 ```
 
 ### 3. `frontend/src/lib/utils/format.ts`
+
 **목적**: 데이터 포맷팅 유틸리티 (41줄)
 
 ```typescript
@@ -410,6 +433,7 @@ export function formatDateTime(date: string | Date): string {
 ## 🎨 디자인 개선 사항
 
 ### 1. 반응형 타이포그래피
+
 ```
 요소                  모바일          데스크톱        비율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -421,6 +445,7 @@ export function formatDateTime(date: string | Date): string {
 ```
 
 ### 2. 반응형 카드 레이아웃
+
 ```
 요소                  모바일          데스크톱
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -430,6 +455,7 @@ export function formatDateTime(date: string | Date): string {
 ```
 
 ### 3. 버튼 터치 타겟
+
 ```
 버튼 타입            크기            터치 영역       피드백
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -439,6 +465,7 @@ export function formatDateTime(date: string | Date): string {
 ```
 
 ### 4. 상태 색상 체계
+
 ```
 상태              색상              배경                텍스트
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -454,6 +481,7 @@ DELETED          muted            bg-muted            text-muted-foreground
 ## 📱 반응형 디자인 분석
 
 ### 1. 그리드 레이아웃 전환
+
 ```
 화면 크기       날짜 그리드          레이아웃
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -462,6 +490,7 @@ DELETED          muted            bg-muted            text-muted-foreground
 ```
 
 ### 2. 간격 조정
+
 ```
 요소                  모바일          데스크톱
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -472,6 +501,7 @@ DELETED          muted            bg-muted            text-muted-foreground
 ```
 
 ### 3. 아이콘 크기
+
 ```
 요소                  크기            설명
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -486,22 +516,27 @@ DELETED          muted            bg-muted            text-muted-foreground
 ## 🧪 테스트 시나리오
 
 ### 1. 예약 상태별 테스트 ✅
+
 **테스트 기기**: iPhone 14 Pro (393x852), Galaxy S23 (360x800), iPad Pro (1024x1366)
 
 **테스트 케이스**:
+
 1. **PENDING 상태**
+
    - [ ] "결제 대기" 상태 표시 확인
    - [ ] "결제하기" 버튼 표시 확인
    - [ ] 결제 페이지로 이동 확인
    - [ ] "예약 취소" 버튼 표시 확인
 
 2. **CONFIRMED 상태**
+
    - [ ] "예약 확정" 상태 표시 확인
    - [ ] 안내 메시지 표시 확인
    - [ ] "예약 취소" 버튼 표시 확인
    - [ ] 취소 확인 모달 동작 확인
 
 3. **COMPLETED 상태**
+
    - [ ] "이용 완료" 상태 표시 확인
    - [ ] "리뷰 작성" 버튼 표시 확인
    - [ ] 리뷰 페이지로 이동 확인
@@ -512,20 +547,25 @@ DELETED          muted            bg-muted            text-muted-foreground
    - [ ] "예약 목록으로" 버튼만 표시 확인
 
 ### 2. 정보 표시 테스트 ✅
+
 **테스트 데이터**: 다양한 예약 정보 (3박 4일, 특별 요청 포함)
 
 **테스트 케이스**:
+
 1. **캠핑장 정보**
+
    - [ ] 캠핑장 이름 링크 동작 확인
    - [ ] 사이트 번호 표시 확인
 
 2. **예약 정보**
+
    - [ ] 체크인/아웃 날짜 포맷 확인 (한국어)
    - [ ] 박수 계산 정확도 확인
    - [ ] 인원 수 표시 확인
    - [ ] 특별 요청 표시 확인
 
 3. **결제 정보**
+
    - [ ] 결제 수단 한국어 변환 확인
    - [ ] 금액 포맷 확인 (쉼표, 원)
    - [ ] 총 결제 금액 강조 확인
@@ -535,18 +575,23 @@ DELETED          muted            bg-muted            text-muted-foreground
    - [ ] 연락처 표시 확인 (optional)
 
 ### 3. 액션 버튼 테스트 ✅
+
 **테스트 시나리오**: 각 상태별 버튼 동작
 
 **테스트 케이스**:
+
 1. **결제하기**
+
    - [ ] 결제 페이지로 이동
    - [ ] reservationId 파라미터 전달 확인
 
 2. **리뷰 작성**
+
    - [ ] 리뷰 작성 페이지로 이동
    - [ ] campgroundId, reservationId 파라미터 전달
 
 3. **예약 취소**
+
    - [ ] 확인 모달 표시
    - [ ] 취소 API 호출
    - [ ] 성공 시 예약 목록으로 이동
@@ -557,15 +602,19 @@ DELETED          muted            bg-muted            text-muted-foreground
    - [ ] 대시보드 예약 탭으로 이동
 
 ### 4. 에러 처리 테스트 ✅
+
 **테스트 시나리오**: API 실패, 잘못된 ID 등
 
 **테스트 케이스**:
+
 1. **예약 없음**
+
    - [ ] 에러 화면 표시 (XCircle 아이콘)
    - [ ] 에러 메시지 표시
    - [ ] "예약 목록으로" 버튼 표시
 
 2. **API 실패**
+
    - [ ] 에러 상태 처리
    - [ ] 에러 메시지 표시
 
@@ -578,6 +627,7 @@ DELETED          muted            bg-muted            text-muted-foreground
 ## 📊 성능 측정
 
 ### 1. Lighthouse 모바일 점수 (예상)
+
 ```
 항목                  Before    After     개선
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -588,6 +638,7 @@ SEO                  N/A       100       +100 ⬆️
 ```
 
 ### 2. Core Web Vitals (예상)
+
 ```
 지표                  목표      예상        결과
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -598,6 +649,7 @@ INP (인터랙션)       < 200ms   80ms        ✅
 ```
 
 ### 3. 번들 크기 (예상)
+
 ```
 파일                           크기        Gzipped
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -608,6 +660,7 @@ Total                         18KB        6.2KB
 ```
 
 ### 4. API 호출 성능 (실측 예상)
+
 ```
 API                      평균 응답시간    목표
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -620,6 +673,7 @@ cancel (예약 취소)       250ms          < 500ms ✅
 ## 🛠️ 기술적 세부사항
 
 ### 1. 동적 라우팅 구현
+
 ```tsx
 // 파일 구조: app/reservations/[id]/page.tsx
 interface PageProps {
@@ -635,11 +689,13 @@ export default function ReservationDetailPage({ params }: PageProps) {
 ```
 
 **장점**:
+
 - Next.js 15 App Router 활용
 - 타입 안전한 파라미터 전달
 - SEO 친화적 URL 구조
 
 ### 2. Suspense 기반 비동기 데이터 로딩
+
 ```tsx
 <Suspense
   fallback={
@@ -653,44 +709,55 @@ export default function ReservationDetailPage({ params }: PageProps) {
 ```
 
 **장점**:
+
 - React 19 Suspense 활용
 - 선언적 로딩 상태 관리
 - 사용자 경험 향상 (로딩 인디케이터)
 
 ### 3. 조건부 렌더링 최적화
+
 ```tsx
 // 액션 가능 여부 계산
 const canCancel =
-  reservation.status === "CONFIRMED" ||
-  reservation.status === "PENDING";
+  reservation.status === "CONFIRMED" || reservation.status === "PENDING";
 const canReview = reservation.status === "COMPLETED";
 
 // 조건부 렌더링
-{reservation.status === "PENDING" && <PaymentButton />}
-{canReview && <ReviewButton />}
-{canCancel && <CancelButton />}
+{
+  reservation.status === "PENDING" && <PaymentButton />;
+}
+{
+  canReview && <ReviewButton />;
+}
+{
+  canCancel && <CancelButton />;
+}
 ```
 
 **장점**:
+
 - 명확한 비즈니스 로직
 - 불필요한 렌더링 방지
 - 유지보수성 향상
 
 ### 4. 날짜 계산 로직
+
 ```tsx
 const checkIn = new Date(reservation.checkInDate);
 const checkOut = new Date(reservation.checkOutDate);
 const nights = Math.ceil(
-  (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24),
+  (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
 );
 ```
 
 **장점**:
+
 - 정확한 박수 계산
 - 타임존 고려 (UTC 기반)
 - 밀리초 단위 정확도
 
 ### 5. 에러 경계 처리
+
 ```tsx
 // 로딩 상태
 if (loading) {
@@ -699,11 +766,7 @@ if (loading) {
 
 // 에러 상태
 if (error || !reservation) {
-  return (
-    <ErrorView 
-      error={error || "예약 정보를 찾을 수 없습니다"}
-    />
-  );
+  return <ErrorView error={error || "예약 정보를 찾을 수 없습니다"} />;
 }
 
 // 정상 렌더링
@@ -711,6 +774,7 @@ return <ReservationDetailView reservation={reservation} />;
 ```
 
 **장점**:
+
 - 3단계 렌더링 (로딩 → 에러 → 성공)
 - 명확한 에러 메시지
 - 사용자 행동 유도 (예약 목록으로 버튼)
@@ -720,6 +784,7 @@ return <ReservationDetailView reservation={reservation} />;
 ## ✅ Phase 8 체크리스트
 
 ### 필수 작업
+
 - [x] 예약 상세 페이지 생성 (`reservations/[id]/page.tsx`)
 - [x] ReservationDetail 클라이언트 컴포넌트 생성
 - [x] 포맷 유틸리티 생성 (`formatKRW`, `formatDate`, `formatDateTime`)
@@ -740,12 +805,14 @@ return <ReservationDetailView reservation={reservation} />;
 - [x] Prettier 포맷팅
 
 ### 선택 작업 (다른 Phase)
+
 - [ ] 예약 수정 기능 (현재 미구현)
 - [ ] 예약 재결제 링크 최적화
 - [ ] 캘린더 기반 날짜 표시
 - [ ] 예약 히스토리 타임라인
 
 ### 품질 검증
+
 - [ ] Lighthouse 모바일 90+ 점수 달성
 - [ ] 모든 터치 타겟 44px+ 확인
 - [ ] 실제 디바이스 테스트 (iPhone, Android, iPad)
@@ -757,26 +824,31 @@ return <ReservationDetailView reservation={reservation} />;
 ## 📝 학습 및 개선 사항
 
 ### 1. 동적 라우팅 패턴
+
 - **App Router**: `app/[dynamic]/page.tsx` 구조 활용
 - **파라미터 전달**: `params.id` 타입 안전하게 전달
 - **SEO 최적화**: 의미 있는 URL 구조 (`/reservations/123`)
 
 ### 2. Suspense 활용
+
 - **비동기 로딩**: React 19 Suspense로 선언적 처리
 - **폴백 UI**: LoadingSpinner 중앙 정렬
 - **사용자 경험**: 로딩 상태 명확하게 표시
 
 ### 3. 조건부 UI 렌더링
+
 - **상태 기반**: 예약 상태에 따른 버튼 표시
 - **비즈니스 로직**: `canCancel`, `canReview` 명확히 분리
 - **유지보수성**: 상태 추가 시 확장 용이
 
 ### 4. 포맷 유틸리티의 중요성
+
 - **재사용성**: 여러 곳에서 동일한 포맷 사용
 - **일관성**: 금액, 날짜 표시 통일
 - **국제화 준비**: 로케일 기반 포맷팅
 
 ### 5. 터치 최적화 전략
+
 - **44px 규칙**: 모든 인터랙티브 요소
 - **피드백**: `active:scale-[0.98]` 즉각 반응
 - **간격**: 충분한 `gap`으로 오터치 방지
@@ -787,7 +859,8 @@ return <ReservationDetailView reservation={reservation} />;
 
 **총 작업 시간**: 약 2시간  
 **생성 파일 수**: 3개  
-**총 코드 라인**: 약 540줄  
+**총 코드 라인**: 약 540줄
+
 - page.tsx: 38줄
 - ReservationDetail.tsx: 460줄
 - format.ts: 41줄

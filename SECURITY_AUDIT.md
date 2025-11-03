@@ -443,6 +443,7 @@ public class SecurityUtils {
 ```
 
 **적용된 Controller**:
+
 - ✅ CampgroundController (updateCampground, deleteCampground)
 - ✅ SiteController (createSite, updateSite, deleteSite)
 
@@ -500,6 +501,7 @@ public @interface Authenticated {}
 **모든 보안 감사 및 개선 사항이 완료되었습니다.**
 
 ### 보안 감사 항목
+
 - ✅ CRITICAL 문제 2건 해결
 - ✅ HIGH 문제 7건 해결
 - ✅ 16개 TODO 모두 완료
@@ -508,6 +510,7 @@ public @interface Authenticated {}
 - ✅ 실제 소유자 검증 로직 추가
 
 ### 보안 개선 항목
+
 - ✅ SecurityUtils 헬퍼 클래스 구현
 - ✅ 커스텀 어노테이션 3개 구현 (@OwnerOrAdmin, @AdminOnly, @Authenticated)
 - ✅ Ownable 인터페이스 구현
@@ -515,6 +518,7 @@ public @interface Authenticated {}
 - ✅ CampgroundController, SiteController에 SecurityUtils 적용
 
 ### 적용된 개선사항 통계
+
 - **신규 생성 파일**: 6개
   - SecurityUtils.java
   - Ownable.java

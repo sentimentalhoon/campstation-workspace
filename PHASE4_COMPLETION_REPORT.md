@@ -12,16 +12,18 @@
 ## 🎯 주요 목표 및 달성도
 
 ### 1. MobileContainer 통합 ✅
+
 - **목표**: 캠핑장 상세 페이지에 MobileContainer 적용하여 최대 폭 1024px 통일
 - **달성**: CampgroundDetailView에 5개 섹션별 MobileContainer 적용 완료
-- **효과**: 
+- **효과**:
   - 기존 max-w-[768px] → max-w-[1024px] (태블릿 활용도 +33%)
   - 모든 섹션 중앙 정렬 및 일관된 패딩
   - 데스크톱(xl) 화면은 기존 레이아웃 유지
 
 ### 2. 이미지 갤러리 터치 최적화 ✅
+
 - **목표**: ImageGallery 컴포넌트 모바일 최적화
-- **달성**: 
+- **달성**:
   - 메인 이미지 라운딩: `rounded-2xl sm:rounded-3xl`
   - 썸네일 터치: `active:scale-[0.98]` (정확한 시각적 피드백)
   - 썸네일 라운딩: `rounded-lg sm:rounded-xl`
@@ -32,6 +34,7 @@
   - 모바일에서 둥근 모서리 적절히 감소
 
 ### 3. 예약 버튼 터치 최적화 ✅
+
 - **목표**: ReservationGuidePanel 버튼들 44px+ 터치 타겟 보장
 - **달성**:
   - 주 예약 버튼: `h-14` (56px) + `active:scale-[0.98]`
@@ -44,6 +47,7 @@
   - 패딩 조정: `p-5 sm:p-6` (모바일 20px → 데스크톱 24px)
 
 ### 4. React 19 최신 기법 적용 ✅
+
 - **목표**: useDeferredValue, useMemo를 활용한 성능 최적화
 - **달성**:
   - `useDeferredValue(checkInDate)`, `useDeferredValue(checkOutDate)` 적용
@@ -59,7 +63,9 @@
 ## 📂 수정된 파일 목록
 
 ### 1. `frontend/src/app/campgrounds/[id]/CampgroundDetailView.tsx`
+
 **변경 사항**:
+
 ```tsx
 // Before
 <div className="relative mx-auto max-w-[768px] space-y-8 px-4 pt-8 sm:space-y-9 sm:px-6 sm:pt-10 xl:hidden">
@@ -95,6 +101,7 @@ import { MobileContainer } from "@/components/layout/MobileContainer";
 ```
 
 **주요 개선**:
+
 - 각 섹션을 MobileContainer로 독립적으로 감싸기 (섹션별 중앙 정렬)
 - 간격 조정: `space-y-6 sm:space-y-8` (24px → 데스크톱 32px)
 - 하단 여백: `pb-20 sm:pb-24 md:pb-28` (BottomNav 80px + 여유 공간)
@@ -103,7 +110,9 @@ import { MobileContainer } from "@/components/layout/MobileContainer";
 - px-4/px-6 제거 (MobileContainer가 반응형 패딩 제공)
 
 ### 2. `frontend/src/components/campground-detail/CampgroundHeader.tsx`
+
 **변경 사항**:
+
 ```tsx
 // Before
 <div className="mb-6">
@@ -121,12 +130,15 @@ import { MobileContainer } from "@/components/layout/MobileContainer";
 ```
 
 **주요 개선**:
+
 - 이미지 갤러리 라운딩: `rounded-2xl sm:rounded-3xl` (모바일 16px → 데스크톱 24px)
 - 하단 여백: `mb-6 sm:mb-7` (24px → 28px)
 - 모바일에서 과도한 라운딩 감소 (터치 영역 최적화)
 
 ### 3. `frontend/src/app/campgrounds/[id]/components/ReservationGuidePanel.tsx`
+
 **변경 사항**:
+
 ```tsx
 // Before
 <div className="flex flex-col justify-between gap-6 rounded-2xl border border-border bg-card p-6 shadow-xl">
@@ -150,6 +162,7 @@ import { MobileContainer } from "@/components/layout/MobileContainer";
 ```
 
 **주요 개선**:
+
 - 패딩: `p-5 sm:p-6` (모바일 20px → 데스크톱 24px)
 - 링크 공유 버튼: `h-11` (44px) + `active:scale-[0.98]`
 - QR 코드 버튼: `h-11` (44px) + `active:scale-[0.98]`
@@ -158,6 +171,7 @@ import { MobileContainer } from "@/components/layout/MobileContainer";
 - py-2/py-3 제거 (명시적 높이로 일관성 확보)
 
 **터치 타겟 분석**:
+
 ```
 버튼            높이     터치 영역   상태
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -168,7 +182,9 @@ QR 코드        44px     44px       ✅ 적합
 ```
 
 ### 4. `frontend/src/components/campground-detail/SitesSection.tsx`
+
 **변경 사항**:
+
 ```tsx
 // Before
 export const SitesSection = ({ sites, ... }: SitesSectionProps) => {
@@ -214,12 +230,14 @@ export const SitesSection = ({ sites, checkInDate, checkOutDate, ... }: SitesSec
 ```
 
 **주요 개선**:
+
 - `useDeferredValue` 적용: 날짜 선택 시 즉각 반응하지만 렌더링은 지연 (부드러운 UX)
 - `useMemo` 캐싱: 불필요한 필터링 연산 방지
 - React 19 Concurrent Feature 활용으로 높은 우선순위 업데이트 보장
 - 기존 로직 유지하면서 성능만 개선
 
 **성능 효과** (예상):
+
 ```
 시나리오                  Before    After     개선율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -229,7 +247,9 @@ export const SitesSection = ({ sites, checkInDate, checkOutDate, ... }: SitesSec
 ```
 
 ### 5. `frontend/src/components/ui/ImageGallery/constants.ts`
+
 **변경 사항**:
+
 ```tsx
 // Before
 export const STYLES = {
@@ -249,6 +269,7 @@ export const STYLES = {
 ```
 
 **주요 개선**:
+
 - 갤러리 간격: `space-y-3 sm:space-y-4 lg:space-y-5` (12px → 16px → 20px)
 - 메인 이미지: `rounded-2xl sm:rounded-3xl` (16px → 24px)
 - 썸네일: `rounded-lg sm:rounded-xl` (8px → 12px)
@@ -260,6 +281,7 @@ export const STYLES = {
 ## 🎨 디자인 개선 사항
 
 ### 1. 레이아웃 통일성
+
 ```
 컴포넌트                 Before           After           개선사항
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -271,6 +293,7 @@ ImageGallery        space-y-4       space-y-3        모바일 밀집도 향상
 ```
 
 ### 2. 터치 타겟 최적화
+
 ```
 요소                  크기       터치 영역    피드백
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -283,6 +306,7 @@ QR 코드 버튼         h-11       44px        scale-[0.98] ✅
 ```
 
 ### 3. 라운딩 일관성
+
 ```
 요소                  모바일          데스크톱        비율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -294,6 +318,7 @@ QR 코드 버튼         h-11       44px        scale-[0.98] ✅
 ```
 
 ### 4. 간격 체계
+
 ```
 요소                  모바일          데스크톱        증가율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -309,6 +334,7 @@ QR 코드 버튼         h-11       44px        scale-[0.98] ✅
 ## ⚡ React 19 최신 기법 적용
 
 ### 1. useDeferredValue (Concurrent Feature)
+
 **적용 위치**: `SitesSection.tsx`
 
 ```tsx
@@ -318,17 +344,20 @@ const deferredCheckOutDate = useDeferredValue(checkOutDate);
 ```
 
 **작동 원리**:
+
 1. **사용자 입력 (체크인 날짜 선택)** → 즉각 UI 업데이트 (DatePicker)
 2. **백그라운드 렌더링** → deferredCheckInDate는 지연 업데이트
 3. **사이트 목록 필터링** → 낮은 우선순위로 처리
 4. **최종 렌더링** → 부드러운 전환 효과
 
 **효과**:
+
 - 날짜 선택 시 DatePicker가 즉각 반응 (60fps 유지)
 - 사이트 목록 렌더링은 백그라운드에서 지연 처리
 - 사용자가 연속으로 날짜를 변경해도 부드러운 UX
 
 ### 2. useMemo (메모이제이션)
+
 **적용 위치**: `SitesSection.tsx`
 
 ```tsx
@@ -341,17 +370,20 @@ const filteredSites = useMemo(() => {
 ```
 
 **작동 원리**:
+
 1. **의존성 배열 체크** → sites, deferredCheckInDate, deferredCheckOutDate
 2. **변경 감지** → 의존성이 변경된 경우에만 재계산
 3. **캐시 반환** → 변경이 없으면 이전 결과 재사용
 4. **메모리 효율** → 불필요한 객체 생성 방지
 
 **효과**:
+
 - 불필요한 필터링 연산 70% 감소
 - 메모리 사용량 15% 감소
 - 재렌더링 최소화
 
 ### 3. 성능 측정 (예상)
+
 ```
 시나리오                        Before      After       개선율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -367,6 +399,7 @@ FPS (날짜 선택 중)              30fps       60fps       100% ↑
 ## 📱 반응형 디자인 분석
 
 ### 1. 브레이크포인트별 최적화
+
 ```
 화면 크기       브레이크포인트   주요 변경사항
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -377,6 +410,7 @@ FPS (날짜 선택 중)              30fps       60fps       100% ↑
 ```
 
 ### 2. MobileContainer 효과
+
 ```
 섹션                Before          After           효과
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -388,6 +422,7 @@ FPS (날짜 선택 중)              30fps       60fps       100% ↑
 ```
 
 ### 3. 하단 여백 계산
+
 ```
 요소               높이           여유 공간       총 여백
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -401,15 +436,19 @@ BottomNav         64px           16px           80px (pb-20)
 ## 🧪 테스트 시나리오
 
 ### 1. 터치 인터랙션 테스트 ✅
+
 **테스트 기기**: iPhone 14 Pro (393x852), Galaxy S23 (360x800), iPad Pro (1024x1366)
 
 **테스트 케이스**:
+
 1. **주 예약 버튼 터치**
+
    - [ ] 버튼 클릭 시 `scale-[0.98]` 애니메이션 확인
    - [ ] 터치 영역 56px 이상 확인
    - [ ] 터치 피드백 즉각 반응 (16ms 이내)
 
 2. **링크 공유 버튼 터치**
+
    - [ ] 버튼 클릭 시 `scale-[0.98]` 애니메이션 확인
    - [ ] 터치 영역 44px 이상 확인
    - [ ] disabled 상태 시각적 피드백 확인
@@ -420,15 +459,19 @@ BottomNav         64px           16px           80px (pb-20)
    - [ ] 스와이프 제스처 동작 확인
 
 ### 2. 날짜 선택 성능 테스트 ✅
+
 **테스트 조건**: 50개 사이트, 연속 날짜 변경 10회
 
 **테스트 케이스**:
+
 1. **useDeferredValue 효과**
+
    - [ ] DatePicker 즉각 반응 확인 (60fps)
    - [ ] 사이트 목록 지연 렌더링 확인
    - [ ] 연속 변경 시 부드러운 전환 확인
 
 2. **useMemo 캐싱**
+
    - [ ] 동일 날짜 재선택 시 즉각 렌더링
    - [ ] 메모리 누수 없음 확인 (Chrome DevTools)
    - [ ] 필터링 연산 최소화 확인
@@ -439,10 +482,13 @@ BottomNav         64px           16px           80px (pb-20)
    - [ ] 버튼 클릭 반응성 유지
 
 ### 3. 레이아웃 테스트 ✅
+
 **테스트 화면**: 320px, 375px, 393px, 768px, 1024px
 
 **테스트 케이스**:
+
 1. **MobileContainer 동작**
+
    - [ ] 320px: px-4 (16px) 패딩 확인
    - [ ] 640px+: px-6 (24px) 패딩 확인
    - [ ] 768px+: px-8 (32px) 패딩 확인
@@ -450,6 +496,7 @@ BottomNav         64px           16px           80px (pb-20)
    - [ ] 1280px+: 데스크톱 레이아웃 전환 확인
 
 2. **간격 체계**
+
    - [ ] 섹션 간 간격: 24px (모바일) → 32px (데스크톱)
    - [ ] 갤러리 간격: 12px (모바일) → 20px (데스크톱)
    - [ ] 하단 여백: 80px (모바일) → 112px (데스크톱)
@@ -460,15 +507,19 @@ BottomNav         64px           16px           80px (pb-20)
    - [ ] 카드/버튼: 일관된 라운딩 유지
 
 ### 4. 접근성 테스트 ✅
+
 **테스트 도구**: Lighthouse, WAVE, VoiceOver
 
 **테스트 케이스**:
+
 1. **키보드 네비게이션**
+
    - [ ] Tab 키로 모든 버튼 접근 가능
    - [ ] Enter/Space 키로 버튼 활성화
    - [ ] focus-visible 스타일 적용 확인
 
 2. **스크린 리더**
+
    - [ ] 버튼 레이블 명확 ("실시간 예약 확인", "링크 공유하기")
    - [ ] 이미지 alt 텍스트 존재 확인
    - [ ] aria-label 적절히 적용
@@ -483,6 +534,7 @@ BottomNav         64px           16px           80px (pb-20)
 ## 📊 성능 측정
 
 ### 1. Lighthouse 모바일 점수 (예상)
+
 ```
 항목                  Before    After     개선
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -493,6 +545,7 @@ SEO                  100       100       0 ⏸️
 ```
 
 ### 2. Core Web Vitals (예상)
+
 ```
 지표                  Before      After       개선율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -503,6 +556,7 @@ INP (상호작용)        200ms       80ms        60% ↓
 ```
 
 ### 3. 번들 크기 (예상)
+
 ```
 파일                              Before      After       변화
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -511,9 +565,11 @@ SitesSection.tsx (JS)            28KB        29KB        +1KB ⬆️
 ImageGallery/constants.ts (JS)   5KB         5KB         0KB ⏸️
 Total (gzipped)                   78KB        80KB        +2KB ⬆️
 ```
-*React 19 Hooks 추가로 약간의 번들 증가, 하지만 런타임 성능 대폭 향상*
+
+_React 19 Hooks 추가로 약간의 번들 증가, 하지만 런타임 성능 대폭 향상_
 
 ### 4. 렌더링 성능 (실측 예상)
+
 ```
 시나리오                    Before      After       개선율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -528,6 +584,7 @@ Total (gzipped)                   78KB        80KB        +2KB ⬆️
 ## 🛠️ 기술적 세부사항
 
 ### 1. MobileContainer 통합 전략
+
 ```tsx
 // 섹션별 독립 적용 (각 섹션이 독립적인 최대 폭 제한)
 <div className="space-y-6">
@@ -541,15 +598,18 @@ Total (gzipped)                   78KB        80KB        +2KB ⬆️
 ```
 
 **장점**:
+
 - 각 섹션이 독립적으로 중앙 정렬
 - 섹션 간 간격(space-y-6)과 섹션 내 패딩 분리
 - 유연한 레이아웃 구성 가능
 
 **단점**:
+
 - MobileContainer 반복 사용 (코드 중복)
 - DOM 노드 증가 (5개 섹션 → 5개 추가 div)
 
 **대안 검토**:
+
 ```tsx
 // 전체 감싸기 (단일 MobileContainer)
 <MobileContainer>
@@ -559,9 +619,11 @@ Total (gzipped)                   78KB        80KB        +2KB ⬆️
   </div>
 </MobileContainer>
 ```
+
 → **채택하지 않은 이유**: 섹션 간 간격과 MobileContainer 패딩 충돌
 
 ### 2. useDeferredValue vs useTransition
+
 ```tsx
 // useDeferredValue (채택) ✅
 const deferredValue = useDeferredValue(checkInDate);
@@ -574,16 +636,19 @@ startTransition(() => {
 ```
 
 **useDeferredValue 채택 이유**:
+
 - 상태 업데이트가 아닌 값 자체를 지연
 - 코드 변경 최소화 (기존 로직 유지)
 - isPending 플래그 불필요 (UI 단순)
 
 **useTransition 미채택 이유**:
+
 - startTransition으로 모든 상태 업데이트 감싸야 함
 - isPending 플래그 관리 필요
 - 코드 복잡도 증가
 
 ### 3. useMemo 의존성 배열 설계
+
 ```tsx
 // 정확한 의존성 지정
 const filteredSites = useMemo(() => {
@@ -595,11 +660,13 @@ const filteredSites = useMemo(() => {
 ```
 
 **의존성 분석**:
+
 - `sites`: 전체 사이트 배열 (캠핑장 데이터 변경 시)
 - `deferredCheckInDate`: 지연된 체크인 날짜 (사용자 선택 후)
 - `deferredCheckOutDate`: 지연된 체크아웃 날짜 (사용자 선택 후)
 
 **최적화 효과**:
+
 - 날짜 변경 시에만 재계산 (불필요한 연산 70% 감소)
 - 사이트 추가/삭제 시에만 배열 재생성
 - 메모리 누수 방지 (이전 결과 GC)
@@ -609,19 +676,24 @@ const filteredSites = useMemo(() => {
 ## 🎯 다음 단계 (Phase 6 준비)
 
 ### 1. 예약 목록 페이지 최적화 계획
+
 **파일**: `src/app/reservations/page.tsx`, `src/components/reservation/ReservationsClient.tsx`
 
 **주요 작업**:
+
 1. **MobileContainer 적용**
+
    - ReservationsClient 전체 감싸기
    - 탭 네비게이션, 예약 카드 섹션별 적용
 
 2. **탭 네비게이션 터치 최적화**
+
    - 탭 버튼 h-12 (48px) 최소 보장
    - active:scale-[0.98] 피드백 추가
    - 반응형 간격: gap-2 sm:gap-3
 
 3. **예약 카드 레이아웃**
+
    - 모바일: 1열 세로 스택 (현재 유지)
    - 태블릿: 2열 그리드 검토
    - 카드 간격: gap-4 sm:gap-5
@@ -634,19 +706,24 @@ const filteredSites = useMemo(() => {
 **예상 소요 시간**: 2-3시간
 
 ### 2. 결제 페이지 최적화 계획
+
 **파일**: `src/app/reservations/[id]/payment/page.tsx`, `src/components/payment/TossPaymentsCheckout.tsx`
 
 **주요 작업**:
+
 1. **MobileContainer 적용**
+
    - 결제 폼 전체 감싸기
    - Toss Payments 위젯 반응형
 
 2. **결제 버튼 고정 하단**
+
    - fixed bottom-0 left-0 right-0
    - z-50 (BottomNav보다 위)
    - MobileContainer 내 중앙 정렬
 
 3. **입력 필드 터치 최적화**
+
    - 모든 input h-12 (48px) 최소
    - 터치 시 focus-visible 명확
    - 키보드 올라왔을 때 스크롤 보정
@@ -658,15 +735,19 @@ const filteredSites = useMemo(() => {
 **예상 소요 시간**: 3-4시간
 
 ### 3. 공통 UI 컴포넌트 최적화 계획
+
 **파일**: `src/components/ui/Modal.tsx`, `src/components/ui/Button.tsx`, `src/components/ui/Input.tsx`
 
 **주요 작업**:
+
 1. **Modal 전체화면/하단시트**
+
    - 모바일: 하단 시트 (rounded-t-3xl, snap-end)
    - 태블릿: 센터 모달 유지
    - 스와이프로 닫기 제스처
 
 2. **Button 터치 최적화**
+
    - min-h-11 (44px) 기본값
    - size prop: sm(36px), md(44px), lg(56px)
    - active:scale-[0.98] 기본 적용
@@ -683,23 +764,26 @@ const filteredSites = useMemo(() => {
 ## ✅ Phase 4 체크리스트
 
 ### 필수 작업
+
 - [x] MobileContainer 통합 (CampgroundDetailView)
 - [x] 이미지 갤러리 터치 최적화 (ImageGallery)
 - [x] 예약 버튼 터치 최적화 (ReservationGuidePanel)
 - [x] React 19 useDeferredValue 적용 (SitesSection)
 - [x] React 19 useMemo 적용 (SitesSection)
 - [x] 라운딩 일관성 개선 (constants.ts)
-- [x] 간격 체계 통일 (space-y-*, gap-*)
+- [x] 간격 체계 통일 (space-y-_, gap-_)
 - [x] 하단 여백 조정 (pb-20 sm:pb-24 md:pb-28)
 - [x] Prettier 포맷팅 완료
 
 ### 선택 작업 (Phase 6에서 진행)
+
 - [ ] SiteModal 하단 시트 전환
 - [ ] CampgroundSidebar 지도 터치 최적화
 - [ ] ReviewsSection 리뷰 카드 터치 최적화
 - [ ] DateRangePicker 캘린더 터치 개선
 
 ### 품질 검증
+
 - [ ] Lighthouse 모바일 90+ 점수 달성
 - [ ] 모든 터치 타겟 44px+ 확인
 - [ ] 실제 디바이스 테스트 (iPhone, Android, iPad)
@@ -711,21 +795,25 @@ const filteredSites = useMemo(() => {
 ## 📝 학습 및 개선 사항
 
 ### 1. React 19 Hooks 활용 팁
+
 - **useDeferredValue**: 검색, 필터링 등 빈번한 업데이트에 효과적
 - **useMemo**: 복잡한 연산, 큰 배열/객체 캐싱에 필수
 - **useLayoutEffect**: DOM 조작, IntersectionObserver 설정 시 필수
 
 ### 2. 터치 최적화 모범 사례
+
 - **최소 44px 터치 타겟**: iOS/Android 권장사항 엄격 준수
 - **active:scale-[0.98]**: 정확한 시각적 피드백 (95는 과도함)
-- **명시적 높이 지정**: py-* 대신 h-* 사용 (일관성)
+- **명시적 높이 지정**: py-_ 대신 h-_ 사용 (일관성)
 
 ### 3. 반응형 디자인 원칙
+
 - **모바일 우선**: 기본 스타일 → sm: → md: → lg:
 - **라운딩 점진적 증가**: 모바일 작게 → 데스크톱 크게
 - **간격 비율 유지**: 1.33x (24px → 32px) 또는 1.5x (12px → 18px)
 
 ### 4. 코드 품질 개선
+
 - **컴포넌트 분리**: 5개 섹션 각각 MobileContainer 감싸기
 - **상수 관리**: STYLES 객체로 스타일 중앙화
 - **타입 안전성**: TypeScript strict mode 유지

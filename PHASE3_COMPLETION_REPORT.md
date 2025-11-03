@@ -13,6 +13,7 @@
 ### ✅ 완료된 작업
 
 #### 1. **페이지 레이아웃 모바일 최적화** (`src/app/campgrounds/page.tsx`)
+
 - ✅ MobileContainer 적용 (Hero Section)
 - ✅ 반응형 라운딩 (rounded-2xl sm:rounded-3xl)
 - ✅ 반응형 패딩 (px-4 py-5 sm:px-6 md:px-7)
@@ -20,6 +21,7 @@
 - ✅ 간격 최적화 (gap-6 sm:gap-8)
 
 #### 2. **CampgroundsClient 최적화** (`src/app/campgrounds/CampgroundsClient.tsx`)
+
 - ✅ 각 섹션에 MobileContainer 적용
 - ✅ SearchAndFilterSection 감싸기
 - ✅ 캠핑장 리스트 섹션 감싸기
@@ -27,6 +29,7 @@
 - ✅ 무한 스크롤 IntersectionObserver 최적화
 
 #### 3. **SearchAndFilterSection 터치 최적화** (`src/components/campgrounds/SearchAndFilterSection.tsx`)
+
 - ✅ 검색 입력창 최소 높이 44px (h-11 sm:h-12)
 - ✅ 반응형 라운딩 (rounded-xl sm:rounded-2xl)
 - ✅ 필터 버튼 터치 최적화 (h-14, active:scale-[0.98])
@@ -39,17 +42,17 @@
 ### 1. **모바일 우선 레이아웃**
 
 #### Before (기존)
+
 ```tsx
 // page.tsx
 <div className="max-w-[768px] px-4 gap-8 pb-[110px]">
-  <section className="px-5 py-6 sm:px-7 sm:py-8">
-    {/* Hero Section */}
-  </section>
+  <section className="px-5 py-6 sm:px-7 sm:py-8">{/* Hero Section */}</section>
   <CampgroundsClient />
 </div>
 ```
 
 #### After (개선)
+
 ```tsx
 // page.tsx
 <div className="gap-6 sm:gap-8 pb-20 sm:pb-24 md:pb-28">
@@ -58,11 +61,12 @@
       {/* Hero Section - max-w-1024px 자동 적용 */}
     </section>
   </MobileContainer>
-  <CampgroundsClient />  {/* 내부에 MobileContainer */}
+  <CampgroundsClient /> {/* 내부에 MobileContainer */}
 </div>
 ```
 
 **개선 효과**:
+
 - 최대 폭 768px → 1024px 확장 (태블릿 활용도 증가)
 - 일관된 중앙 정렬 및 패딩
 - BottomNav 겹침 완전 방지 (pb-20 vs pb-[110px])
@@ -70,18 +74,21 @@
 ### 2. **검색 입력 터치 최적화**
 
 #### Before (기존)
+
 ```tsx
 <input className="py-4 text-base sm:text-lg" />
 // 높이: 패딩 기반 (불안정)
 ```
 
 #### After (개선)
+
 ```tsx
 <input className="h-11 sm:h-12 py-3 sm:py-4 text-sm sm:text-base md:text-lg" />
 // 높이: 명시적 지정 (44px+)
 ```
 
 **브레이크포인트별 높이**:
+
 - **모바일 (< 640px)**: 44px (h-11) - iOS 최소 터치 타겟
 - **태블릿 (≥ 640px)**: 48px (h-12) - 여유로운 터치
 - **데스크톱**: 48px 유지
@@ -89,16 +96,19 @@
 ### 3. **필터 버튼 애니메이션**
 
 #### Before (기존)
+
 ```tsx
 <button className="hover:shadow-lg hover:bg-card-hover">
 ```
 
 #### After (개선)
+
 ```tsx
 <button className="h-14 hover:shadow-lg hover:bg-card-hover active:scale-[0.98]">
 ```
 
 **개선 효과**:
+
 - 터치 시 시각적 피드백 (98% 스케일)
 - 최소 높이 56px (h-14) 보장
 - 자연스러운 애니메이션
@@ -108,7 +118,9 @@
 ## 📁 수정된 파일
 
 ### 1. `frontend/src/app/campgrounds/page.tsx`
+
 **주요 변경**:
+
 ```tsx
 import { MobileContainer } from "@/components/layout/MobileContainer";
 
@@ -128,7 +140,7 @@ export default async function CampgroundsPage() {
                   </div>
                 ))}
               </div>
-              
+
               {/* 큐레이션 테마 */}
               <div className="flex gap-3 overflow-x-auto">
                 {curatedThemes.map((theme) => (
@@ -140,7 +152,7 @@ export default async function CampgroundsPage() {
             </div>
           </section>
         </MobileContainer>
-        
+
         <CampgroundsClient initialCampgrounds={initialCampgrounds} />
       </div>
     </Layout>
@@ -149,7 +161,9 @@ export default async function CampgroundsPage() {
 ```
 
 ### 2. `frontend/src/app/campgrounds/CampgroundsClient.tsx`
+
 **주요 변경**:
+
 ```tsx
 import { MobileContainer } from "@/components/layout/MobileContainer";
 import { useDeferredValue, useLayoutEffect } from "react";
@@ -157,7 +171,7 @@ import { useDeferredValue, useLayoutEffect } from "react";
 export default function CampgroundsClient({ initialCampgrounds }) {
   // React 19: useDeferredValue로 검색 성능 최적화
   const deferredSearchQuery = useDeferredValue(searchQuery);
-  
+
   // React 19: useLayoutEffect로 IntersectionObserver 최적화
   useLayoutEffect(() => {
     const observer = new IntersectionObserver(
@@ -167,13 +181,13 @@ export default function CampgroundsClient({ initialCampgrounds }) {
           loadMoreCampgrounds();
         }
       },
-      { threshold: 0.5 },
+      { threshold: 0.5 }
     );
-    
+
     if (observerRef.current) {
       observer.observe(observerRef.current);
     }
-    
+
     return () => observer.disconnect();
   }, [hasMoreData, loadingMore, loadMoreCampgrounds]);
 
@@ -196,7 +210,7 @@ export default function CampgroundsClient({ initialCampgrounds }) {
               <CampgroundCard key={campground.id} campground={campground} />
             ))}
           </div>
-          
+
           {/* 무한 스크롤 트리거 */}
           <div ref={observerRef} className="h-20" />
         </section>
@@ -207,18 +221,20 @@ export default function CampgroundsClient({ initialCampgrounds }) {
 ```
 
 ### 3. `frontend/src/components/campgrounds/SearchAndFilterSection.tsx`
+
 **주요 변경**:
+
 ```tsx
 export default function SearchAndFilterSection({ ... }) {
   // Debounce hook로 검색 성능 최적화
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const debouncedSearch = useCallback(
     (value: string) => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
-      
+
       debounceTimerRef.current = setTimeout(() => {
         setSearchQuery(value);
       }, 300);
@@ -243,7 +259,7 @@ export default function SearchAndFilterSection({ ... }) {
           </div>
         </div>
       </div>
-      
+
       {/* 모바일 필터 버튼 */}
       <div className="md:hidden">
         <button
@@ -265,6 +281,7 @@ export default function SearchAndFilterSection({ ... }) {
 ## 🎯 React 19 & Next.js 15 최신 기법 활용
 
 ### 1. **useDeferredValue로 검색 성능 최적화**
+
 ```tsx
 // CampgroundsClient.tsx
 const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -272,18 +289,20 @@ const deferredSearchQuery = useDeferredValue(searchQuery);
 // 검색어 입력 중에도 UI가 끊기지 않음
 const loadCampgrounds = useCallback(async () => {
   const response = await campgroundApi.search({
-    keyword: deferredSearchQuery || undefined,  // 지연된 값 사용
+    keyword: deferredSearchQuery || undefined, // 지연된 값 사용
     // ...
   });
 }, [deferredSearchQuery]);
 ```
 
 **장점**:
+
 - 검색 입력 중 UI 응답성 유지
 - 불필요한 API 호출 방지
 - 사용자 경험 개선
 
 ### 2. **useLayoutEffect로 IntersectionObserver 최적화**
+
 ```tsx
 // CampgroundsClient.tsx
 useLayoutEffect(() => {
@@ -293,23 +312,25 @@ useLayoutEffect(() => {
         loadMoreCampgrounds();
       }
     },
-    { threshold: 0.5 },
+    { threshold: 0.5 }
   );
-  
+
   if (observerRef.current) {
     observer.observe(observerRef.current);
   }
-  
+
   return () => observer.disconnect();
 }, [hasMoreData, loadingMore, loadMoreCampgrounds]);
 ```
 
 **장점**:
+
 - 레이아웃 깜빡임 방지
 - 무한 스크롤 정확도 향상
 - 브라우저 렌더링 최적화
 
 ### 3. **Debounce Hook으로 검색 최적화**
+
 ```tsx
 // SearchAndFilterSection.tsx
 const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -319,21 +340,23 @@ const debouncedSearch = useCallback(
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
-    
+
     debounceTimerRef.current = setTimeout(() => {
       setSearchQuery(value);
     }, 300);
   },
-  [setSearchQuery],
+  [setSearchQuery]
 );
 ```
 
 **장점**:
+
 - 타이핑 중 API 호출 최소화
 - 서버 부하 감소
 - 300ms 딜레이로 사용자 입력 완료 대기
 
 ### 4. **Dynamic Import로 코드 스플리팅**
+
 ```tsx
 // CampgroundsClient.tsx
 const CampgroundCard = dynamic(
@@ -344,11 +367,12 @@ const CampgroundCard = dynamic(
         {/* Skeleton UI */}
       </div>
     ),
-  },
+  }
 );
 ```
 
 **장점**:
+
 - 초기 번들 크기 감소
 - 빠른 페이지 로드
 - 필요 시점에 컴포넌트 로드
@@ -358,18 +382,21 @@ const CampgroundCard = dynamic(
 ## 📊 성능 개선 측정
 
 ### Before (Phase 2)
+
 - 최대 폭: 768px (고정)
 - 검색 입력: 높이 불안정
 - 필터 버튼: 터치 피드백 없음
 - 무한 스크롤: useEffect 사용
 
 ### After (Phase 3)
+
 - 최대 폭: 1024px (MobileContainer)
 - 검색 입력: h-11 (44px) 보장
 - 필터 버튼: active:scale-[0.98] 피드백
 - 무한 스크롤: useLayoutEffect 최적화
 
 **예상 개선 효과**:
+
 - 태블릿 화면 활용도 +33% (768px → 1024px)
 - 터치 타겟 정확도 100% (모든 요소 44px+)
 - 검색 API 호출 -70% (debounce 적용)
@@ -380,6 +407,7 @@ const CampgroundCard = dynamic(
 ## 🧪 테스트 시나리오
 
 ### 1. **반응형 레이아웃 테스트**
+
 - [ ] 320px (iPhone SE): 1열 카드, 검색창 44px 높이
 - [ ] 375px (iPhone 12): 모든 버튼 터치 가능
 - [ ] 640px: 2열 카드 전환 확인
@@ -387,18 +415,21 @@ const CampgroundCard = dynamic(
 - [ ] 1024px (iPad Pro): 최대 폭 도달, 중앙 정렬
 
 ### 2. **검색 기능 테스트**
+
 - [ ] 검색어 입력 시 300ms debounce 동작
 - [ ] 한글 입력 정상 처리
 - [ ] 검색 중 UI 끊김 없음 (useDeferredValue)
 - [ ] 검색 결과 그리드 1열→2열 전환
 
 ### 3. **무한 스크롤 테스트**
+
 - [ ] 스크롤 하단 도달 시 자동 로드
 - [ ] 로딩 중 중복 요청 방지
 - [ ] 마지막 페이지 도달 시 observer 해제
 - [ ] 스크롤 중 깜빡임 없음 (useLayoutEffect)
 
 ### 4. **터치 인터랙션 테스트**
+
 - [ ] 검색 입력창 터치 시 포커스
 - [ ] 필터 버튼 터치 시 scale-[0.98] 애니메이션
 - [ ] 캠핑장 카드 터치 시 페이지 이동
@@ -409,9 +440,11 @@ const CampgroundCard = dynamic(
 ## 📝 다음 단계
 
 ### Phase 4: 캠핑장 상세 페이지 최적화
+
 **예상 시간**: 4시간
 
 **주요 작업**:
+
 1. `src/app/campgrounds/[id]/page.tsx` MobileContainer 적용
 2. 이미지 갤러리 스와이프 제스처
 3. SiteModal 하단 시트 or 전체 화면
@@ -419,6 +452,7 @@ const CampgroundCard = dynamic(
 5. 편의시설 아이콘 그리드 터치 최적화
 
 **파일**:
+
 - `src/app/campgrounds/[id]/page.tsx`
 - `src/app/campgrounds/[id]/CampgroundDetailPage.tsx`
 - `src/app/campgrounds/[id]/components/*`
@@ -428,35 +462,43 @@ const CampgroundCard = dynamic(
 ## 💡 추가 개선 사항 (선택)
 
 ### 1. **검색 히스토리**
+
 ```tsx
 const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
 useEffect(() => {
-  const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+  const history = JSON.parse(localStorage.getItem("searchHistory") || "[]");
   setSearchHistory(history);
 }, []);
 
 const saveSearchHistory = (query: string) => {
-  const newHistory = [query, ...searchHistory.filter(h => h !== query)].slice(0, 5);
+  const newHistory = [query, ...searchHistory.filter((h) => h !== query)].slice(
+    0,
+    5
+  );
   setSearchHistory(newHistory);
-  localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+  localStorage.setItem("searchHistory", JSON.stringify(newHistory));
 };
 ```
 
 ### 2. **스켈레톤 로딩 개선**
+
 ```tsx
-{loading ? (
-  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-    {Array.from({ length: 6 }).map((_, i) => (
-      <div key={i} className="animate-pulse rounded-2xl bg-card h-[320px]" />
-    ))}
-  </div>
-) : (
-  <CampgroundGrid campgrounds={displayCampgrounds} />
-)}
+{
+  loading ? (
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="animate-pulse rounded-2xl bg-card h-[320px]" />
+      ))}
+    </div>
+  ) : (
+    <CampgroundGrid campgrounds={displayCampgrounds} />
+  );
+}
 ```
 
 ### 3. **필터 결과 카운트**
+
 ```tsx
 const filteredCount = displayCampgrounds.length;
 const totalCount = campgrounds.length;
@@ -468,7 +510,7 @@ const totalCount = campgrounds.length;
       필터 초기화
     </button>
   )}
-</p>
+</p>;
 ```
 
 ---

@@ -12,16 +12,18 @@
 ## 🎯 주요 목표 및 달성도
 
 ### 1. MobileContainer 통합 ✅
+
 - **목표**: 모든 결제 페이지에 MobileContainer 적용하여 일관된 레이아웃 구현
 - **달성**: 재결제, 성공, 실패 페이지 모두 MobileContainer 적용 완료
-- **효과**: 
+- **효과**:
   - 최대 폭 1024px 통일 (태블릿 활용도 최적화)
   - 중앙 정렬 및 반응형 패딩 자동 적용
   - 좌우 여백 일관성 (px-4 → MobileContainer 상속)
 
 ### 2. 버튼 터치 최적화 ✅
+
 - **목표**: 모든 버튼 44px+ 터치 타겟 보장
-- **달성**: 
+- **달성**:
   - 뒤로가기 버튼: `h-11` (44px)
   - 예약 목록 버튼: `h-11` (44px)
   - 캠핑장 목록 버튼: `h-11` (44px)
@@ -33,6 +35,7 @@
   - 일관된 버튼 높이로 UI 통일성 향상
 
 ### 3. 반응형 타이포그래피 개선 ✅
+
 - **목표**: 모바일과 데스크톱에서 가독성 최적화
 - **달성**:
   - 제목: `text-xl sm:text-2xl` (20px → 24px)
@@ -44,6 +47,7 @@
   - 화면 크기에 따른 자연스러운 확대
 
 ### 4. 카드 라운딩 반응형 개선 ✅
+
 - **목표**: 모바일에서 적절한 라운딩 적용
 - **달성**:
   - 카드: `rounded-2xl sm:rounded-3xl` (16px → 24px)
@@ -58,7 +62,9 @@
 ## 📂 수정된 파일 목록
 
 ### 1. `frontend/src/app/reservations/[id]/payment/page.tsx`
+
 **변경 사항**:
+
 ```tsx
 // Before
 import { ArrowLeft } from "lucide-react";
@@ -119,6 +125,7 @@ import { useParams, useRouter } from "next/navigation";
 ```
 
 **주요 개선**:
+
 - MobileContainer import 및 적용
 - container mx-auto px-4 제거 → MobileContainer 상속
 - 뒤로가기 버튼: `h-11` (44px) + `active:scale-[0.98]` + `rounded-lg`
@@ -128,6 +135,7 @@ import { useParams, useRouter } from "next/navigation";
 - 간격: `mb-6 sm:mb-8` (24px → 32px)
 
 **에러 화면 최적화**:
+
 ```tsx
 // Before
 <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 pt-20">
@@ -179,6 +187,7 @@ import { useParams, useRouter } from "next/navigation";
 ```
 
 **주요 개선**:
+
 - MobileContainer 적용
 - 카드 라운딩: `rounded-2xl sm:rounded-3xl`
 - 카드 패딩: `p-6 sm:p-8` (24px → 32px)
@@ -188,7 +197,9 @@ import { useParams, useRouter } from "next/navigation";
 - 터치 피드백: `active:scale-[0.98]`
 
 ### 2. `frontend/src/app/payment/success/page.tsx`
+
 **변경 사항**:
+
 ```tsx
 // Before
 "use client";
@@ -222,10 +233,10 @@ import { CheckCircle, Loader2 } from "lucide-react";
       </div>
     </div>
   </div>
-</div>
+</div>;
 
 // After (MobileContainer + 반응형)
-"use client";
+("use client");
 
 import { MobileContainer } from "@/components/layout/MobileContainer";
 import { confirmPayment } from "@/lib/api/paymentApi";
@@ -261,10 +272,11 @@ import { CheckCircle, Loader2 } from "lucide-react";
       </div>
     </div>
   </MobileContainer>
-</div>
+</div>;
 ```
 
 **주요 개선**:
+
 - MobileContainer import 및 적용
 - 카드 라운딩: `rounded-2xl sm:rounded-3xl`
 - 카드 패딩: `p-6 sm:p-8` (24px → 32px)
@@ -276,12 +288,15 @@ import { CheckCircle, Loader2 } from "lucide-react";
 - 터치 피드백: `active:scale-[0.98]`
 
 **로딩/에러 화면도 동일하게 최적화**:
+
 - 모든 상태(로딩, 에러, 성공)에서 일관된 레이아웃
 - MobileContainer로 통일된 중앙 정렬
 - 반응형 타이포그래피 및 패딩
 
 ### 3. `frontend/src/app/payment/fail/page.tsx`
+
 **변경 사항**:
+
 ```tsx
 // Before
 "use client";
@@ -293,10 +308,7 @@ import { XCircle } from "lucide-react";
     <div className="flex flex-col items-center gap-4">
       <XCircle className="h-16 w-16 text-error" />
       <h2 className="text-2xl font-bold text-error">결제 실패</h2>
-      <div className="w-full space-y-2 rounded-lg bg-error-light p-4">
-        ...
-      </div>
-
+      <div className="w-full space-y-2 rounded-lg bg-error-light p-4">...</div>
       <div className="mt-4 w-full space-y-2">
         <button
           onClick={() => router.back()}
@@ -314,10 +326,10 @@ import { XCircle } from "lucide-react";
       ...
     </div>
   </div>
-</div>
+</div>;
 
 // After (MobileContainer + 터치 최적화)
-"use client";
+("use client");
 
 import { MobileContainer } from "@/components/layout/MobileContainer";
 import { XCircle } from "lucide-react";
@@ -327,13 +339,10 @@ import { XCircle } from "lucide-react";
     <div className="mx-auto w-full max-w-md rounded-2xl bg-card p-6 shadow-lg sm:rounded-3xl sm:p-8">
       <div className="flex flex-col items-center gap-4">
         <XCircle className="h-16 w-16 text-error" />
-        <h2 className="text-xl font-bold text-error sm:text-2xl">
-          결제 실패
-        </h2>
+        <h2 className="text-xl font-bold text-error sm:text-2xl">결제 실패</h2>
         <div className="w-full space-y-2 rounded-lg bg-error-light p-4">
           ...
         </div>
-
         <div className="mt-4 w-full space-y-3">
           <button
             onClick={() => router.back()}
@@ -352,10 +361,11 @@ import { XCircle } from "lucide-react";
       </div>
     </div>
   </MobileContainer>
-</div>
+</div>;
 ```
 
 **주요 개선**:
+
 - MobileContainer import 및 적용
 - 카드 라운딩: `rounded-2xl sm:rounded-3xl`
 - 카드 패딩: `p-6 sm:p-8` (24px → 32px)
@@ -370,6 +380,7 @@ import { XCircle } from "lucide-react";
 ## 🎨 디자인 개선 사항
 
 ### 1. 레이아웃 통일성
+
 ```
 컴포넌트                Before           After           개선사항
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -380,6 +391,7 @@ import { XCircle } from "lucide-react";
 ```
 
 ### 2. 터치 타겟 최적화
+
 ```
 요소                  크기       터치 영역    피드백
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -390,6 +402,7 @@ import { XCircle } from "lucide-react";
 ```
 
 ### 3. 타이포그래피 스케일
+
 ```
 요소                  모바일          데스크톱        비율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -400,6 +413,7 @@ import { XCircle } from "lucide-react";
 ```
 
 ### 4. 라운딩 일관성
+
 ```
 요소                  모바일          데스크톱        비율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -409,6 +423,7 @@ import { XCircle } from "lucide-react";
 ```
 
 ### 5. 간격 체계
+
 ```
 요소                  모바일          데스크톱        증가율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -423,6 +438,7 @@ import { XCircle } from "lucide-react";
 ## 📱 반응형 디자인 분석
 
 ### 1. 브레이크포인트별 최적화
+
 ```
 화면 크기       브레이크포인트   주요 변경사항
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -433,6 +449,7 @@ import { XCircle } from "lucide-react";
 ```
 
 ### 2. 버튼 레이아웃 전략
+
 ```
 화면 크기       버튼 레이아웃              특징
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -444,6 +461,7 @@ import { XCircle } from "lucide-react";
 ```
 
 ### 3. 카드 크기 최적화
+
 ```
 페이지           모바일 패딩     데스크톱 패딩   최대 너비
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -458,15 +476,19 @@ import { XCircle } from "lucide-react";
 ## 🧪 테스트 시나리오
 
 ### 1. 재결제 페이지 테스트 ✅
+
 **테스트 기기**: iPhone 14 Pro (393x852), Galaxy S23 (360x800), iPad Pro (1024x1366)
 
 **테스트 케이스**:
+
 1. **뒤로가기 버튼**
+
    - [ ] 터치 영역 44px 확인 (h-11)
    - [ ] active:scale-[0.98] 애니메이션 확인
    - [ ] 터치 시 즉각 반응 (16ms 이내)
 
 2. **헤더 영역**
+
    - [ ] 제목: 24px (모바일) → 36px (데스크톱)
    - [ ] 설명: 14px (모바일) → 16px (데스크톱)
    - [ ] MobileContainer 중앙 정렬 확인
@@ -478,15 +500,19 @@ import { XCircle } from "lucide-react";
    - [ ] 하단 여백: 80px (모바일) → 112px (데스크톱)
 
 ### 2. 결제 성공 페이지 테스트 ✅
+
 **테스트 화면**: 320px, 375px, 393px, 768px, 1024px
 
 **테스트 케이스**:
+
 1. **로딩 상태**
+
    - [ ] 스피너 중앙 정렬 확인
    - [ ] 메시지 가독성 확인
    - [ ] 카드 그림자 및 라운딩 확인
 
 2. **성공 상태**
+
    - [ ] 성공 아이콘 크기 적절 (64px)
    - [ ] 버튼 레이아웃: 세로 (모바일) → 가로 (데스크톱)
    - [ ] 버튼 터치 영역 44px 확인
@@ -498,15 +524,19 @@ import { XCircle } from "lucide-react";
    - [ ] 버튼 터치 최적화 확인
 
 ### 3. 결제 실패 페이지 테스트 ✅
+
 **테스트 시나리오**: 결제 실패 다양한 케이스
 
 **테스트 케이스**:
+
 1. **오류 정보 표시**
+
    - [ ] 오류 코드 표시 확인
    - [ ] 오류 메시지 디코딩 확인
    - [ ] 긴 메시지 줄바꿈 확인
 
 2. **버튼 동작**
+
    - [ ] 다시 시도 버튼 동작
    - [ ] 캠핑장 목록 이동 동작
    - [ ] 버튼 간격 적절 (12px)
@@ -517,15 +547,19 @@ import { XCircle } from "lucide-react";
    - [ ] 전체 레이아웃 균형
 
 ### 4. 접근성 테스트 ✅
+
 **테스트 도구**: Lighthouse, WAVE, VoiceOver
 
 **테스트 케이스**:
+
 1. **키보드 네비게이션**
+
    - [ ] Tab 키로 모든 버튼 접근 가능
    - [ ] Enter/Space 키로 버튼 활성화
    - [ ] focus-visible 스타일 적용 확인
 
 2. **스크린 리더**
+
    - [ ] 버튼 레이블 명확 ("뒤로 가기", "다시 시도하기")
    - [ ] 상태 메시지 읽기 가능
    - [ ] 오류 내용 명확히 전달
@@ -540,6 +574,7 @@ import { XCircle } from "lucide-react";
 ## 📊 성능 측정
 
 ### 1. Lighthouse 모바일 점수 (예상)
+
 ```
 항목                  Before    After     개선
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -550,6 +585,7 @@ SEO                  100       100       0 ⏸️
 ```
 
 ### 2. Core Web Vitals (예상)
+
 ```
 지표                  Before      After       개선율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -560,6 +596,7 @@ INP (인터랙션)       100ms       45ms        55% ↓
 ```
 
 ### 3. 번들 크기 (예상)
+
 ```
 파일                           Before      After       변화
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -568,9 +605,11 @@ success/page.tsx (JS)         18KB        19KB        +1KB ⬆️
 fail/page.tsx (JS)            16KB        17KB        +1KB ⬆️
 Total (gzipped)               56KB        59KB        +3KB ⬆️
 ```
-*MobileContainer import로 약간의 번들 증가, 하지만 레이아웃 일관성 대폭 향상*
+
+_MobileContainer import로 약간의 번들 증가, 하지만 레이아웃 일관성 대폭 향상_
 
 ### 4. 렌더링 성능 (실측 예상)
+
 ```
 시나리오                    Before      After       개선율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -586,6 +625,7 @@ Total (gzipped)               56KB        59KB        +3KB ⬆️
 ## 🛠️ 기술적 세부사항
 
 ### 1. MobileContainer 적용 전략
+
 ```tsx
 // 중앙 정렬 + 상하 패딩 (재결제 페이지)
 <main className="...">
@@ -607,15 +647,18 @@ Total (gzipped)               56KB        59KB        +3KB ⬆️
 ```
 
 **장점**:
+
 - 일관된 최대 폭 (1024px)
 - 반응형 패딩 자동 적용
 - 중앙 정렬 보장
 
 **단점**:
+
 - 추가 DOM 노드 (1개)
 - 약간의 번들 증가 (+1-3KB)
 
 ### 2. 버튼 레이아웃 전환
+
 ```tsx
 // 성공 페이지: flex-1로 동일 너비
 <div className="flex w-full flex-col gap-3 sm:flex-row">
@@ -637,11 +680,13 @@ Total (gzipped)               56KB        59KB        +3KB ⬆️
 ```
 
 **선택 이유**:
+
 - 성공 페이지: 두 버튼 동일 중요도 → flex-1
 - 실패 페이지: 재시도가 우선 → 세로 스택 유지
 - 에러 화면: 맥락 의존 → 반응형
 
 ### 3. 타이포그래피 스케일링
+
 ```tsx
 // 제목: 1.5배 확대 (24px → 36px)
 <h1 className="text-2xl sm:text-3xl">
@@ -657,6 +702,7 @@ Total (gzipped)               56KB        59KB        +3KB ⬆️
 ```
 
 **확대 비율 근거**:
+
 - 제목 (1.5x): 명확한 시각적 계층
 - 섹션 제목 (1.2x): 적절한 강조
 - 본문 (1.14x): 가독성 향상
@@ -667,20 +713,25 @@ Total (gzipped)               56KB        59KB        +3KB ⬆️
 ## 🎯 다음 단계 (Phase 8 준비)
 
 ### 1. 예약 상세 페이지 최적화 계획
+
 **파일**: `src/app/reservations/[id]/page.tsx`, `src/components/reservation/ReservationDetail.tsx`
 
 **주요 작업**:
+
 1. **MobileContainer 적용**
+
    - 예약 정보 카드 전체 감싸기
    - 결제 정보 섹션 최적화
    - 액션 버튼 영역 고정 하단
 
 2. **예약 정보 카드 최적화**
+
    - 캠핑장 정보 카드 반응형
    - 예약 날짜/시간 가독성 향상
    - 예약 상태 배지 터치 최적화
 
 3. **액션 버튼 최적화**
+
    - 취소 버튼: h-11 (44px)
    - 수정 버튼: h-11 (44px)
    - 리뷰 작성 버튼: h-11 (44px)
@@ -694,15 +745,19 @@ Total (gzipped)               56KB        59KB        +3KB ⬆️
 **예상 소요 시간**: 2-3시간
 
 ### 2. 리뷰 페이지 최적화 계획
+
 **파일**: `src/app/reviews/[id]/page.tsx`, `src/components/review/ReviewForm.tsx`
 
 **주요 작업**:
+
 1. **리뷰 작성 폼**
+
    - 별점 선택 터치 최적화 (48px)
    - 텍스트 입력 필드 h-12 (48px)
    - 이미지 업로드 버튼 최적화
 
 2. **이미지 업로드**
+
    - 이미지 미리보기 그리드
    - 삭제 버튼 터치 최적화
    - 드래그 앤 드롭 모바일 대응
@@ -715,15 +770,19 @@ Total (gzipped)               56KB        59KB        +3KB ⬆️
 **예상 소요 시간**: 3-4시간
 
 ### 3. 관리자 페이지 최적화 계획
+
 **파일**: `src/app/admin/**/*.tsx`, `src/components/admin/**/*.tsx`
 
 **주요 작업**:
+
 1. **대시보드**
+
    - 통계 카드 그리드 반응형
    - 차트 터치 인터랙션
    - 빠른 액션 버튼 최적화
 
 2. **예약 관리**
+
    - 예약 목록 테이블 → 카드 전환 (모바일)
    - 필터/검색 UI 최적화
    - 액션 버튼 최적화
@@ -740,6 +799,7 @@ Total (gzipped)               56KB        59KB        +3KB ⬆️
 ## ✅ Phase 7 체크리스트
 
 ### 필수 작업
+
 - [x] MobileContainer 통합 (재결제 페이지)
 - [x] MobileContainer 통합 (결제 성공 페이지)
 - [x] MobileContainer 통합 (결제 실패 페이지)
@@ -753,12 +813,14 @@ Total (gzipped)               56KB        59KB        +3KB ⬆️
 - [x] Prettier 포맷팅 완료
 
 ### 선택 작업 (Phase 8 이후)
+
 - [ ] Toss Payments 위젯 UI 커스터마이징
 - [ ] 결제 타이머 UI 개선
 - [ ] 결제 진행 단계 시각화
 - [ ] 결제 방법 선택 UI 최적화
 
 ### 품질 검증
+
 - [ ] Lighthouse 모바일 90+ 점수 달성
 - [ ] 모든 터치 타겟 44px+ 확인
 - [ ] 실제 디바이스 테스트 (iPhone, Android, iPad)
@@ -770,21 +832,25 @@ Total (gzipped)               56KB        59KB        +3KB ⬆️
 ## 📝 학습 및 개선 사항
 
 ### 1. 버튼 레이아웃 선택 기준
+
 - **성공 페이지**: 두 버튼 동일 중요도 → flex-1 (동일 너비)
 - **실패 페이지**: 재시도 우선 → 세로 스택 유지
 - **에러 화면**: 맥락 의존 → flex-col sm:flex-row
 
 ### 2. 카드 크기 제한
+
 - **max-w-md (448px)**: 결제 관련 카드는 너무 넓지 않게
 - **MobileContainer**: 전체 레이아웃은 1024px까지 활용
 - **균형**: 가독성 vs 공간 활용
 
 ### 3. 타이포그래피 스케일링 비율
+
 - **제목 1.5x**: 명확한 계층 구조
 - **본문 1.14x**: 적절한 가독성
 - **설명 1.0x**: 일관성 유지
 
 ### 4. 터치 피드백 일관성
+
 - **모든 인터랙티브 요소**: active:scale-[0.98]
 - **버튼 높이**: h-11 (44px) 최소
 - **transition-all**: 부드러운 애니메이션

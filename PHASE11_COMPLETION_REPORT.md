@@ -12,17 +12,19 @@
 ## 🎯 주요 목표 및 달성도
 
 ### 1. 모달 하단 시트 전환 ✅
+
 - **목표**: 모바일에서 모달을 하단 시트 스타일로 전환
 - **달성**: SiteModal 하단 시트 전환 완료
-- **효과**: 
+- **효과**:
   - 모바일: `rounded-t-3xl` 상단 라운딩 + 하단 슬라이드 애니메이션
   - 데스크톱: `rounded-2xl` 센터 모달 유지
   - 모바일 핸들 바 추가 (스와이프 힌트)
   - `items-end sm:items-center` 반응형 정렬
 
 ### 2. 입력 필드 터치 최적화 ✅
+
 - **목표**: 모든 입력 필드 48px 최소 높이 보장
-- **달성**: 
+- **달성**:
   - 텍스트 입력: `h-12` (48px)
   - 셀렉트 박스: `h-12` (48px)
   - 숫자 입력: `h-12` (48px)
@@ -33,8 +35,9 @@
   - 터치 정확도 대폭 향상
 
 ### 3. 버튼 터치 최적화 ✅
+
 - **목표**: 모든 버튼 44px+ 터치 타겟 보장
-- **달성**: 
+- **달성**:
   - 모달 닫기 버튼: `h-11 w-11` (44px)
   - 취소/저장 버튼: `h-11` (44px)
   - 프리셋 선택 버튼: `h-11` (44px)
@@ -48,6 +51,7 @@
   - 일관된 버튼 크기 체계
 
 ### 4. Toast 알림 반응형 개선 ✅
+
 - **목표**: Toast 알림 모바일 최적화
 - **달성**:
   - 컨테이너: `w-full max-w-sm px-4 sm:w-96 sm:px-0`
@@ -63,9 +67,11 @@
 ## 📂 수정된 파일 목록
 
 ### 1. `frontend/src/components/ui/SiteModal.tsx`
+
 **변경 사항**:
 
 **모달 하단 시트 전환**:
+
 ```tsx
 // Before
 <div className="fixed inset-0 z-50 overflow-y-auto animate-in fade-in duration-200">
@@ -79,12 +85,14 @@
 ```
 
 **주요 개선**:
+
 - 모달 정렬: `items-end sm:items-center` (하단 → 센터)
 - 라운딩: `rounded-t-3xl sm:rounded-2xl` (상단만 → 전체)
 - 애니메이션: `slide-in-from-bottom sm:zoom-in-95` (슬라이드 → 줌)
 - 패딩: `sm:p-4` (데스크톱만 패딩)
 
 **헤더 핸들 바 추가**:
+
 ```tsx
 // Before
 <div className="sticky top-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b border-border px-6 py-5 backdrop-blur-sm">
@@ -100,7 +108,7 @@
 <div className="sticky top-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b border-border px-4 py-4 backdrop-blur-sm sm:px-6 sm:py-5">
   {/* 모바일 핸들 바 */}
   <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-muted sm:hidden" />
-  
+
   <div className="flex items-center justify-between">
     ...
     <button
@@ -111,6 +119,7 @@
 ```
 
 **주요 개선**:
+
 - 모바일 핸들 바: `h-1 w-12` (스와이프 다운 힌트)
 - 닫기 버튼: `h-11 w-11` (40px → 44px)
 - 터치 피드백: `active:scale-[0.98]`
@@ -118,6 +127,7 @@
 - 제목 크기: `text-lg sm:text-xl` (18px → 20px)
 
 **입력 필드 h-12 적용**:
+
 ```tsx
 // Before (사이트 번호)
 <input
@@ -159,11 +169,13 @@
 ```
 
 **주요 개선**:
+
 - 모든 입력 필드: `h-12` (48px) 명시적 높이
 - py-3 유지 (h-12와 함께 사용하여 내부 패딩)
 - 일관된 터치 타겟
 
 **Textarea min-h 적용**:
+
 ```tsx
 // Before
 <textarea
@@ -181,10 +193,12 @@
 ```
 
 **주요 개선**:
+
 - 최소 높이: `min-h-[96px]` (3줄 × 32px)
 - rows={3}과 조화
 
 **버튼 터치 최적화**:
+
 ```tsx
 // Before (위치 선택 버튼)
 <button
@@ -240,6 +254,7 @@
 ```
 
 **주요 개선**:
+
 - 모든 버튼: `h-11` (44px)
 - 패딩: `py-3` → `py-2` (h-11과 함께 사용)
 - 터치 피드백: `active:scale-[0.98]`
@@ -247,6 +262,7 @@
 - 클래스 순서 정리 (Tailwind 권장사항)
 
 **Footer 반응형 개선**:
+
 ```tsx
 // Before
 <div className="sticky bottom-0 bg-card/95 backdrop-blur-sm border-t border-border px-6 py-4">
@@ -258,11 +274,14 @@
 ```
 
 **주요 개선**:
+
 - 패딩: `px-4 sm:px-6` (16px → 24px)
 - 일관된 레이아웃
 
 ### 2. `frontend/src/components/ui/ThemeToggle.tsx`
+
 **변경 사항**:
+
 ```tsx
 // Before
 <button
@@ -282,19 +301,23 @@
 ```
 
 **주요 개선**:
+
 - 크기: `h-9 w-9` → `h-11 w-11` (36px → 44px)
 - 터치 피드백: `active:scale-95` → `active:scale-[0.98]`
 - placeholder div도 `h-11 w-11`로 통일
 
 **효과**:
+
 - 터치 타겟 22% 증가 (36px → 44px)
 - 헤더에서 눈에 더 잘 띄는 크기
 - 일관된 터치 피드백
 
 ### 3. `frontend/src/components/ui/Toast.tsx`
+
 **변경 사항**:
 
 **컨테이너 반응형**:
+
 ```tsx
 // Before
 <div className="fixed top-4 right-4 z-50 w-96 max-w-sm">
@@ -304,11 +327,13 @@
 ```
 
 **주요 개선**:
+
 - 모바일: `w-full max-w-sm px-4` (전체 폭 - 패딩)
 - 데스크톱: `sm:w-96` (384px 고정)
 - 모바일 패딩: `px-4` (left: 16px, right: 16px)
 
 **닫기 버튼 터치 최적화**:
+
 ```tsx
 // Before
 <button
@@ -330,35 +355,42 @@
 ```
 
 **주요 개선**:
+
 - 크기: `h-11 w-11` (44px)
 - 호버 배경: `hover:bg-black/10` (시각적 피드백)
 - 라운딩: `rounded-lg` (8px)
 - 터치 피드백: `active:scale-[0.98]`
 
 **액션 버튼 터치 최적화**:
+
 ```tsx
 // Before
-{action && (
-  <button
-    onClick={action.onClick}
-    className="mt-2 text-sm font-medium underline hover:no-underline"
-  >
-    {action.label}
-  </button>
-)}
+{
+  action && (
+    <button
+      onClick={action.onClick}
+      className="mt-2 text-sm font-medium underline hover:no-underline"
+    >
+      {action.label}
+    </button>
+  );
+}
 
 // After (터치 타겟)
-{action && (
-  <button
-    onClick={action.onClick}
-    className="mt-2 inline-flex h-11 items-center text-sm font-medium underline transition hover:no-underline active:scale-[0.98]"
-  >
-    {action.label}
-  </button>
-)}
+{
+  action && (
+    <button
+      onClick={action.onClick}
+      className="mt-2 inline-flex h-11 items-center text-sm font-medium underline transition hover:no-underline active:scale-[0.98]"
+    >
+      {action.label}
+    </button>
+  );
+}
 ```
 
 **주요 개선**:
+
 - 높이: `h-11` (44px)
 - 터치 피드백: `active:scale-[0.98]`
 
@@ -367,6 +399,7 @@
 ## 🎨 디자인 개선 사항
 
 ### 1. 모달 하단 시트 전환
+
 ```
 화면 크기       모달 스타일              애니메이션
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -375,6 +408,7 @@
 ```
 
 ### 2. 입력 필드 터치 타겟
+
 ```
 요소                  높이       터치 영역    규격
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -385,6 +419,7 @@
 ```
 
 ### 3. 버튼 터치 타겟
+
 ```
 요소                  크기       터치 영역    피드백
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -397,6 +432,7 @@ Toast 닫기 버튼       h-11 w-11  44px        scale-[0.98] ✅
 ```
 
 ### 4. 라운딩 일관성
+
 ```
 요소                  모바일          데스크톱        비율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -411,6 +447,7 @@ Toast 닫기 버튼      8px            8px            1.0x
 ## 📱 반응형 디자인 분석
 
 ### 1. 모달 레이아웃 전환
+
 ```
 화면 크기       레이아웃              특징
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -421,6 +458,7 @@ Toast 닫기 버튼      8px            8px            1.0x
 ```
 
 ### 2. Toast 반응형
+
 ```
 화면 크기       너비                  패딩
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -429,6 +467,7 @@ Toast 닫기 버튼      8px            8px            1.0x
 ```
 
 ### 3. 버튼 레이아웃
+
 ```
 컨텍스트              모바일              데스크톱
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -441,16 +480,20 @@ Toast 닫기 버튼      8px            8px            1.0x
 ## 🧪 테스트 시나리오
 
 ### 1. SiteModal 테스트 ✅
+
 **테스트 기기**: iPhone 14 Pro (393x852), Galaxy S23 (360x800), iPad Pro (1024x1366)
 
 **테스트 케이스**:
+
 1. **하단 시트 전환**
+
    - [ ] 모바일: 하단에서 슬라이드 업
    - [ ] 핸들 바 표시 확인 (h-1 w-12)
    - [ ] 상단 라운딩 확인 (rounded-t-3xl)
    - [ ] 데스크톱: 센터 줌 인 애니메이션
 
 2. **입력 필드**
+
    - [ ] 모든 입력 필드 48px 확인
    - [ ] 포커스 시 키보드 올라옴
    - [ ] textarea 최소 96px 확인
@@ -462,10 +505,13 @@ Toast 닫기 버튼      8px            8px            1.0x
    - [ ] 터치 피드백 scale-[0.98] 확인
 
 ### 2. ThemeToggle 테스트 ✅
+
 **테스트 화면**: 320px ~ 1024px
 
 **테스트 케이스**:
+
 1. **크기 확인**
+
    - [ ] 44px × 44px 크기 확인
    - [ ] 터치 영역 충분
    - [ ] 아이콘 중앙 정렬
@@ -476,15 +522,19 @@ Toast 닫기 버튼      8px            8px            1.0x
    - [ ] hover 효과 확인
 
 ### 3. Toast 테스트 ✅
+
 **테스트 시나리오**: 성공, 에러, 경고, 정보 알림
 
 **테스트 케이스**:
+
 1. **컨테이너**
+
    - [ ] 모바일: 전체 폭 - 패딩 (w-full px-4)
    - [ ] 데스크톱: 384px 고정 (w-96)
    - [ ] 우측 상단 고정 확인
 
 2. **버튼**
+
    - [ ] 닫기 버튼 44px 확인
    - [ ] hover 배경 효과 확인
    - [ ] 액션 버튼 44px 확인
@@ -495,16 +545,20 @@ Toast 닫기 버튼      8px            8px            1.0x
    - [ ] 애니메이션 확인
 
 ### 4. 접근성 테스트 ✅
+
 **테스트 도구**: Lighthouse, WAVE, VoiceOver
 
 **테스트 케이스**:
+
 1. **키보드 네비게이션**
+
    - [ ] Tab 키로 모든 입력/버튼 접근
    - [ ] Enter/Space 키로 버튼 활성화
    - [ ] 모달 Esc로 닫기
    - [ ] focus-visible 스타일 확인
 
 2. **스크린 리더**
+
    - [ ] 입력 필드 레이블 읽기
    - [ ] 버튼 레이블 명확
    - [ ] 에러 메시지 전달
@@ -520,6 +574,7 @@ Toast 닫기 버튼      8px            8px            1.0x
 ## 📊 성능 측정
 
 ### 1. Lighthouse 모바일 점수 (예상)
+
 ```
 항목                  Before    After     개선
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -530,6 +585,7 @@ SEO                  100       100       0 ⏸️
 ```
 
 ### 2. Core Web Vitals (예상)
+
 ```
 지표                  Before      After       개선율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -540,6 +596,7 @@ INP (입력 필드)      80ms        40ms        50% ↓
 ```
 
 ### 3. 번들 크기 (예상)
+
 ```
 파일                           Before      After       변화
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -550,6 +607,7 @@ Total (gzipped)               96KB        97KB        +1KB ⬆️
 ```
 
 ### 4. 렌더링 성능 (실측 예상)
+
 ```
 시나리오                    Before      After       개선율
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -564,6 +622,7 @@ Toast 표시                  80ms        70ms        13% ↓
 ## 🛠️ 기술적 세부사항
 
 ### 1. 모달 하단 시트 구현
+
 ```tsx
 // 모바일: 하단 시트
 <div className="flex items-end sm:items-center justify-center min-h-screen sm:p-4">
@@ -576,15 +635,18 @@ Toast 표시                  80ms        70ms        13% ↓
 ```
 
 **장점**:
+
 - 모바일 네이티브 앱 느낌
 - 스와이프 다운 힌트 (핸들 바)
 - 화면 하단부터 올라와 자연스러움
 
 **단점**:
+
 - 모달 높이가 짧으면 어색할 수 있음
 - iOS Safari 하단 바 고려 필요
 
 ### 2. 입력 필드 명시적 높이
+
 ```tsx
 // h-12 (48px) + py-3 조합
 <input className="w-full h-12 px-4 py-3 ...">
@@ -594,22 +656,26 @@ Toast 표시                  80ms        70ms        13% ↓
 ```
 
 **채택 이유**:
+
 - 명시적 높이로 일관성 보장
 - py-3는 내부 패딩으로 유지
 - iOS/Android 권장사항 100% 충족
 
 **장점**:
+
 - 터치 정확도 대폭 향상
 - 크로스 브라우저 일관성
 - 디자인 체계 통일
 
 ### 3. 터치 피드백 일관성
+
 ```tsx
 // 모든 인터랙티브 요소
-className="... active:scale-[0.98]"
+className = "... active:scale-[0.98]";
 ```
 
 **채택 이유**:
+
 - 0.98 = 2% 축소 (자연스러운 피드백)
 - 전체 프로젝트 일관성
 - iOS/Android 네이티브 앱과 유사
@@ -619,6 +685,7 @@ className="... active:scale-[0.98]"
 ## ✅ Phase 11 체크리스트
 
 ### 필수 작업
+
 - [x] SiteModal 하단 시트 전환 (rounded-t-3xl)
 - [x] SiteModal 핸들 바 추가 (h-1 w-12)
 - [x] SiteModal 모든 입력 필드 h-12 (48px)
@@ -632,12 +699,14 @@ className="... active:scale-[0.98]"
 - [x] Prettier 포맷팅 완료
 
 ### 선택 작업 (다른 Phase)
+
 - [ ] 다른 모달 컴포넌트 (UserReservationDetailModal 등) 최적화
 - [ ] 폼 컴포넌트 재사용 가능한 Button/Input 래퍼 생성
 - [ ] 스와이프 다운으로 모달 닫기 제스처
 - [ ] 모달 애니메이션 커스터마이징
 
 ### 품질 검증
+
 - [ ] Lighthouse 모바일 90+ 점수 달성
 - [ ] 모든 터치 타겟 44px+ 확인
 - [ ] 실제 디바이스 테스트 (iPhone, Android, iPad)
@@ -649,21 +718,25 @@ className="... active:scale-[0.98]"
 ## 📝 학습 및 개선 사항
 
 ### 1. 모달 하단 시트 vs 센터 모달
+
 - **하단 시트**: 모바일 네이티브 앱 느낌, 한 손 조작 용이
 - **센터 모달**: 데스크톱 전통적 패턴, 집중도 높음
 - **선택**: 화면 크기에 따라 반응형 전환 (items-end sm:items-center)
 
 ### 2. 입력 필드 명시적 높이의 중요성
+
 - **py-3만**: 콘텐츠에 따라 높이 가변 (일관성 부족)
 - **h-12**: 항상 48px 보장 (터치 타겟 안정)
 - **조합 (h-12 + py-3)**: 명시적 높이 + 내부 패딩 (권장)
 
 ### 3. ThemeToggle 크기 증가 효과
+
 - **36px → 44px**: 터치 영역 22% 증가
 - **시각적 균형**: 헤더에서 더 눈에 잘 띄는 크기
 - **일관성**: 다른 버튼들과 동일한 터치 타겟
 
 ### 4. Toast 반응형 전략
+
 - **모바일**: 전체 폭 활용 (w-full px-4)
 - **데스크톱**: 고정 너비 (w-96, 384px)
 - **이유**: 모바일 가독성 vs 데스크톱 간결함
