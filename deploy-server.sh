@@ -61,11 +61,16 @@ fi
 # ================================
 print_step "2" "Git Credential Helper 설정 중..."
 
+# Git credential helper 설정 (영구 저장)
 git config --global credential.helper store
 
-# 토큰을 credential에 저장
-echo "https://${GITHUB_TOKEN}@github.com" > ~/.git-credentials
+# 토큰을 credential에 저장 (정확한 형식)
+mkdir -p ~/.config/git
+echo "https://sentimentalhoon:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
 chmod 600 ~/.git-credentials
+
+# Git 전역 설정
+git config --global url."https://sentimentalhoon:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
 
 echo "Git Credential 설정 완료"
 
@@ -91,13 +96,12 @@ print_step "4" "서브모듈 업데이트 중..."
 
 cd ~/campstation-workspace
 
-# .gitmodules 파일의 URL을 토큰 포함 URL로 변경
-sed -i "s|https://github.com/sentimentalhoon/campstation-backend.git|https://${GITHUB_TOKEN}@github.com/sentimentalhoon/campstation-backend.git|g" .gitmodules
-sed -i "s|https://github.com/sentimentalhoon/campstation-frontend.git|https://${GITHUB_TOKEN}@github.com/sentimentalhoon/campstation-frontend.git|g" .gitmodules
+# .gitmodules 파일의 URL을 사용자명:토큰 형식으로 변경
+sed -i "s|https://github.com/sentimentalhoon/|https://sentimentalhoon:${GITHUB_TOKEN}@github.com/sentimentalhoon/|g" .gitmodules
 
-# 서브모듈 URL을 토큰 포함 URL로 변경
-git config submodule.backend.url https://${GITHUB_TOKEN}@github.com/sentimentalhoon/campstation-backend.git
-git config submodule.frontend.url https://${GITHUB_TOKEN}@github.com/sentimentalhoon/campstation-frontend.git
+# 서브모듈 URL을 git config에도 설정
+git config submodule.backend.url https://sentimentalhoon:${GITHUB_TOKEN}@github.com/sentimentalhoon/campstation-backend.git
+git config submodule.frontend.url https://sentimentalhoon:${GITHUB_TOKEN}@github.com/sentimentalhoon/campstation-frontend.git
 
 # 서브모듈 동기화 및 업데이트
 git submodule sync
