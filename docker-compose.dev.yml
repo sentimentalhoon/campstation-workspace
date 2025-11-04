@@ -131,10 +131,11 @@ services:
       - MINIO_ROOT_USER=campstation
       - MINIO_ROOT_PASSWORD=campstation123
       - MINIO_REGION=us-east-1
-      - MINIO_DOMAIN=localhost
+      - MINIO_DOMAIN=${MINIO_DOMAIN:-localhost}
+      - MINIO_SERVER_URL=${MINIO_SERVER_URL:-http://localhost:9000}
+      - MINIO_BROWSER_REDIRECT_URL=${MINIO_BROWSER_REDIRECT_URL:-http://localhost:9001}
       - MINIO_API_REQUESTS_MAX=1000
       - MINIO_API_REQUESTS_DEADLINE=1m
-      - MINIO_BROWSER_REDIRECT_URL=http://localhost:9001
     command: server /data --console-address ":9001" --address ":9000"
     networks:
       - campstation-network

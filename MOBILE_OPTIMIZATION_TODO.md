@@ -20,7 +20,7 @@
 - ✅ **Phase 2**: 홈페이지 모바일 최적화
 - ✅ **Phase 3**: 캠핑장 목록 페이지
 - ✅ **Phase 4**: 캠핑장 상세 페이지
-- ✅ **Phase 5**: 지도 페이지 (건너뜀/대기)
+- ✅ **Phase 5**: 지도 페이지 (완료)
 - ✅ **Phase 6**: 예약 목록/대시보드
 - ✅ **Phase 7**: 결제 페이지
 - ✅ **Phase 8**: 예약 상세 페이지
@@ -212,10 +212,52 @@
 
 ---
 
-### ⏭️ Phase 5: 지도 페이지 (건너뜀)
+### ✅ Phase 5: 지도 페이지 (완료)
 
-**상태**: 대기 중 (우선순위 낮음)  
-**사유**: 카카오맵 API 통합 필요, 다른 Phase 우선
+**완료일**: 2025-01-28  
+**문서**: PHASE5_MAP_MOBILE_OPTIMIZATION_REPORT.md  
+**작업 시간**: 4시간
+
+#### Task 5.1: MapClient 레이아웃 최적화 ✅
+
+**파일**: `src/app/campgrounds/map/MapClient.tsx`
+
+- ✅ 반응형 레이아웃 구조 (모바일/데스크톱)
+- ✅ 현재 위치 플로팅 버튼 추가 (44px+)
+- ✅ 터치 최적화 (hover:scale-110, active:scale-95)
+- ✅ 로딩 오버레이 개선 (backdrop-blur)
+- ✅ JSDoc @component, @version 2.0.0
+
+#### Task 5.2: MapSidebar 하단 시트 구현 ✅
+
+**파일**: `src/components/map/MapSidebar.tsx`
+
+- ✅ 3단계 높이 조절 (collapsed: 12vh, half: 50vh, full: 85vh)
+- ✅ 스와이프 제스처 구현 (onTouchStart/End)
+- ✅ 드래그 핸들 UI (모바일 전용)
+- ✅ 우측 사이드바 유지 (데스크톱 768px+)
+- ✅ 캠핑장 카드 터치 최적화 (44px+)
+- ✅ SSR 안전성 (window 객체 체크)
+
+#### Task 5.3: CampgroundMap 터치 최적화 ✅
+
+**파일**: `src/components/map/CampgroundMap.tsx`
+
+- ✅ 줌 컨트롤 터치 최적화 (44px/48px)
+- ✅ 줌 레벨 제한 (1~14) 및 disabled 상태
+- ✅ 호버/액티브 효과 개선
+- ✅ 로딩 UI 개선 (backdrop-blur, z-index)
+- ✅ 접근성 개선 (aria-label, title)
+
+#### Task 5.4: MapFiltersPanel 모바일 모달 ✅
+
+**파일**: `src/components/map/MapFilters.tsx`
+
+- ✅ 전체 화면 모달 (모바일 하단 슬라이드 업)
+- ✅ Body 스크롤 방지 (useEffect)
+- ✅ Sticky 푸터 버튼 (적용/초기화)
+- ✅ 터치 최적화 (44px+, py-3)
+- ✅ 입력 필드 최적화 (inputMode="numeric")
 
 ---
 
@@ -565,7 +607,7 @@ const isMobile = useMediaQuery("(max-width: 768px)");
 - ✅ Phase 2: 홈페이지
 - ✅ Phase 3: 캠핑장 목록
 - ✅ Phase 4: 캠핑장 상세
-- ⏭️ Phase 5: 지도 페이지 (건너뜀)
+- ✅ Phase 5: 지도 페이지 (완료)
 - ✅ Phase 6: 예약 대시보드
 - ✅ Phase 7: 결제 페이지
 - ✅ Phase 8: 예약 상세
