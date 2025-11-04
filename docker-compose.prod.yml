@@ -42,33 +42,33 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SERVER_PORT=8080
-      
+
       # Database
       - DB_URL=${DB_URL:-jdbc:postgresql://db:5432/campstation}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_POOL_SIZE=${DB_POOL_SIZE:-20}
-      
+
       # Redis
       - REDIS_HOST=${REDIS_HOST:-redis}
       - REDIS_PORT=${REDIS_PORT:-6379}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-      
+
       # JWT
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRATION=${JWT_EXPIRATION:-3600000}
       - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION:-604800000}
-      
+
       # CORS
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
-      
+
       # S3/MinIO
       - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}
       - AWS_S3_REGION=${AWS_S3_REGION:-us-east-1}
       - AWS_S3_ACCESS_KEY_ID=${AWS_S3_ACCESS_KEY_ID}
       - AWS_S3_SECRET_ACCESS_KEY=${AWS_S3_SECRET_ACCESS_KEY}
       - AWS_S3_ENDPOINT=${AWS_S3_ENDPOINT}
-      
+
       # OAuth2
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
@@ -76,22 +76,22 @@ services:
       - KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
       - NAVER_CLIENT_ID=${NAVER_CLIENT_ID}
       - NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET}
-      
+
       # Email
       - MAIL_USERNAME=${MAIL_USERNAME}
       - MAIL_PASSWORD=${MAIL_PASSWORD}
       - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
       - MAIL_PORT=${MAIL_PORT:-587}
-      
+
       # Admin
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
-      
+
       # Logging
       - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT:-WARN}
       - LOGGING_LEVEL_COM_CAMPSTATION=${LOGGING_LEVEL_COM_CAMPSTATION:-INFO}
-      
+
       # Toss Payments
       - TOSS_SECRET_KEY=${TOSS_SECRET_KEY}
       - TOSS_CLIENT_KEY=${TOSS_CLIENT_KEY}
@@ -217,4 +217,3 @@ volumes:
     driver: local
   backend_uploads:
     driver: local
-

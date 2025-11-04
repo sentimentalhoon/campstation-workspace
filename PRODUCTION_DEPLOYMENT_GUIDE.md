@@ -1,6 +1,7 @@
 # CampStation DDNS 프로덕션 배포 가이드
 
 ## 📋 목차
+
 1. [사전 준비](#1-사전-준비)
 2. [서버 초기 설정](#2-서버-초기-설정)
 3. [DDNS 설정](#3-ddns-설정)
@@ -16,6 +17,7 @@
 ## 1️⃣ 사전 준비
 
 ### 필요한 것
+
 - [ ] 리눅스 서버 (Ubuntu 20.04/22.04 LTS 권장)
 - [ ] 최소 사양: CPU 2코어, RAM 4GB, 디스크 40GB
 - [ ] 공유기 관리자 권한 (포트포워딩용)
@@ -23,6 +25,7 @@
 - [ ] 도메인 (선택사항)
 
 ### 서버 접속
+
 ```bash
 ssh user@server-ip
 ```
@@ -32,11 +35,13 @@ ssh user@server-ip
 ## 2️⃣ 서버 초기 설정
 
 ### 시스템 업데이트
+
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
 ### Docker 설치
+
 ```bash
 # Docker 설치
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -55,6 +60,7 @@ docker compose version
 ```
 
 ### 방화벽 설정
+
 ```bash
 # UFW 설치 (Ubuntu)
 sudo apt install ufw -y
@@ -78,6 +84,7 @@ sudo ufw status verbose
 ```
 
 ### Git 설치
+
 ```bash
 sudo apt install git -y
 ```
@@ -89,14 +96,17 @@ sudo apt install git -y
 ### DuckDNS (추천 - 가장 간단)
 
 #### 1. DuckDNS 가입
+
 https://www.duckdns.org/ 접속 → Google/GitHub 계정으로 로그인
 
 #### 2. 도메인 생성
+
 - 도메인 입력: `mycamp` (예시)
 - 생성된 도메인: `mycamp.duckdns.org`
 - Token 복사 (중요!)
 
 #### 3. DuckDNS 클라이언트 설치
+
 ```bash
 # DuckDNS 디렉토리 생성
 mkdir -p ~/duckdns
@@ -123,6 +133,7 @@ cat duck.log
 ```
 
 #### 4. 크론탭 등록 (자동 업데이트)
+
 ```bash
 # 크론탭 편집
 crontab -e
@@ -135,6 +146,7 @@ crontab -l
 ```
 
 #### 5. 서브도메인 설정 (Cloudflare 무료)
+
 DuckDNS는 서브도메인을 지원하지 않으므로, Cloudflare를 추가로 사용:
 
 1. Cloudflare 가입: https://www.cloudflare.com/
@@ -152,6 +164,7 @@ DuckDNS는 서브도메인을 지원하지 않으므로, Cloudflare를 추가로
 ## 4️⃣ 환경변수 설정
 
 ### 프로젝트 클론
+
 ```bash
 cd ~
 git clone https://github.com/sentimentalhoon/campstation-workspace.git
@@ -159,6 +172,7 @@ cd campstation-workspace
 ```
 
 ### 환경변수 파일 생성
+
 ```bash
 # .env.prod 파일 생성
 cp .env.prod.example .env.prod
@@ -168,6 +182,7 @@ nano .env.prod
 ```
 
 ### 필수 설정 항목
+
 ```bash
 # 1. 도메인 설정 (실제 DDNS 도메인으로 변경)
 DOMAIN=mycamp.duckdns.org
@@ -204,6 +219,7 @@ MAIL_PASSWORD=your_gmail_app_password
 ```
 
 ### 비밀번호 출력 및 저장
+
 ```bash
 # 생성된 비밀번호 출력 (안전한 곳에 저장!)
 echo "DB Password: $DB_PASSWORD"
@@ -230,11 +246,13 @@ chmod 600 ~/passwords.txt
 ## 5️⃣ Nginx 설정
 
 ### Nginx 설치
+
 ```bash
 sudo apt install nginx -y
 ```
 
 ### 설정 파일 복사
+
 ```bash
 # Nginx 설정 복사
 sudo cp infrastructure/nginx/campstation-prod.conf /etc/nginx/sites-available/campstation
@@ -253,6 +271,7 @@ sudo nginx -t
 ```
 
 ### Nginx 시작 (SSL 전에는 주석 처리)
+
 ```bash
 # SSL 인증서 발급 전에는 HTTP만 허용하도록 수정
 sudo nano /etc/nginx/sites-available/campstation
@@ -268,11 +287,13 @@ sudo systemctl enable nginx
 ## 6️⃣ SSL 인증서 발급
 
 ### Certbot 설치
+
 ```bash
 sudo apt install certbot python3-certbot-nginx -y
 ```
 
 ### 인증서 발급 (와일드카드)
+
 ```bash
 # 모든 서브도메인 포함 인증서 발급
 sudo certbot --nginx \
@@ -290,6 +311,7 @@ sudo certbot renew --dry-run
 ```
 
 ### 자동 갱신 설정 (크론탭)
+
 ```bash
 # 크론탭 편집
 sudo crontab -e
@@ -299,6 +321,7 @@ sudo crontab -e
 ```
 
 ### Nginx 설정 활성화
+
 ```bash
 # SSL 블록 주석 해제
 sudo nano /etc/nginx/sites-available/campstation
@@ -315,6 +338,7 @@ sudo systemctl restart nginx
 ## 7️⃣ 배포 실행
 
 ### Docker 이미지 빌드 및 실행
+
 ```bash
 cd ~/campstation-workspace
 
@@ -331,6 +355,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f
 ```
 
 ### 컨테이너 상태 확인
+
 ```bash
 # 실행 중인 컨테이너 확인
 docker ps
@@ -344,6 +369,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
 ## 8️⃣ 배포 후 검증
 
 ### 서비스 접속 테스트
+
 ```bash
 # Frontend
 curl -I https://mycamp.duckdns.org
@@ -359,6 +385,7 @@ curl -I https://console.mycamp.duckdns.org
 ```
 
 ### 브라우저 접속
+
 1. **Frontend**: https://mycamp.duckdns.org
 2. **MinIO Console**: https://console.mycamp.duckdns.org
    - ID: `campstation_minio_admin_2025`
@@ -368,6 +395,7 @@ curl -I https://console.mycamp.duckdns.org
    - PW: (생성한 비밀번호)
 
 ### SSL 인증서 확인
+
 ```bash
 # 인증서 정보
 sudo certbot certificates
@@ -381,6 +409,7 @@ https://www.ssllabs.com/ssltest/analyze.html?d=mycamp.duckdns.org
 ## 9️⃣ 트러블슈팅
 
 ### 컨테이너가 시작되지 않음
+
 ```bash
 # 로그 확인
 docker compose -f docker-compose.yml -f docker-compose.prod.yml logs backend
@@ -393,6 +422,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml restart
 ```
 
 ### 502 Bad Gateway
+
 ```bash
 # Backend 상태 확인
 docker logs campstation-backend
@@ -405,6 +435,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml restart backend
 ```
 
 ### SSL 인증서 갱신 실패
+
 ```bash
 # 수동 갱신
 sudo certbot renew --force-renewal
@@ -417,6 +448,7 @@ sudo cat /var/log/letsencrypt/letsencrypt.log
 ```
 
 ### 데이터베이스 연결 실패
+
 ```bash
 # DB 컨테이너 로그
 docker logs campstation-db
@@ -429,6 +461,7 @@ cat .env.prod | grep DB_PASSWORD
 ```
 
 ### MinIO 접속 불가
+
 ```bash
 # MinIO 로그
 docker logs campstation-minio
@@ -445,6 +478,7 @@ docker exec -it campstation-minio mc ls campstation
 ## 🔄 업데이트 방법
 
 ### 코드 업데이트
+
 ```bash
 cd ~/campstation-workspace
 
@@ -459,6 +493,7 @@ docker image prune -f
 ```
 
 ### 환경변수 변경
+
 ```bash
 # .env.prod 수정
 nano .env.prod
@@ -472,6 +507,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml restart
 ## 🗄️ 백업 방법
 
 ### 데이터베이스 백업
+
 ```bash
 # 백업 디렉토리 생성
 mkdir -p ~/backups
@@ -489,6 +525,7 @@ crontab -e
 ```
 
 ### MinIO 데이터 백업
+
 ```bash
 # MinIO 볼륨 백업
 docker run --rm -v campstation_minio_data_prod:/data -v ~/backups:/backup ubuntu tar czf /backup/minio_$(date +%Y%m%d).tar.gz /data
@@ -499,6 +536,7 @@ docker run --rm -v campstation_minio_data_prod:/data -v ~/backups:/backup ubuntu
 ## 📊 모니터링
 
 ### 로그 확인
+
 ```bash
 # 모든 서비스 로그
 docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f
@@ -512,6 +550,7 @@ sudo tail -f /var/log/nginx/campstation-*-error.log
 ```
 
 ### 리소스 모니터링
+
 ```bash
 # 컨테이너 리소스 사용량
 docker stats
@@ -547,4 +586,3 @@ free -h
 - [Let's Encrypt](https://letsencrypt.org/)
 - [DuckDNS](https://www.duckdns.org/)
 - [MinIO 문서](https://min.io/docs/minio/linux/index.html)
-
