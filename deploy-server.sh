@@ -91,6 +91,10 @@ print_step "4" "서브모듈 업데이트 중..."
 
 cd ~/campstation-workspace
 
+# .gitmodules 파일의 URL을 토큰 포함 URL로 변경
+sed -i "s|https://github.com/sentimentalhoon/campstation-backend.git|https://${GITHUB_TOKEN}@github.com/sentimentalhoon/campstation-backend.git|g" .gitmodules
+sed -i "s|https://github.com/sentimentalhoon/campstation-frontend.git|https://${GITHUB_TOKEN}@github.com/sentimentalhoon/campstation-frontend.git|g" .gitmodules
+
 # 서브모듈 URL을 토큰 포함 URL로 변경
 git config submodule.backend.url https://${GITHUB_TOKEN}@github.com/sentimentalhoon/campstation-backend.git
 git config submodule.frontend.url https://${GITHUB_TOKEN}@github.com/sentimentalhoon/campstation-frontend.git
