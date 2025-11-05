@@ -112,11 +112,12 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./infrastructure/nginx/campstation-prod-simple.conf:/etc/nginx/conf.d/default.conf:ro
-      # SSL 적용 후에는 campstation-prod.conf로 변경
-      # - ./infrastructure/nginx/campstation-prod.conf:/etc/nginx/conf.d/default.conf:ro
-      # - /etc/letsencrypt:/etc/letsencrypt:ro
-      # - /var/www/certbot:/var/www/certbot:ro
+      # HTTP-only config (SSL 설정 전)
+      # - ./infrastructure/nginx/campstation-prod-simple.conf:/etc/nginx/conf.d/default.conf:ro
+      # SSL 적용 버전
+      - ./infrastructure/nginx/campstation-prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
     depends_on:
       - frontend
       - backend
