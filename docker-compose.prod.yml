@@ -72,7 +72,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_S3_SECRET_ACCESS_KEY}
       - CLOUD_AWS_S3_ENDPOINT=${AWS_S3_ENDPOINT:-http://campstation-minio:9000}
       - CLOUD_AWS_S3_EXTERNAL_ENDPOINT=${AWS_S3_EXTERNAL_ENDPOINT:-http://campstation-minio:9000}
-      - CLOUD_AWS_S3_PUBLIC_ENDPOINT=${AWS_S3_PUBLIC_ENDPOINT:-https://storage.mycamp.duckdns.org}
+      - CLOUD_AWS_S3_PUBLIC_ENDPOINT=${AWS_S3_PUBLIC_ENDPOINT:-https://mycamp.duckdns.org/storage}
 
       # OAuth2
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
