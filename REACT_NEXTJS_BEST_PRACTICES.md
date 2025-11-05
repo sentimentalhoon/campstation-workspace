@@ -9,24 +9,28 @@
 ## 🎯 Next.js 16 & React 19 주요 변경사항
 
 ### ✨ React Compiler (자동 메모이제이션)
+
 - **React Compiler 활성화**: `reactCompiler: true` 설정으로 자동 최적화
 - **수동 최적화 감소**: `useMemo`, `useCallback` 대부분 불필요
 - **컴포넌트 자동 메모**: React.memo 자동 적용
 - **여전히 필요한 것**: 올바른 key 사용, 적절한 상태 구조
 
 ### 🔄 Async Request APIs (필수)
+
 - **params**: `Promise<{ id: string }>` → `await params` 필요
-- **searchParams**: `Promise<{ q: string }>` → `await searchParams` 필요  
+- **searchParams**: `Promise<{ q: string }>` → `await searchParams` 필요
 - **cookies()**: `await cookies()` 필수
 - **headers()**: `await headers()` 필수
 - **draftMode()**: `await draftMode()` 필수
 
 ### 🚀 Turbopack 기본 사용
+
 - **개발/프로덕션**: 모두 Turbopack 기본 활성화
 - **빌드 속도**: Webpack 대비 5-10배 빠름
 - **Webpack 사용**: `--webpack` 플래그로 옵트아웃 가능
 
 ### 📦 React 19 새 기능
+
 - **use()**: Promise와 Context를 직접 읽기
 - **useFormStatus()**: 폼 제출 상태 관리
 - **useFormState()**: 서버 액션 상태 관리
@@ -372,9 +376,12 @@ const BasicInfoSection = memo(() => {
 
 ```tsx
 // ❌ 구식 (Next.js 14)
-export default function Page({ params, searchParams }: {
-  params: { id: string }
-  searchParams: { q: string }
+export default function Page({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { q: string };
 }) {
   const id = params.id;
   const query = searchParams.q;
@@ -382,12 +389,12 @@ export default function Page({ params, searchParams }: {
 
 // ✅ 현대적 (Next.js 16)
 export default async function Page(props: {
-  params: Promise<{ id: string }>
-  searchParams: Promise<{ q: string }>
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ q: string }>;
 }) {
   const params = await props.params;
   const searchParams = await props.searchParams;
-  
+
   const id = params.id;
   const query = searchParams.q;
 }
@@ -397,16 +404,16 @@ export default async function Page(props: {
 
 ```tsx
 // Server Component에서
-import { cookies, headers } from 'next/headers';
+import { cookies, headers } from "next/headers";
 
 export default async function Page() {
   // ✅ await 필수
   const cookieStore = await cookies();
-  const token = cookieStore.get('token');
-  
+  const token = cookieStore.get("token");
+
   const headersList = await headers();
-  const userAgent = headersList.get('user-agent');
-  
+  const userAgent = headersList.get("user-agent");
+
   return <div>Token: {token?.value}</div>;
 }
 ```
@@ -414,17 +421,17 @@ export default async function Page() {
 #### ✅ Server Action에서 cookies 사용
 
 ```tsx
-'use server';
-import { cookies } from 'next/headers';
+"use server";
+import { cookies } from "next/headers";
 
 export async function createSession(data: FormData) {
   const cookieStore = await cookies();
-  
-  cookieStore.set('session', 'value', {
+
+  cookieStore.set("session", "value", {
     httpOnly: true,
     secure: true,
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 7 // 1 week
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7, // 1 week
   });
 }
 ```
@@ -436,34 +443,34 @@ export async function createSession(data: FormData) {
 #### ✅ Promise 읽기
 
 ```tsx
-import { use } from 'react';
+import { use } from "react";
 
 function UserProfile({ userPromise }: { userPromise: Promise<User> }) {
   // ✅ use()로 Promise 직접 읽기
   const user = use(userPromise);
-  
+
   return <div>{user.name}</div>;
 }
 
 // 사용
 <Suspense fallback={<Skeleton />}>
   <UserProfile userPromise={fetchUser()} />
-</Suspense>
+</Suspense>;
 ```
 
 #### ✅ Context 읽기 (조건부 가능)
 
 ```tsx
-import { use } from 'react';
+import { use } from "react";
 
 function Button() {
   const theme = use(ThemeContext);
-  
+
   // ✅ 조건부로 사용 가능 (useContext는 불가능)
   if (condition) {
     const auth = use(AuthContext);
   }
-  
+
   return <button className={theme}>Click</button>;
 }
 ```
@@ -475,15 +482,15 @@ function Button() {
 #### ✅ useFormStatus()로 제출 상태 관리
 
 ```tsx
-'use client';
-import { useFormStatus } from 'react-dom';
+"use client";
+import { useFormStatus } from "react-dom";
 
 function SubmitButton() {
   const { pending, data, method } = useFormStatus();
-  
+
   return (
     <button type="submit" disabled={pending}>
-      {pending ? '저장 중...' : '저장'}
+      {pending ? "저장 중..." : "저장"}
     </button>
   );
 }
@@ -492,13 +499,13 @@ function SubmitButton() {
 #### ✅ useFormState()로 서버 액션 상태 관리
 
 ```tsx
-'use client';
-import { useFormState } from 'react-dom';
-import { createCampground } from './actions';
+"use client";
+import { useFormState } from "react-dom";
+import { createCampground } from "./actions";
 
 function CampgroundForm() {
-  const [state, formAction] = useFormState(createCampground, { message: '' });
-  
+  const [state, formAction] = useFormState(createCampground, { message: "" });
+
   return (
     <form action={formAction}>
       <input name="name" required />
@@ -512,16 +519,16 @@ function CampgroundForm() {
 #### ✅ Server Action 작성
 
 ```tsx
-'use server';
+"use server";
 
 export async function createCampground(prevState: any, formData: FormData) {
-  const name = formData.get('name') as string;
-  
+  const name = formData.get("name") as string;
+
   try {
     await db.campgrounds.create({ name });
-    return { message: '캠핑장이 생성되었습니다.' };
+    return { message: "캠핑장이 생성되었습니다." };
   } catch (error) {
-    return { message: '오류가 발생했습니다.' };
+    return { message: "오류가 발생했습니다." };
   }
 }
 ```
@@ -533,66 +540,62 @@ export async function createCampground(prevState: any, formData: FormData) {
 #### ✅ 즉시 피드백 UI
 
 ```tsx
-'use client';
-import { useOptimistic } from 'react';
+"use client";
+import { useOptimistic } from "react";
 
 function LikeButton({ reviewId, initialLikes }: Props) {
   const [optimisticLikes, addOptimisticLike] = useOptimistic(
     initialLikes,
     (state, newLike: number) => state + newLike
   );
-  
+
   async function handleLike() {
     // ✅ 즉시 UI 업데이트
     addOptimisticLike(1);
-    
+
     // 서버 요청
     await likeReview(reviewId);
   }
-  
-  return (
-    <button onClick={handleLike}>
-      좋아요 {optimisticLikes}
-    </button>
-  );
+
+  return <button onClick={handleLike}>좋아요 {optimisticLikes}</button>;
 }
 ```
 
 #### ✅ 낙관적 상태와 폼 결합
 
 ```tsx
-'use client';
-import { useOptimistic } from 'react';
-import { addReview } from './actions';
+"use client";
+import { useOptimistic } from "react";
+import { addReview } from "./actions";
 
 function Reviews({ reviews }: { reviews: Review[] }) {
   const [optimisticReviews, addOptimisticReview] = useOptimistic(
     reviews,
     (state, newReview: Review) => [...state, { ...newReview, pending: true }]
   );
-  
+
   async function formAction(formData: FormData) {
     const newReview = {
       id: Date.now(),
-      content: formData.get('content') as string,
+      content: formData.get("content") as string,
     };
-    
+
     // ✅ 즉시 화면에 표시
     addOptimisticReview(newReview);
-    
+
     // 서버 요청
     await addReview(formData);
   }
-  
+
   return (
     <>
       <form action={formAction}>
         <textarea name="content" required />
         <button type="submit">리뷰 작성</button>
       </form>
-      
-      {optimisticReviews.map(review => (
-        <div key={review.id} className={review.pending ? 'opacity-50' : ''}>
+
+      {optimisticReviews.map((review) => (
+        <div key={review.id} className={review.pending ? "opacity-50" : ""}>
           {review.content}
         </div>
       ))}
@@ -612,17 +615,13 @@ function Reviews({ reviews }: { reviews: Review[] }) {
 function ExpensiveComponent({ data }: Props) {
   // 수동 useMemo 불필요 - 컴파일러가 자동 처리
   const computed = data.items.reduce((acc, item) => acc + item.price, 0);
-  
+
   // 수동 useCallback 불필요 - 컴파일러가 자동 처리
   const handleClick = () => {
     console.log(computed);
   };
-  
-  return (
-    <div onClick={handleClick}>
-      Total: {computed}
-    </div>
-  );
+
+  return <div onClick={handleClick}>Total: {computed}</div>;
 }
 ```
 
@@ -630,12 +629,14 @@ function ExpensiveComponent({ data }: Props) {
 
 ```tsx
 // ✅ key는 여전히 중요 (컴파일러가 해결 못함)
-{items.map(item => (
-  <Item key={item.id} {...item} />  // ✅ 안정된 key
-))}
+{
+  items.map((item) => (
+    <Item key={item.id} {...item} /> // ✅ 안정된 key
+  ));
+}
 
 // ✅ 큰 리스트는 가상화 필요
-import { FixedSizeList } from 'react-window';
+import { FixedSizeList } from "react-window";
 
 // ✅ 무거운 계산은 웹 워커로
 const result = await heavyComputation();
@@ -648,26 +649,26 @@ const result = await heavyComputation();
 #### ✅ 부드러운 페이지 전환
 
 ```tsx
-'use client';
-import { useRouter } from 'next/navigation';
-import { startTransition } from 'react';
+"use client";
+import { useRouter } from "next/navigation";
+import { startTransition } from "react";
 
 function Navigation() {
   const router = useRouter();
-  
+
   function handleNavigate() {
     // ✅ View Transition 사용
     if (document.startViewTransition) {
       document.startViewTransition(() => {
         startTransition(() => {
-          router.push('/campgrounds');
+          router.push("/campgrounds");
         });
       });
     } else {
-      router.push('/campgrounds');
+      router.push("/campgrounds");
     }
   }
-  
+
   return <button onClick={handleNavigate}>캠핑장 보기</button>;
 }
 ```
@@ -690,11 +691,15 @@ function Navigation() {
 }
 
 @keyframes fade-out {
-  to { opacity: 0; }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
+  from {
+    opacity: 0;
+  }
 }
 ```
 
@@ -706,7 +711,7 @@ function Navigation() {
 
 ```tsx
 // ❌ 더 이상 필요 없음
-import React from 'react';
+import React from "react";
 
 // ✅ React 임포트 불필요 (tsconfig.json의 jsx: "react-jsx")
 export default function Component() {
@@ -717,18 +722,20 @@ export default function Component() {
 #### ✅ 타입 안전한 Server Actions
 
 ```tsx
-'use server';
+"use server";
 
 // ✅ 타입 정의
-type CreateResult = { success: true; id: number } | { success: false; error: string };
+type CreateResult =
+  | { success: true; id: number }
+  | { success: false; error: string };
 
 export async function createCampground(data: FormData): Promise<CreateResult> {
-  const name = data.get('name') as string;
-  
+  const name = data.get("name") as string;
+
   if (!name) {
-    return { success: false, error: '이름을 입력하세요.' };
+    return { success: false, error: "이름을 입력하세요." };
   }
-  
+
   const campground = await db.campgrounds.create({ name });
   return { success: true, id: campground.id };
 }
@@ -739,25 +746,29 @@ export async function createCampground(data: FormData): Promise<CreateResult> {
 ## 📊 마이그레이션 체크리스트
 
 ### Phase 1: 필수 마이그레이션 (Breaking Changes)
+
 - [ ] 모든 `params`를 `Promise<T>` 타입으로 변경
-- [ ] 모든 `searchParams`를 `Promise<T>` 타입으로 변경  
+- [ ] 모든 `searchParams`를 `Promise<T>` 타입으로 변경
 - [ ] `cookies()` 호출에 `await` 추가
 - [ ] `headers()` 호출에 `await` 추가
 - [ ] `draftMode()` 호출에 `await` 추가
 - [ ] 불필요한 `React` 임포트 제거
 
 ### Phase 2: Server Actions 현대화
+
 - [ ] 폼 제출에 `useFormState()` 적용
 - [ ] 제출 버튼에 `useFormStatus()` 적용
 - [ ] Server Actions에 타입 안전성 추가
 - [ ] 에러 처리 개선
 
 ### Phase 3: 낙관적 UI 추가
+
 - [ ] 좋아요/북마크에 `useOptimistic()` 적용
 - [ ] 리뷰 작성에 즉시 피드백 추가
 - [ ] 예약 생성에 낙관적 업데이트 적용
 
 ### Phase 4: 고급 최적화
+
 - [ ] View Transitions API 적용
 - [ ] `use()` Hook으로 Promise 처리
 - [ ] React Compiler 최적화 검증
@@ -777,6 +788,7 @@ export async function createCampground(data: FormData): Promise<CreateResult> {
 **마지막 업데이트**: 2025-11-06  
 **프로젝트**: CampStation  
 **버전**: Next.js 16.0.1 + React 19.2.0
+
 ```
 
 ---
@@ -804,3 +816,4 @@ export async function createCampground(data: FormData): Promise<CreateResult> {
 - ✅ 이미지/리소스 재로드 방지
 - ✅ API 중복 호출 방지
 - ✅ 부드러운 사용자 경험
+```
