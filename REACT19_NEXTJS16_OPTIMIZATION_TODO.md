@@ -31,7 +31,8 @@
 - ⚠️ **H-5: Server Actions (아키텍처 제약으로 보류)** 🔍
 - ✅ **M-1: Error Boundary 추가 (3개 페이지, 1개 커밋)** ⭐
 - ✅ **M-2: Metadata API 최적화 (2개 페이지, 1개 커밋)** ⭐
-- ✅ **M-3: Route Segment Config (7개 페이지, 1개 커밋)** ⭐ NEW!
+- ✅ **M-3: Route Segment Config (7개 페이지, 1개 커밋)** ⭐
+- ✅ **M-4: Loading UI 추가 (3개 라우트, 1개 커밋)** ⭐ NEW!
 
 ### 🔍 발견된 최적화 대상
 
@@ -438,7 +439,7 @@ const handleFilter = (newFilter) => {
 현재 프로젝트는 **HttpOnly 쿠키 기반 인증**을 사용하고 있어 Server Actions 적용에 제약이 있습니다:
 
 1. **인증 시스템**: Backend가 HttpOnly 쿠키로 토큰 관리
-2. **Server Actions 한계**: 
+2. **Server Actions 한계**:
    - Next.js Server Actions는 쿠키를 설정할 수 있으나, 백엔드 API가 이미 쿠키 관리
    - 중복된 쿠키 처리 로직 필요
    - AuthContext와의 동기화 문제
@@ -457,6 +458,7 @@ const handleFilter = (newFilter) => {
 **결론**:
 
 현재 아키텍처에서는 **클라이언트 컴포넌트 + useTransition + API 레이어** 패턴이 더 적합합니다. Server Actions 적용은 다음 조건에서 재검토:
+
 - 백엔드 API를 Next.js Route Handlers로 마이그레이션
 - Session 기반 인증으로 전환
 - 또는 Server Component에서 직접 데이터 mutation이 필요한 경우
@@ -590,6 +592,7 @@ export default function CampgroundsError({ error, reset }: ErrorProps) {
 - [x] `app/payment/error.tsx` - 결제 에러 (중복 결제 경고) ✅
 
 **특징**:
+
 - 페이지별 맞춤형 에러 메시지
 - 개발 모드에서 에러 상세 정보 표시
 - 사용자 친화적인 액션 버튼 (재시도, 홈, 로그인)
@@ -630,6 +633,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   - 에러 처리 및 폴백
 
 **성과**:
+
 - 동적 페이지 SEO 개선
 - 소셜 미디어 공유 최적화
 - 프라이버시 정책 준수 (예약 정보 noindex) 🎉
@@ -659,22 +663,28 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   - 캠핑장 상세 정보 5분 캐싱
 
 **성과**:
+
 - 사용자 데이터는 항상 최신 상태 유지 (`force-dynamic`)
 - 공개 정보는 적절한 캐싱 적용 (`revalidate`)
 - 7개 페이지에 Route Segment Config 적용 완료 🎉
 
 ---
 
-### 🟡 M-4: Loading.tsx 파일 추가 (10+ 라우트)
+### ✅ M-4: Loading.tsx 파일 추가 (10+ 라우트) → ✅ 완료!
 
 **문제**: Next.js 로딩 UI 미활용  
 **영향**: 로딩 상태 일관성 부족
 
-**작업**:
+**완료된 작업** (Commit daf5652):
 
-- [ ] `app/campgrounds/loading.tsx` 생성
-- [ ] `app/dashboard/loading.tsx` 생성
-- [ ] 주요 라우트별 `loading.tsx` 추가
+- [x] `app/campgrounds/loading.tsx` - 캠핑장 목록 로딩 UI ✅
+- [x] `app/dashboard/loading.tsx` - 대시보드 로딩 UI ✅
+- [x] `app/reservations/loading.tsx` - 예약 페이지 로딩 UI ✅
+
+**성과**:
+- 주요 라우트에 Next.js 자동 로딩 상태 적용
+- LoadingSpinner 컴포넌트로 일관된 UX 제공
+- 3개 라우트에 loading.tsx 추가 완료 🎉
 
 ---
 
