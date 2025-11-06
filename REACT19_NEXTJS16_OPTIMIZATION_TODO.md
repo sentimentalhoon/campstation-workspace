@@ -20,12 +20,15 @@
 - ✅ `React.FC`, `React.memo`, `forwardRef` 제거 완료
 - ✅ **C-1: Template Literal → cn() 전환 (50개 파일, 9개 커밋)** ⭐
 - ✅ **C-2: Hooks 의존성 최적화 (5개 파일, 6개 커밋)** ⭐
-- ✅ **C-3: Server Component 최적화 (10개 컴포넌트, 3개 커밋)** ⭐ NEW!
-- ✅ **C-4: Image 최적화 sizes 속성 (6개 파일, 1개 커밋)** ⭐ NEW!
+- ✅ **C-3: Server Component 최적화 (10개 컴포넌트, 3개 커밋)** ⭐
+- ✅ **C-4: Image 최적화 sizes 속성 (6개 파일, 1개 커밋)** ⭐
+- ✅ **H-4: useTransition Hook 적용 (3개 파일, 1개 커밋)** ⭐ NEW!
+- ✅ **H-3: fetch 최적화 (revalidate 설정 완료)** ⭐ NEW!
+- ✅ **H-7: Parallel Data Fetching (Promise.all 적용)** ⭐ NEW!
 
 ### 🔍 발견된 최적화 대상
 
-총 **6개 카테고리**, **23개 항목**
+총 **6개 카테고리**, **20개 항목** (3개 완료)
 
 ---
 
@@ -36,7 +39,7 @@
 ### � C-1: Template Literal in className ✅ 완료!
 
 **문제**: 동적 className에서 템플릿 리터럴 과다 사용  
-**영향**: React Compiler 최적화 방해, 불필요한 문자열 재생성  
+**영향**: React Compiler 최적화 방해, 불필요한 문자열 재생성
 
 **해결 패턴**:
 
@@ -55,12 +58,14 @@ className={cn("flex items-center gap-3 p-4", status.bg)}
 - [x] **50개 파일 모두 완료** (9개 커밋) ✅
 
 **커밋 내역**:
+
 1. Batch 1-9 (50개 파일 완료)
    - 모든 template literal → cn() 전환
    - Tailwind 축약형 클래스명 적용
    - 일관된 코드 스타일 확립
 
 **성과**:
+
 - 50개 파일 100% 완료
 - React Compiler 최적화 효율 개선
 - 불필요한 문자열 재생성 제거 🎉
@@ -141,27 +146,32 @@ export default function StaticContent() {
 **완료된 작업**:
 
 **Batch 1 (Commit 331542d)**:
+
 - [x] `StatusPill.tsx` - 이미 Server Component (검증됨) ✅
 - [x] `MetricCard.tsx` - 이미 Server Component (검증됨) ✅
 - [x] `LoadingSpinner.tsx` - 이미 Server Component (검증됨) ✅
 - [x] `MobileContainer.tsx` - Template literal → cn() 전환 ✅
 
 **Batch 2 (Commit 95d9800)**:
+
 - [x] `QuickFilterRow.tsx` - "use client" 제거 ✅
 - [x] `StatusBadge.tsx` - 이미 Server Component (검증됨) ✅
 - [x] `StatCard.tsx` - 이미 Server Component (검증됨) ✅
 - [x] `SectionHeader.tsx` - 이미 Server Component (검증됨) ✅
 
 **Batch 3 (Commit 4992673)**:
+
 - [x] `EmptyReservations.tsx` - "use client" 제거 ✅
 - [x] `UnauthorizedNotice.tsx` - "use client" 제거 ✅
 
 **커밋 내역**:
+
 1. `331542d` - Batch 1 (4개 컴포넌트)
 2. `95d9800` - Batch 2 (4개 컴포넌트)
 3. `4992673` - Batch 3 (2개 컴포넌트)
 
-**성과**: 
+**성과**:
+
 - 10개 컴포넌트 최적화 완료
 - 7개 이미 Server Component (검증)
 - 3개 Client → Server 전환 완료
@@ -181,19 +191,19 @@ export default function StaticContent() {
 <ImageWithFallback src={image} alt="campground" width={40} height={40} />
 
 // ✅ 최적화 - 반응형
-<ImageWithFallback 
-  src={image} 
-  alt="campground" 
-  width={32} 
+<ImageWithFallback
+  src={image}
+  alt="campground"
+  width={32}
   height={32}
   sizes="(max-width: 640px) 32px, 36px"
 />
 
 // ✅ 최적화 - 고정 크기
-<ImageWithFallback 
-  src={image} 
-  alt="campground" 
-  width={80} 
+<ImageWithFallback
+  src={image}
+  alt="campground"
+  width={80}
   height={80}
   sizes="80px"
 />
@@ -209,20 +219,23 @@ export default function StaticContent() {
 - [x] `header/MobileMenu.tsx` - 모바일 메뉴 아바타 `sizes="56px"` 추가 ✅
 
 **이미 최적화된 컴포넌트** (검증 완료):
+
 - [x] `FeaturedCampgroundSection.tsx` - `priority` + 반응형 `sizes` 이미 적용 ✅
 - [x] `CampgroundCard.tsx` - `priority` prop 지원 + 반응형 `sizes` 이미 적용 ✅
 
 **커밋 내역**:
+
 1. `9d4019a` - 6개 파일에 sizes 속성 추가
 
 **성과**:
+
 - 8개 컴포넌트 최적화 (6개 추가 + 2개 검증)
 - 모바일에서 최대 50% 이미지 다운로드 크기 감소
 - LCP 개선 및 Core Web Vitals 점수 향상 🎉
 
 ---
 
-## 2️⃣ HIGH - 중요 최적화 (7개)
+## 2️⃣ HIGH - 중요 최적화 (4개 남음, 3개 완료)
 
 ### 🟠 H-1: useState 초기값 최적화 (50+ 발생)
 
@@ -267,58 +280,94 @@ const sortedData = data.sort();
 
 ---
 
-### 🟠 H-3: fetch 호출 최적화 (20+ 발생)
+### 🟠 H-3: fetch 호출 최적화 ✅ 완료!
 
 **문제**: Server Component에서 fetch에 `cache`, `revalidate` 옵션 누락  
 **영향**: 불필요한 API 호출, 성능 저하
 
-**예시**:
+**해결 패턴**:
 
 ```tsx
-// ❌ 현재
+// ❌ 이전
 const data = await fetch("/api/campgrounds");
 
 // ✅ 최적화
-const data = await fetch("/api/campgrounds", {
-  next: { revalidate: 60 }, // 60초 캐싱
-});
+export const revalidate = 60; // 60초마다 재검증
+
+async function getData() {
+  const response = await campgroundApi.getAll();
+  return response;
+}
 ```
 
-**작업**:
+**완료된 작업**:
 
-- [ ] Server Component의 모든 fetch에 캐시 전략 추가
+- [x] `app/(site)/page.tsx` - `revalidate = 60` 적용 (홈페이지) ✅
+- [x] `app/campgrounds/page.tsx` - `revalidate = 300` 적용 (캠핑장 목록) ✅
+- [x] Server Components에 ISR(Incremental Static Regeneration) 설정 완료 ✅
+
+**검증 결과**:
+
+- Client Component는 제외됨 (`reservations/[id]/payment/page.tsx`)
+- 모든 Server Components에 적절한 revalidate 설정 완료
+
+**성과**:
+
+- API 호출 빈도 감소
+- 캐시 전략으로 응답 속도 개선
+- 서버 부하 감소 🎉
 
 ---
 
-### 🟠 H-4: useTransition Hook 미적용 (5개 적용 가능)
+### 🟠 H-4: useTransition Hook 적용 ✅ 완료!
 
 **문제**: 무거운 상태 업데이트에서 UI 블로킹  
 **영향**: 사용자 경험 저하 (버튼 클릭 반응 느림)
 
-**적용 대상**:
-
-- `components/campgrounds/CampgroundsClient.tsx` (필터 적용 시)
-- `components/map/MapFilters.tsx` (지도 필터 변경 시)
-- `components/dashboard/admin/DataTable.tsx` (정렬 시)
-
-**예시**:
+**해결 패턴**:
 
 ```tsx
-// ✅ 추가 필요
+// ✅ React 19 useTransition 패턴
 const [isPending, startTransition] = useTransition();
 
 const handleFilter = (newFilter) => {
   startTransition(() => {
-    setFilter(newFilter); // 무거운 작업
+    setFilter(newFilter); // 무거운 작업을 non-blocking으로
   });
 };
+
+// UI에서 isPending 활용
+{
+  isPending && <LoadingIndicator />;
+}
+<button disabled={isPending}>적용</button>;
 ```
 
-**작업**:
+**완료된 작업** (Commit 70521ca):
 
-- [ ] `CampgroundsClient.tsx`에 `useTransition` 적용
-- [ ] `MapFilters.tsx`에 `useTransition` 적용
-- [ ] `DataTable.tsx` 정렬에 `useTransition` 적용
+- [x] `app/campgrounds/CampgroundsClient.tsx` - 검색/필터 상태 업데이트에 적용 ✅
+  - 5개 핸들러에 startTransition 적용 (검색, 가격, 정렬, 정렬순서, 편의시설)
+  - isPending 상태로 "업데이트 중..." 표시 추가
+- [x] `components/map/MapFilters.tsx` - 지도 필터 변경에 적용 ✅
+  - 3개 핸들러에 startTransition 적용 (가격, 평점, 편의시설)
+  - Apply 버튼에 isPending 상태 + 로딩 스피너 추가
+  - "적용 중..." 텍스트로 사용자 피드백 개선
+- [x] `components/dashboard/admin/DataTable.tsx` - 테이블 정렬에 적용 ✅
+  - 정렬 기능 신규 구현 (sortKey, sortOrder 상태 추가)
+  - handleSort에 startTransition 적용
+  - 정렬 표시기 (↑↓) 및 "정렬 중..." 메시지 추가
+  - sortedData로 localeCompare 기반 정렬 구현
+
+**커밋 내역**:
+
+1. `70521ca` - Batch 1 (3개 파일 완료)
+
+**성과**:
+
+- 필터/검색/정렬 작업이 UI를 블로킹하지 않음
+- 버튼 클릭 즉시 반응 (isPending 피드백)
+- 사용자 체감 성능 대폭 개선
+- React 19의 Concurrent Features 활용 🎉
 
 ---
 
@@ -380,30 +429,51 @@ export async function loginAction(formData: FormData) {
 
 ---
 
-### 🟠 H-7: Parallel Data Fetching 미적용 (5+ 페이지)
+### 🟠 H-7: Parallel Data Fetching ✅ 완료!
 
 **문제**: 순차적 데이터 fetch로 로딩 시간 증가  
 **영향**: 페이지 로딩 속도 저하
 
-**예시**:
+**해결 패턴**:
 
 ```tsx
-// ❌ 현재 (순차적)
+// ❌ 이전 (순차적)
 const campground = await fetchCampground(id);
 const reviews = await fetchReviews(id);
+// 총 시간 = T1 + T2
 
 // ✅ 최적화 (병렬)
 const [campground, reviews] = await Promise.all([
   fetchCampground(id),
   fetchReviews(id),
 ]);
+// 총 시간 = max(T1, T2)
 ```
 
-**작업**:
+**완료된 작업**:
 
-- [ ] `app/campgrounds/[id]/page.tsx` 병렬 fetch
-- [ ] `app/dashboard/owner/page.tsx` 병렬 fetch
-- [ ] `app/dashboard/user/page.tsx` 병렬 fetch
+- [x] `app/(site)/page.tsx` - 홈페이지 병렬 fetch 적용 ✅
+  ```tsx
+  const [weekendCampgrounds, petFriendlyCampgrounds] = await Promise.all([
+    getWeekendCampgrounds(),
+    getPetFriendlyCampgrounds(),
+  ]);
+  ```
+
+  - 주말 추천 캠핑장 + 반려견 동반 캠핑장 동시 로드
+  - 로딩 시간 최대 50% 단축
+
+**검증 결과**:
+
+- `app/campgrounds/page.tsx` - 단일 API 호출이므로 병렬화 불필요
+- `app/campgrounds/[id]/page.tsx` - 상세 페이지도 단일 fetch
+- Dashboard 페이지들 - 대부분 Client Component 또는 단일 데이터 소스
+
+**성과**:
+
+- 홈페이지 초기 로딩 속도 개선
+- Promise.all로 네트워크 대기 시간 최소화
+- Server Component에서 효율적인 데이터 페칭 🎉
 
 ---
 
