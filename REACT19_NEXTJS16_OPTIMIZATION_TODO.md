@@ -26,8 +26,9 @@
 - ✅ **H-3: fetch 최적화 (revalidate 설정 완료)** ⭐
 - ✅ **H-7: Parallel Data Fetching (Promise.all 적용)** ⭐
 - ✅ **H-6: Suspense 경계 추가 (5개 페이지, 1개 커밋)** ⭐
-- ✅ **H-1: useState 초기값 최적화 (2개 파일, 1개 커밋)** ⭐ NEW!
-- ✅ **H-2: useMemo 과다 사용 제거 (4개 파일, 1개 커밋)** ⭐ NEW!
+- ✅ **H-1: useState 초기값 최적화 (2개 파일, 1개 커밋)** ⭐
+- ✅ **H-2: useMemo 과다 사용 제거 (4개 파일, 1개 커밋)** ⭐
+- ⚠️ **H-5: Server Actions (아키텍처 제약으로 보류)** 🔍 NEW!
 
 ### 🔍 발견된 최적화 대상
 
@@ -238,7 +239,7 @@ export default function StaticContent() {
 
 ---
 
-## 2️⃣ HIGH - 중요 최적화 (1개 남음, 6개 완료)
+## 2️⃣ HIGH - 중요 최적화 (0개 남음, 7개 완료 - 1개 보류)
 
 ### 🟠 H-1: useState 초기값 최적화 ✅ 완료!
 
@@ -261,14 +262,17 @@ const [currentDate, setCurrentDate] = useState(() => new Date());
 - [x] `DateRangePicker.tsx` - `useState(() => new Date())` 적용 ✅
 
 **검토 결과**:
+
 - 다른 useState 초기값들은 대부분 단순 값이거나 props
 - `??` 또는 `||` 연산자는 비용이 낮아 최적화 불필요
 - React Compiler가 이미 자동 최적화
 
 **커밋 내역**:
+
 1. `a8f24f7` - 2개 파일 lazy initialization 적용
 
 **성과**:
+
 - Date 객체 불필요한 재생성 방지
 - 초기 렌더링 성능 개선
 - React 모범 사례 준수 🎉
@@ -298,20 +302,24 @@ const canEdit = user?.role === "OWNER";
 - [x] `HomeLandingShell.tsx` - displayName을 IIFE 패턴으로 변경 ✅
 
 **제거한 useMemo 유형**:
+
 1. **단순 비교**: `user?.role === "OWNER"` - 불필요한 memoization
 2. **단순 ternary**: 조건부 문자열 템플릿 - React Compiler 자동 처리
 3. **IIFE 패턴**: 복잡한 로직도 IIFE로 가독성 유지하며 불필요한 memoization 제거
 
 **검토 결과**:
+
 - 총 50+ useMemo 발견
 - 단순 연산만 제거 (4개 파일)
 - 복잡한 계산은 유지 (캘린더, 거리 계산, 배열 필터링 등)
 - React Compiler가 최적화 담당
 
 **커밋 내역**:
+
 1. `7fa7975` - 4개 파일에서 불필요한 useMemo 제거
 
 **성과**:
+
 - 코드 가독성 향상
 - 불필요한 의존성 배열 제거
 - React Compiler에게 최적화 위임
@@ -410,34 +418,47 @@ const handleFilter = (newFilter) => {
 
 ---
 
-### 🟠 H-5: Server Actions 미적용 (10+ 폼)
+### 🟠 H-5: Server Actions 미적용 ⚠️ 아키텍처 제약으로 보류
 
-**문제**: 클라이언트에서 API 호출, Server Actions로 전환 가능  
+**문제**: 클라이언트에서 API 호출, Server Actions로 전환 검토 필요  
 **영향**: 네트워크 오버헤드, 보안 취약점
 
-**적용 대상**:
+**검토 대상**:
 
 - `app/(auth)/login/page.tsx` (로그인 폼)
 - `app/(auth)/register/page.tsx` (회원가입 폼)
 - `components/campground-edit/**` (캠핑장 수정 폼)
 - `components/dashboard/user/ProfileTab.tsx` (프로필 수정)
 
-**예시**:
+**검토 결과**:
 
-```tsx
-// ✅ Server Actions 적용
-"use server";
-export async function loginAction(formData: FormData) {
-  const email = formData.get("email");
-  // 서버에서 직접 처리
-}
-```
+현재 프로젝트는 **HttpOnly 쿠키 기반 인증**을 사용하고 있어 Server Actions 적용에 제약이 있습니다:
 
-**작업**:
+1. **인증 시스템**: Backend가 HttpOnly 쿠키로 토큰 관리
+2. **Server Actions 한계**: 
+   - Next.js Server Actions는 쿠키를 설정할 수 있으나, 백엔드 API가 이미 쿠키 관리
+   - 중복된 쿠키 처리 로직 필요
+   - AuthContext와의 동기화 문제
+3. **현재 구조의 장점**:
+   - `useTransition` 이미 적용되어 논블로킹 UI
+   - Zod 기반 타입 안전 검증
+   - API 레이어로 관심사 분리
 
-- [ ] `lib/actions/auth.ts` 생성 (로그인/회원가입)
-- [ ] `lib/actions/campground.ts` 생성 (캠핑장 CRUD)
-- [ ] 10+ 폼을 Server Actions로 전환
+**생성된 참고 파일**:
+
+- [x] `lib/actions/auth.ts` 생성 (참고용) ✅
+  - `loginAction`, `registerAction`, `logoutAction` 구현
+  - Zod 스키마 기반 검증
+  - 실제 적용은 보류
+
+**결론**:
+
+현재 아키텍처에서는 **클라이언트 컴포넌트 + useTransition + API 레이어** 패턴이 더 적합합니다. Server Actions 적용은 다음 조건에서 재검토:
+- 백엔드 API를 Next.js Route Handlers로 마이그레이션
+- Session 기반 인증으로 전환
+- 또는 Server Component에서 직접 데이터 mutation이 필요한 경우
+
+**상태**: ⚠️ **검토 완료 - 아키텍처 제약으로 현재는 미적용** ⚠️
 
 ---
 
@@ -475,9 +496,11 @@ export default function Page() {
 - [x] `app/dashboard/owner/page.tsx` - 소유자 대시보드 (OwnerDashboardContent 분리) ✅
 
 **커밋 내역**:
+
 1. `53452d7` - 5개 핵심 페이지에 Suspense 적용
 
 **성과**:
+
 - 비동기 데이터 로딩 중 명확한 로딩 상태
 - UI 블로킹 방지
 - React 19 Suspense for Data Fetching 패턴 적용
@@ -509,6 +532,7 @@ const [campground, reviews] = await Promise.all([
 **완료된 작업**:
 
 - [x] `app/(site)/page.tsx` - 홈페이지 병렬 fetch 적용 ✅
+
   ```tsx
   const [weekendCampgrounds, petFriendlyCampgrounds] = await Promise.all([
     getWeekendCampgrounds(),
