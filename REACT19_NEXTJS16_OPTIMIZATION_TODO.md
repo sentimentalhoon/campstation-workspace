@@ -28,7 +28,9 @@
 - ✅ **H-6: Suspense 경계 추가 (5개 페이지, 1개 커밋)** ⭐
 - ✅ **H-1: useState 초기값 최적화 (2개 파일, 1개 커밋)** ⭐
 - ✅ **H-2: useMemo 과다 사용 제거 (4개 파일, 1개 커밋)** ⭐
-- ⚠️ **H-5: Server Actions (아키텍처 제약으로 보류)** 🔍 NEW!
+- ⚠️ **H-5: Server Actions (아키텍처 제약으로 보류)** 🔍
+- ✅ **M-1: Error Boundary 추가 (3개 페이지, 1개 커밋)** ⭐ NEW!
+- ✅ **M-2: Metadata API 최적화 (2개 페이지, 1개 커밋)** ⭐ NEW!
 
 ### 🔍 발견된 최적화 대상
 
@@ -557,42 +559,79 @@ const [campground, reviews] = await Promise.all([
 
 ---
 
-## 3️⃣ MEDIUM - 개선 권장 (8개)
+## 3️⃣ MEDIUM - 개선 권장 (6개 남음, 2개 완료)
 
-### 🟡 M-1: Error Boundary 추가 (10+ 위치)
+### 🟡 M-1: Error Boundary 추가 ✅ 완료!
 
 **문제**: 에러 발생 시 전체 앱 크래시  
 **영향**: 사용자 경험 저하
 
-**작업**:
+**해결 패턴**:
 
-- [ ] `app/error.tsx` 개선 (현재 있지만 기본적)
-- [ ] 주요 페이지별 Error Boundary 추가
+```tsx
+// ✅ 페이지별 맞춤형 Error Boundary
+export default function CampgroundsError({ error, reset }: ErrorProps) {
+  return (
+    <div>
+      <h2>캠핑장 정보를 불러올 수 없습니다</h2>
+      <button onClick={reset}>다시 시도</button>
+      <Link href="/">홈으로 돌아가기</Link>
+    </div>
+  );
+}
+```
+
+**완료된 작업** (Commit afde372):
+
+- [x] `app/error.tsx` 검증 - 이미 잘 구현됨 ✅
+- [x] `app/campgrounds/error.tsx` - 캠핑장 목록 에러 ✅
+- [x] `app/dashboard/error.tsx` - 대시보드 에러 (로그인 유도) ✅
+- [x] `app/payment/error.tsx` - 결제 에러 (중복 결제 경고) ✅
+
+**특징**:
+- 페이지별 맞춤형 에러 메시지
+- 개발 모드에서 에러 상세 정보 표시
+- 사용자 친화적인 액션 버튼 (재시도, 홈, 로그인)
+- 일관된 UI/UX 패턴 🎉
 
 ---
 
-### 🟡 M-2: Metadata API 최적화 (20+ 페이지)
+### 🟡 M-2: Metadata API 최적화 ✅ 완료!
 
 **문제**: 동적 metadata 미적용  
 **영향**: SEO 최적화 부족
 
-**예시**:
+**해결 패턴**:
 
 ```tsx
-// ✅ 추가 필요
+// ✅ 동적 메타데이터 생성
 export async function generateMetadata({ params }): Promise<Metadata> {
   const campground = await fetchCampground(params.id);
   return {
-    title: campground.name,
+    title: `${campground.name} | CampStation`,
     description: campground.description,
-    openGraph: { ... }
+    openGraph: {
+      images: campground.originalImageUrls,
+    },
   };
 }
 ```
 
-**작업**:
+**완료된 작업** (Commit 3dfb598):
 
-- [ ] 모든 동적 페이지에 `generateMetadata` 추가
+- [x] `app/campgrounds/[id]/page.tsx` - 캠핑장 상세 메타데이터 ✅
+  - OpenGraph 이미지 및 설명
+  - Twitter 카드 지원
+  - 키워드 최적화
+- [x] `app/reservations/[id]/page.tsx` - 예약 상세 메타데이터 ✅
+  - `robots: noindex` (개인정보 보호)
+  - 예약 정보 표시
+  - 에러 처리 및 폴백
+
+**성과**:
+- 동적 페이지 SEO 개선
+- 소셜 미디어 공유 최적화
+- 프라이버시 정책 준수 (예약 정보 noindex) 🎉
 
 ---
 
