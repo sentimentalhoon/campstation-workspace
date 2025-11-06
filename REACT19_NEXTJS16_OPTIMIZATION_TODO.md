@@ -25,11 +25,13 @@
 - ✅ **H-4: useTransition Hook 적용 (3개 파일, 1개 커밋)** ⭐
 - ✅ **H-3: fetch 최적화 (revalidate 설정 완료)** ⭐
 - ✅ **H-7: Parallel Data Fetching (Promise.all 적용)** ⭐
-- ✅ **H-6: Suspense 경계 추가 (5개 페이지, 1개 커밋)** ⭐ NEW!
+- ✅ **H-6: Suspense 경계 추가 (5개 페이지, 1개 커밋)** ⭐
+- ✅ **H-1: useState 초기값 최적화 (2개 파일, 1개 커밋)** ⭐ NEW!
+- ✅ **H-2: useMemo 과다 사용 제거 (4개 파일, 1개 커밋)** ⭐ NEW!
 
 ### 🔍 발견된 최적화 대상
 
-총 **6개 카테고리**, **19개 항목** (4개 완료)
+총 **6개 카테고리**, **19개 항목** (6개 완료)
 
 ---
 
@@ -236,48 +238,84 @@ export default function StaticContent() {
 
 ---
 
-## 2️⃣ HIGH - 중요 최적화 (3개 남음, 4개 완료)
+## 2️⃣ HIGH - 중요 최적화 (1개 남음, 6개 완료)
 
-### 🟠 H-1: useState 초기값 최적화 (50+ 발생)
+### 🟠 H-1: useState 초기값 최적화 ✅ 완료!
 
 **문제**: 복잡한 계산을 초기값에서 매번 수행  
 **영향**: 불필요한 계산, 초기 렌더링 지연
 
-**예시**:
+**해결 패턴**:
 
 ```tsx
-// ❌ 현재
-const [data, setData] = useState(expensiveCalculation());
+// ❌ 이전 - 매 렌더링마다 new Date() 실행
+const [currentDate, setCurrentDate] = useState(new Date());
 
-// ✅ 최적화 (Lazy initialization)
-const [data, setData] = useState(() => expensiveCalculation());
+// ✅ 최적화 - 초기 렌더링 시에만 실행
+const [currentDate, setCurrentDate] = useState(() => new Date());
 ```
 
-**작업**:
+**완료된 작업** (Commit a8f24f7):
 
-- [ ] `useState` 초기값에 함수 전달하도록 수정 (10+ 파일)
+- [x] `ReservationCalendar.tsx` - `useState(() => new Date())` 적용 ✅
+- [x] `DateRangePicker.tsx` - `useState(() => new Date())` 적용 ✅
+
+**검토 결과**:
+- 다른 useState 초기값들은 대부분 단순 값이거나 props
+- `??` 또는 `||` 연산자는 비용이 낮아 최적화 불필요
+- React Compiler가 이미 자동 최적화
+
+**커밋 내역**:
+1. `a8f24f7` - 2개 파일 lazy initialization 적용
+
+**성과**:
+- Date 객체 불필요한 재생성 방지
+- 초기 렌더링 성능 개선
+- React 모범 사례 준수 🎉
 
 ---
 
-### 🟠 H-2: useMemo 과다 사용 (30+ 발생)
+### 🟠 H-2: useMemo 과다 사용 ✅ 완료!
 
 **문제**: React Compiler가 자동 최적화하는데 수동 `useMemo` 사용  
 **영향**: 코드 복잡도 증가, 가독성 저하
 
-**예시**:
+**해결 패턴**:
 
 ```tsx
 // ❌ React Compiler 시대에 불필요
-const sortedData = useMemo(() => data.sort(), [data]);
+const canEdit = useMemo(() => user?.role === "OWNER", [user?.role]);
 
 // ✅ React Compiler가 자동 최적화
-const sortedData = data.sort();
+const canEdit = user?.role === "OWNER";
 ```
 
-**작업**:
+**완료된 작업** (Commit 7fa7975):
 
-- [ ] React Compiler 자동 최적화 가능한 `useMemo` 제거
-- [ ] 진짜 무거운 계산만 `useMemo` 유지
+- [x] `useSiteManagement.ts` - 역할 체크 직접 비교로 변경 ✅
+- [x] `useCampgroundEdit.ts` - 역할 체크 직접 비교로 변경 ✅
+- [x] `useCampgroundShare.ts` - 파일명 생성을 ternary로 변경 ✅
+- [x] `HomeLandingShell.tsx` - displayName을 IIFE 패턴으로 변경 ✅
+
+**제거한 useMemo 유형**:
+1. **단순 비교**: `user?.role === "OWNER"` - 불필요한 memoization
+2. **단순 ternary**: 조건부 문자열 템플릿 - React Compiler 자동 처리
+3. **IIFE 패턴**: 복잡한 로직도 IIFE로 가독성 유지하며 불필요한 memoization 제거
+
+**검토 결과**:
+- 총 50+ useMemo 발견
+- 단순 연산만 제거 (4개 파일)
+- 복잡한 계산은 유지 (캘린더, 거리 계산, 배열 필터링 등)
+- React Compiler가 최적화 담당
+
+**커밋 내역**:
+1. `7fa7975` - 4개 파일에서 불필요한 useMemo 제거
+
+**성과**:
+- 코드 가독성 향상
+- 불필요한 의존성 배열 제거
+- React Compiler에게 최적화 위임
+- 모던 React 패턴 준수 🎉
 
 ---
 
