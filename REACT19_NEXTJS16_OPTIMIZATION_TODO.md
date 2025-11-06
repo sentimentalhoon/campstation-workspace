@@ -35,7 +35,8 @@
 - ✅ **M-4: Loading UI 추가 (3개 라우트, 1개 커밋)** ⭐
 - ✅ **M-5: Type Safety (이미 완료 상태)** ⭐
 - ✅ **M-6: Web Vitals (이미 완료 상태)** ⭐
-- ✅ **M-7: 접근성 개선 (4개 모달, 1개 커밋)** ⭐ NEW!
+- ✅ **M-7: 접근성 개선 (4개 모달, 1개 커밋)** ⭐
+- ✅ **M-8: CSS 최적화 (6개 파일, 1개 커밋)** ⭐ NEW!
 
 ### 🔍 발견된 최적화 대상
 
@@ -685,6 +686,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 - [x] `app/reservations/loading.tsx` - 예약 페이지 로딩 UI ✅
 
 **성과**:
+
 - 주요 라우트에 Next.js 자동 로딩 상태 적용
 - LoadingSpinner 컴포넌트로 일관된 UX 제공
 - 3개 라우트에 loading.tsx 추가 완료 🎉
@@ -697,11 +699,13 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 **영향**: 타입 안정성 저하
 
 **현재 상태**:
+
 - 코드베이스 전체 검색 결과: `any` 타입 사용이 거의 없음
 - LocationPicker의 Kakao Maps 관련 2개 `any`: 외부 라이브러리 타입 미제공으로 불가피
 - 나머지 코드는 이미 타입 안전성 확보됨
 
 **성과**:
+
 - 타입 안정성 우수한 상태 유지 🎉
 - 불가피한 경우만 `eslint-disable` 사용
 
@@ -713,11 +717,13 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 **영향**: 성능 저하 조기 감지 불가
 
 **현재 상태**:
+
 - [x] `WebVitalsReporter` 컴포넌트 존재 (210줄) ✅
 - [x] `app/layout.tsx`에 통합 완료 ✅
 - [x] 개발 환경에서 디버그 로그 활성화 ✅
 
 **측정 지표**:
+
 - LCP (Largest Contentful Paint)
 - INP (Interaction to Next Paint) - FID 대체
 - CLS (Cumulative Layout Shift)
@@ -725,6 +731,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 - TTFB (Time to First Byte)
 
 **성과**:
+
 - Web Vitals 측정 시스템 완벽 구현 🎉
 
 ---
@@ -742,6 +749,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 - [x] ReservationModal - ARIA 속성 + 아이콘 `aria-hidden` ✅
 
 **개선 사항**:
+
 - 4개 주요 모달에 접근성 속성 추가
 - 닫기 버튼에 `aria-label="닫기"` 추가
 - 장식용 SVG에 `aria-hidden="true"` 추가
@@ -749,15 +757,26 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 
 ---
 
-### 🟡 M-8: CSS 최적화
+### ✅ M-8: CSS 최적화 → ✅ 완료!
 
 **문제**: Tailwind 클래스 중복  
 **영향**: 번들 크기 증가
 
-**작업**:
+**완료된 작업** (Commit f945ae0):
 
-- [ ] `@apply` 디렉티브로 공통 스타일 추출
-- [ ] 사용하지 않는 Tailwind 클래스 제거
+- [x] `globals.css`에 공통 패턴 추출 ✅
+  - `modal-overlay`: 모달 배경 (fixed inset-0 z-50...)
+  - `flex-center`: 중앙 정렬 (flex items-center justify-center)
+  - `btn-base`: 버튼 기본 스타일
+  - `transition-standard`: 표준 전환 효과
+  - `card-base`: 카드 기본 스타일
+- [x] 6개 파일에 적용 (3 loading, 3 modals) ✅
+
+**성과**:
+
+- Tailwind 클래스 중복 제거
+- 유지보수성 향상
+- 일관된 디자인 시스템 구축 🎉
 
 ---
 
