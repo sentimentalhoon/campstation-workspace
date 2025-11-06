@@ -29,8 +29,9 @@
 - ✅ **H-1: useState 초기값 최적화 (2개 파일, 1개 커밋)** ⭐
 - ✅ **H-2: useMemo 과다 사용 제거 (4개 파일, 1개 커밋)** ⭐
 - ⚠️ **H-5: Server Actions (아키텍처 제약으로 보류)** 🔍
-- ✅ **M-1: Error Boundary 추가 (3개 페이지, 1개 커밋)** ⭐ NEW!
-- ✅ **M-2: Metadata API 최적화 (2개 페이지, 1개 커밋)** ⭐ NEW!
+- ✅ **M-1: Error Boundary 추가 (3개 페이지, 1개 커밋)** ⭐
+- ✅ **M-2: Metadata API 최적화 (2개 페이지, 1개 커밋)** ⭐
+- ✅ **M-3: Route Segment Config (7개 페이지, 1개 커밋)** ⭐ NEW!
 
 ### 🔍 발견된 최적화 대상
 
@@ -635,23 +636,32 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 
 ---
 
-### 🟡 M-3: Route Segment Config 미설정
+### ✅ M-3: Route Segment Config 미설정 → ✅ 완료!
 
 **문제**: 페이지별 캐싱 전략 없음  
 **영향**: 성능 최적화 기회 손실
 
-**예시**:
+**완료된 작업** (Commit 244c01b):
 
-```tsx
-// ✅ 추가 필요
-export const revalidate = 60; // 60초마다 재검증
-export const dynamic = "force-dynamic"; // 항상 동적
-```
+- [x] `dashboard/user/page.tsx` - `dynamic = "force-dynamic"` ✅
+  - 사용자별 개인 데이터 (예약, 리뷰, 즐겨찾기)
+- [x] `dashboard/owner/page.tsx` - `dynamic = "force-dynamic"` ✅
+  - 소유자별 캠핑장, 예약 관리
+- [x] `reservations/[id]/page.tsx` - `dynamic = "force-dynamic"` ✅
+  - 실시간 예약 상태 변경 반영
+- [x] `campgrounds/[id]/edit/page.tsx` - `dynamic = "force-dynamic"` ✅
+  - 소유자별 권한 확인 필요
+- [x] `campgrounds/[id]/sites/page.tsx` - `dynamic = "force-dynamic"` ✅
+  - 사이트 관리 (소유자 전용)
+- [x] `campgrounds/[id]/sites/[siteId]/pricing/page.tsx` - `dynamic = "force-dynamic"` ✅
+  - 요금제 관리 (소유자 전용)
+- [x] `campgrounds/[id]/page.tsx` - `revalidate = 300` ✅
+  - 캠핑장 상세 정보 5분 캐싱
 
-**작업**:
-
-- [ ] 정적 페이지: `export const revalidate = 3600`
-- [ ] 동적 페이지: `export const dynamic = "force-dynamic"`
+**성과**:
+- 사용자 데이터는 항상 최신 상태 유지 (`force-dynamic`)
+- 공개 정보는 적절한 캐싱 적용 (`revalidate`)
+- 7개 페이지에 Route Segment Config 적용 완료 🎉
 
 ---
 
