@@ -530,6 +530,7 @@
 **목표**: Presigned URL 관련 프론트엔드 코드 정리
 
 **작업 내용**:
+
 1. ✅ files.ts 수정
    - `fetchBatchPresignedUrls()` 함수 제거 (48 lines)
    - `fileApi.getImageUrls()` 메서드 제거 (4 lines)
@@ -538,27 +539,32 @@
    - `ApiError` import 제거 (미사용)
 
 **제거된 코드 요약**:
+
 - 함수: 3개 (fetchBatchPresignedUrls, getImageUrls, getImageUrl)
 - Type: 1개 (FileUrlResponse)
 - 총 라인 수: 69 lines
 
 **중요 의미**:
+
 - **프론트엔드 Presigned URL 코드 완전 제거 완료**
 - fileApi는 이제 upload와 uploadImagePair만 제공 (Direct Upload 전용)
 - Presigned URL 방식 완전 폐기
 
 **커밋**:
+
 - Hash: 1609547
 - 메시지: "refactor(Step6): Frontend Batch URL 로직 제거"
 - 변경사항: 1 file, +1 insertion, -73 deletions
 
 **검증**:
+
 - ✅ 빌드 성공 확인 (에러 없음)
 - ✅ files.ts 컴파일 에러 없음
 - ✅ getImageUrl 사용처 확인 (prop 함수명으로만 사용, 문제없음)
 - ✅ Presigned URL 관련 모든 API 호출 제거 확인
 
 **다음 단계**:
+
 - Step 7: 최종 정리 및 문서화 (주석 업데이트, CHANGELOG 작성)
 
 ---
@@ -570,6 +576,7 @@
 **목표**: Presigned URL 관련 주석 업데이트 및 최종 문서화
 
 **작업 내용**:
+
 1. ✅ 주석 업데이트 (6개 파일)
    - `campgroundMedia.tsx`: presignedImageLoader → publicImageLoader 주석 변경
    - `HomeLandingShell.tsx`: "Presigned URL로 변환" → "Public URL로 변환"
@@ -580,15 +587,18 @@
    - `ReviewModal.tsx`: "Presigned URL에서" → "Public URL에서"
 
 **최종 정리 내용**:
+
 - Presigned URL 관련 모든 주석을 Public URL로 업데이트
 - 코드베이스에서 "Presigned" 용어 완전 제거
 - 일관된 용어 사용: "Public URL", "Direct Upload"
 
 **커밋**:
+
 - Hash: (다음 커밋)
 - 메시지: "docs(Step7): Presigned URL 관련 주석을 Public URL로 업데이트"
 
 **검증**:
+
 - ✅ 주석 업데이트 완료 (7개 파일)
 - ✅ "presigned" 검색 결과 확인 (주석에서 모두 제거)
 - ✅ 코드 일관성 확보
@@ -600,13 +610,16 @@
 ### 전체 요약
 
 **제거된 총 코드량**:
+
 - **Backend**: 227 lines
+
   - Step 2: 131 lines (Upload Presigned URL)
   - Step 4: 59 lines (View Presigned URL 엔드포인트)
   - Step 5: 109 lines (S3FileService View URL 메서드)
   - 기타: 미사용 import, 주석 등
 
 - **Frontend**: 142 lines
+
   - Step 3: 60 lines (Upload 로직 변경, 순 증가분 고려)
   - Step 6: 69 lines (Batch URL 로직)
   - Step 7: 13 lines (주석 업데이트)
@@ -614,6 +627,7 @@
 - **총계**: ~370 lines 제거
 
 **주요 성과**:
+
 1. ✅ **복잡도 감소**: 3단계 업로드 → 1단계 Direct Upload
 2. ✅ **URL 형식 통일**: 4가지 → 1가지 (Public URL)
 3. ✅ **CORS 문제 해결**: 프론트엔드 → MinIO 직접 접근 제거
@@ -623,12 +637,14 @@
 7. ✅ **코드 단순화**: try-catch 제거, 스트림 로직 간소화
 
 **적용된 기술**:
+
 - Backend: Spring Boot 3.5, Java 21 Records, @Transactional
 - Frontend: React 19, Next.js 16, FormData API
 - Storage: MinIO (S3-compatible), Public URL 방식
 - Architecture: Direct Upload, Backend-controlled access
 
 **다음 단계**:
+
 - 통합 테스트 및 검증 (Step 8 - 별도 작업)
 
 **검증**:
