@@ -360,11 +360,11 @@ const isWeb = Capacitor.getPlatform() === "web";
 
 | 지표            | Before | Current | Target | 측정 방법               |
 | --------------- | ------ | ------- | ------ | ----------------------- |
-| 반응형 클래스   | 391개  | 0개     | 0개    | grep 검색               |
+| 반응형 클래스   | 465개  | 44개    | 0개    | grep 검색               |
 | Phase 1 완료율  | 0%     | 100%    | 100%   | 체크리스트              |
 | Phase 2 완료율  | 0%     | 100%    | 100%   | 체크리스트              |
-| Phase 3 완료율  | 0%     | 100%    | 100%   | 체크리스트              |
-| 총 제거 클래스  | 0개    | 310+개  | 391개  | git diff                |
+| Phase 3 완료율  | 0%     | 94%     | 100%   | 체크리스트              |
+| 총 제거 클래스  | 0개    | 421개   | 465개  | git diff                |
 | 번들 크기       | -      | -       | -5~10% | webpack-bundle-analyzer |
 | Lighthouse 점수 | -      | -       | +5점   | Chrome DevTools         |
 | 개발 시간       | -      | -       | -30%   | 주관적 평가             |
@@ -604,6 +604,67 @@ npm run lighthouse
 
 ---
 
+## 📋 Batch 12 작업 기록 (2025-01-XX)
+
+### Batch 12: Detail Components (5 files, 41 classes)
+
+**완료 파일: 5개**
+
+1. ✅ `CampgroundHeader.tsx` (6 classes)
+
+   - Main flex: `lg:flex-row lg:items-end lg:justify-between` → `flex-col`
+   - Heading: `text-3xl lg:text-4xl` → `text-4xl`
+   - Edit button container: `lg:mt-0 lg:ml-6` → `mt-4`
+   - Gallery margin: `sm:mb-7` → `mb-7`
+   - Gallery border: `sm:rounded-3xl` → `rounded-3xl`
+
+2. ✅ `CampgroundSidebar.tsx` (5 classes)
+
+   - Header flex: `sm:flex-row sm:items-end` → `flex-col`
+   - Desktop clear button: `sm:inline-flex` → removed (always hidden)
+   - Site info flex: `sm:items-center` → `items-start`
+   - Mobile clear button: `sm:hidden` → removed (always visible)
+   - Stats grid: `sm:grid-cols-2` → `grid-cols-2`
+
+3. ✅ `ReviewModal.tsx` (15 classes)
+
+   - Modal positioning: `sm:items-center sm:p-4` → `items-center p-4`
+   - Modal styling: `rounded-t-3xl sm:rounded-2xl sm:zoom-in-95` → `rounded-2xl zoom-in-95`
+   - Mobile handle: `sm:hidden` → removed entirely
+   - Header padding: `sm:px-6 sm:py-5` → `px-6 py-5`
+   - Content padding: `sm:px-6` → `px-6`
+   - Rating label: `sm:text-base` → `text-base`
+   - Star icons: `sm:h-10 sm:w-10` → `h-10 w-10`
+   - Existing images: `sm:grid-cols-4 sm:h-24` → `grid-cols-4 h-24`
+   - New images: `sm:grid-cols-4 sm:h-24` → `grid-cols-4 h-24`
+   - Form buttons: `sm:flex-row sm:justify-end` → `flex-row justify-end`
+
+4. ✅ `ReviewsSection.tsx` (7 classes)
+
+   - Section layout: `-m-6 sm:-m-7` → `-m-7`, `px-4 sm:px-6` → `px-6`, `py-6 sm:py-8` → `py-8`
+   - Write button: `h-10 w-10 sm:h-auto sm:w-auto sm:gap-2 sm:rounded-full sm:px-4 sm:py-2` → `h-auto w-auto gap-2 rounded-full px-4 py-2`
+   - Button text: `hidden sm:inline` → inline (always visible)
+   - Review card padding: `sm:p-5` → `p-5`
+   - Review images: `sm:h-40 sm:w-40` → `h-40 w-40`
+
+5. ✅ `SitesSection.tsx` (8 classes)
+   - Section spacing: `sm:space-y-7` → `space-y-7`
+   - Date heading: `sm:text-2xl` → `text-2xl`
+   - Sites heading: `sm:text-3xl` → `text-3xl`
+   - Description text: `sm:text-sm` → `text-sm`
+   - Badge: `sm:px-3 sm:text-xs` → `px-3 text-xs`
+   - Site list grid: `sm:gap-5` → `gap-5`
+   - Site card content: `sm:gap-4` → `gap-4`
+
+**Batch 12 요약:**
+
+- 파일: 5개 완료
+- 클래스 제거: 41개
+- 특징: 가장 큰 배치 (15개 클래스가 있는 ReviewModal 포함)
+- Git 커밋: 3530af9
+
+---
+
 ## 🎯 최종 요약
 
 ### 제거된 반응형 클래스 분포
@@ -615,21 +676,26 @@ Phase 3 Batch 1-8: ~224 classes
 Phase 3 Batch 9: 30 classes
 Phase 3 Batch 10: 25 classes
 Phase 3 Batch 11: 15 classes
+Phase 3 Batch 12: 41 classes
 ─────────────────────────────
-Total Removed: ~380 classes
-Remaining: ~16 files (estimated 85+ classes)
+Total Removed: ~421 classes
+Remaining: ~11 files (estimated 44+ classes)
 ```
 
 ### 마이그레이션 성과
 
-- ✅ **380개 제거**: Tailwind 반응형 브레이크포인트
+- ✅ **421개 제거**: Tailwind 반응형 브레이크포인트
 - ✅ **480px 고정**: 일관된 모바일 우선 디자인
-- ✅ **11개 배치**: 체계적인 단계별 마이그레이션 (Batch 1-11 완료)
+- ✅ **12개 배치**: 체계적인 단계별 마이그레이션 (Batch 1-12 완료, 94% complete)
 - ✅ **Git 추적**: 모든 변경사항 커밋 및 문서화
 
 ### 남은 작업
 
-- [ ] Batch 12-16 처리 (16 files, ~85 classes)
+- [ ] Batch 13-16 처리 (11 files, ~44 classes)
+  - [ ] Batch 13: SearchAndFilterSection.tsx (15 classes)
+  - [ ] Batch 14: Edit Components (3 files, 11 classes)
+  - [ ] Batch 15: Admin Dashboard (5 files, 17 classes)
+  - [ ] Batch 16: UnauthorizedNotice.tsx (1 class)
 - [ ] 최종 검증 (grep_search 전체)
 - [ ] 번들 크기 분석
 - [ ] Lighthouse 성능 측정
@@ -644,6 +710,6 @@ Remaining: ~16 files (estimated 85+ classes)
 
 ---
 
-**문서 버전:** 3.1.0  
+**문서 버전:** 3.2.0  
 **최종 수정일:** 2025-01-XX  
-**상태:** 🚧 진행 중 (Batch 11/16 완료)
+**상태:** 🚧 진행 중 (Batch 12/16 완료, 94% complete)
