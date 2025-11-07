@@ -107,6 +107,7 @@
 
 - [x] `layout.tsx` - AppContainer 적용 완료
 - [x] 전역 래퍼 구조 설정: DeviceMockup > AppContainer > AppProviders
+
 ---
 
 ### **Phase 2: UI 컴포넌트** 🎨
@@ -120,7 +121,7 @@
 - [x] `NavigationButton.tsx` - 네비게이션 버튼 (sm:left-6, sm:right-6 제거)
 - [x] `SiteModal.tsx` - 사이트 모달 (sm/md 전체 제거: items-end→items-center, rounded-t-3xl→rounded-2xl, grid md:grid-cols-2/3→space-y-4/grid-cols-2)
 - [x] `LoadingSpinner.tsx` - 로딩 (크기 조정: w-4→w-6, w-12→w-10)
-- [x] `ImageGallery.tsx` - 이미지 갤러리 (이미 모바일 우선)
+- [x] `ImageGallery.tsx` - 이미지 갤러리 (md:aspect-video 제거)
 - [x] `Card.tsx` - 카드 (이미 모바일 우선)
 
 #### 2.2 예약 관련 UI
@@ -134,17 +135,18 @@
 
 #### 2.3 레이아웃 UI
 
-- [ ] `Header.tsx` - 헤더
-- [ ] `Footer.tsx` - 푸터
-- [ ] `Navigation.tsx` - 네비게이션
-- [ ] `Sidebar.tsx` - 사이드바
+- [x] `Header/index.tsx` - 헤더 (md:py-3, sm/md 반응형 전체 제거, 중앙 네비게이션 숨김)
+- [x] `MobileMenu.tsx` - 모바일 메뉴 (sm:justify-center, sm:px-6, sm:text-xl 제거)
+- [x] `ProfileMenu.tsx` - 프로필 메뉴 (sm:px-5, sm:max-w-360 제거)
+- [x] `Layout.tsx` - 레이아웃 (md:pb-0 제거)
+- [x] `MobileContainer.tsx` - 모바일 컨테이너 (sm:px-6 md:px-8 → px-4)
 
-#### 2.3 복합 UI
+#### 2.4 Map 관련 UI
 
-- [ ] `Card.tsx` - 카드
-- [ ] `ImageGallery.tsx` - 이미지 갤러리
-- [ ] `SiteModal.tsx` - 사이트 모달
-- [ ] `CampgroundCard.tsx` - 캠핑장 카드
+- [x] `Sidebar.tsx` - 사이드바 (md:block 제거, 완전 숨김)
+- [x] `BottomSheet.tsx` - 바텀시트 (md:hidden 제거, 항상 표시)
+- [x] `MyLocationButton.tsx` - 내 위치 버튼 (md:bottom-4 제거)
+- [x] `FavoriteButton.tsx` - 즐겨찾기 버튼 (lg 크기 조정: h-8→h-7)
 
 ---
 
