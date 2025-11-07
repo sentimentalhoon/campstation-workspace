@@ -570,6 +570,7 @@ npm run lighthouse
 7. ✅ `campgrounds/[id]/components/ReservationGuidePanel.tsx` (1 class)
 
 **Batch 10 요약:**
+
 - 파일: 7개 완료
 - 클래스 제거: 25개
 - Git 커밋: 6f2c937
@@ -583,10 +584,12 @@ npm run lighthouse
 **완료 파일: 3개**
 
 1. ✅ `PricingManagementClient.tsx` (2 classes)
+
    - Container: `sm:px-6 lg:px-8` → `px-6`
    - Header: `sm:flex-row sm:items-center sm:justify-between` → `flex-col items-start`
 
 2. ✅ `PricingList.tsx` (1 class)
+
    - Stats grid: `sm:grid-cols-4` → `grid-cols-4`
 
 3. ✅ `PricingModal.tsx` (12 classes)
@@ -594,6 +597,7 @@ npm run lighthouse
    - Span utilities: `sm:col-span-2` → `col-span-2`
 
 **Batch 11 요약:**
+
 - 파일: 3개 완료
 - 클래스 제거: 15개
 - Git 커밋: 9cd3504
