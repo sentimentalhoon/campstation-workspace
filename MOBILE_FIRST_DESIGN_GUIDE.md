@@ -381,22 +381,26 @@ const isNative = Capacitor.isNativePlatform(); // true | false
 ### 최종 결과
 
 **제거된 클래스:**
+
 - Phase 1 (Infrastructure): ~6 classes
-- Phase 2 (UI Components): ~80 classes  
+- Phase 2 (UI Components): ~80 classes
 - Phase 3 (Pages & Features): ~230 classes
 - **총 제거:** ~310+ classes
 
 **변경된 파일:**
+
 - UI 컴포넌트: 30+ 파일
 - 페이지 컴포넌트: 20+ 파일
 - 레이아웃 컴포넌트: 10+ 파일
 
 **Git 커밋:**
+
 - 총 8개 배치로 체계적 커밋
 - 모든 변경사항 문서화
 - Frontend 서브모듈 동기화
 
 **남은 responsive 클래스:**
+
 - LoadingSpinner: prop-based size system (sm/md/lg props, not Tailwind breakpoints)
 - FavoriteButton: prop-based size system (sm/md/lg props, not Tailwind breakpoints)
 - **→ 정상적인 패턴, Tailwind 브레이크포인트 아님**

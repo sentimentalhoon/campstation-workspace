@@ -155,11 +155,13 @@
 #### 3.1 핵심 페이지
 
 - [ ] `page.tsx` (Home) - 홈
-- [ ] `campgrounds/page.tsx` - 캠핑장 목록
+- [x] `campgrounds/page.tsx` - 캠핑장 목록 (9개 sm:/md: 제거)
+- [x] `campgrounds/CampgroundsClient.tsx` - 캠핑장 클라이언트 (15개 sm: 제거)
 - [ ] `campgrounds/[id]/page.tsx` - 캠핑장 상세
 - [ ] `map/page.tsx` - 지도
-- [ ] `login/page.tsx` - 로그인
-- [ ] `register/page.tsx` - 회원가입
+- [x] `login/page.tsx` - 로그인 (2개 sm:/lg: 제거)
+- [x] `register/page.tsx` - 회원가입 (2개 sm:/lg: 제거)
+- [x] `auth/callback/page.tsx` - OAuth 콜백 (2개 sm:/lg: 제거)
 
 #### 3.2 예약 플로우
 
@@ -395,6 +397,7 @@ npm run lighthouse
 **Phase 3 Batch 4-8 완료:**
 
 #### Batch 4: 페이지 컴포넌트 (82개 클래스)
+
 - ReservationDetailClient.tsx (35 클래스)
 - CheckoutPage.tsx (15 클래스)
 - PaymentSuccessPage.tsx (12 클래스)
@@ -402,22 +405,26 @@ npm run lighthouse
 - not-found.tsx, error.tsx (각 5 클래스)
 
 #### Batch 5: 홈 섹션 (60개 클래스)
+
 - HeroSection.tsx (25 클래스): sm:p-6 md:p-7 → p-4, sm:flex-row → flex-col
 - QuickFilterRow.tsx (15 클래스): sm:gap-3 sm:rounded-3xl → gap-2 rounded-2xl
 - FeaturedCampgroundSection.tsx (30 클래스): sm:grid-cols-2 → grid-cols-1
 - RecentCampgroundList.tsx, HomeLandingShell.tsx
 
 #### Batch 6: 레이아웃 (8개 클래스)
+
 - Footer.tsx: md:px-5 md:py-3 → px-3 py-2
 - BottomNav.tsx: lg:hidden → 제거
 - admin/page.tsx: sm:h-auto sm:px-6 → h-11 px-4
 
 #### Batch 7: 대시보드 탭 (20개 클래스)
+
 - ReservationsTab.tsx: sm:space-y-5 → space-y-4
 - OverviewTab.tsx: md:grid-cols-2 lg:grid-cols-3 → grid-cols-1
 - FavoritesTab.tsx, OwnerReviewsTab.tsx
 
 #### Batch 8: Owner 대시보드 & 헤더 (60개 클래스) ✅
+
 - OwnerOverviewTab.tsx (45 클래스):
   - Grid: xl:grid-cols-4 → grid-cols-1
   - Spacing: sm:space-y-8 → space-y-6, sm:mb-4 → mb-3
@@ -434,6 +441,7 @@ npm run lighthouse
 - reservations/[id]/page.tsx: sm:pb-28 sm:pt-24 md:pb-32 → pb-24 pt-20
 
 **Git 커밋:**
+
 - Frontend: 14e0dbf (Batch 8)
 - Workspace: 35d3f25 (Batch 8)
 
@@ -441,6 +449,7 @@ npm run lighthouse
 **전체 누적:** ~310+ 클래스
 
 **최종 상태:**
+
 - ✅ 모든 기능적 responsive 클래스 제거 완료
 - ✅ LoadingSpinner & FavoriteButton은 prop-based (sm/md/lg props, not Tailwind breakpoints)
 - ✅ 100% 480px 모바일 퍼스트 디자인 달성
@@ -476,9 +485,58 @@ npm run lighthouse
 **진행률:**
 
 - Phase 1: 100% ✅
-- Phase 2: 100% ✅  
-- Phase 3: 100% ✅
-- **전체 마이그레이션: 100% 완료** 🎉
+- Phase 2: 100% ✅
+- Phase 3: 진행 중 (5/31 files)
+- **전체 마이그레이션: 85% 완료** 🚧
+
+---
+
+## 📋 Batch 9 작업 기록 (2025-01-XX)
+
+### Batch 9: Auth Pages + Campgrounds Landing
+
+**완료 파일: 5개**
+
+1. ✅ `login/page.tsx`
+   - 제거: `sm:px-6`, `lg:px-8` → `px-4`
+   - 클래스 제거: 2개
+
+2. ✅ `register/page.tsx`
+   - 제거: `sm:px-6`, `lg:px-8` → `px-4`
+   - 클래스 제거: 2개
+
+3. ✅ `auth/callback/page.tsx`
+   - 제거: `sm:px-6`, `lg:px-8` → `px-4`
+   - 클래스 제거: 2개
+
+4. ✅ `campgrounds/page.tsx`
+   - Container: `sm:gap-8 sm:pb-24 md:pb-28` → `gap-6 pb-20`
+   - Hero section: `sm:rounded-3xl sm:px-6 sm:py-6 md:px-7 md:py-8` → `rounded-2xl px-4 py-5`
+   - Heading: `sm:text-4xl` → `text-3xl`
+   - Description: `sm:text-base` → `text-sm`
+   - Stats grid: `sm:grid-cols-4` → `grid-cols-2`
+   - Stat value: `sm:text-xl` → `text-lg`
+   - Stat caption: `sm:text-xs` → `text-[11px]`
+   - Scroll container: `sm:-mx-2 sm:pl-2 sm:pr-2` → `-mx-1 pl-1 pr-1`
+   - Theme description: `sm:text-sm` → `text-xs`
+   - 클래스 제거: 9개
+
+5. ✅ `campgrounds/CampgroundsClient.tsx`
+   - Main container: `space-y-6 sm:space-y-8` → `space-y-6`
+   - Section: `rounded-2xl sm:rounded-3xl` → `rounded-2xl`
+   - Section padding: `px-4 py-5 sm:px-6 sm:py-6` → `px-4 py-5`
+   - Header flex: `sm:flex-row sm:items-center sm:justify-between` → `flex-col gap-1`
+   - Results text: `sm:text-base` → `text-sm`
+   - Loading text: `sm:text-sm` → `text-xs`
+   - Scroll container: `sm:-mx-2 sm:pl-2 sm:pr-2` → `-mx-1 pl-1 pr-1`
+   - Main grid: `sm:grid-cols-2` → `grid-cols-1`
+   - Skeleton grid: `sm:grid-cols-2` → `grid-cols-1`
+   - 클래스 제거: 15개
+
+**Batch 9 요약:**
+- 파일: 5개 완료
+- 클래스 제거: 30개
+- Git 커밋: d5074c2 (Batch 9 전체)
 
 ---
 
@@ -488,30 +546,33 @@ npm run lighthouse
 
 ```
 Phase 1 (Infrastructure): ~6 classes
-Phase 2 (UI Components): ~80 classes  
-Phase 3 (Pages & Features): ~230 classes
+Phase 2 (UI Components): ~80 classes
+Phase 3 Batch 1-8: ~224 classes
+Phase 3 Batch 9: 30 classes
 ─────────────────────────────
-Total Removed: ~310+ classes
-Remaining: LoadingSpinner, FavoriteButton (prop-based, acceptable)
+Total Removed: ~340 classes
+Remaining: ~26 files (estimated 50-100 classes)
 ```
 
 ### 마이그레이션 성과
 
-- ✅ **391개 → 0개**: 모든 Tailwind 반응형 브레이크포인트 제거
+- ✅ **340개 제거**: Tailwind 반응형 브레이크포인트
 - ✅ **480px 고정**: 일관된 모바일 우선 디자인
-- ✅ **8개 배치**: 체계적인 단계별 마이그레이션
+- ✅ **9개 배치**: 체계적인 단계별 마이그레이션 (Batch 1-9 완료)
 - ✅ **Git 추적**: 모든 변경사항 커밋 및 문서화
 
 ### 남은 작업 (선택 사항)
 
-- [ ] 번들 크기 분석 (webpack-bundle-analyzer)
+### 남은 작업
+
+- [ ] Batch 10-15 처리 (26 files)
+- [ ] 최종 검증 (grep_search 전체)
+- [ ] 번들 크기 분석
 - [ ] Lighthouse 성능 측정
-- [ ] 사용자 피드백 수집
-- [ ] A/B 테스트 (반응형 vs 모바일 우선)
 
 ---
 
-## � 참고 자료
+## 📚 참고 자료
 
 - [MOBILE_FIRST_DESIGN_GUIDE.md](./MOBILE_FIRST_DESIGN_GUIDE.md)
 - [Capacitor 공식 문서](https://capacitorjs.com/docs)
@@ -519,6 +580,6 @@ Remaining: LoadingSpinner, FavoriteButton (prop-based, acceptable)
 
 ---
 
-**문서 버전:** 2.0.0  
-**최종 수정일:** 2025-11-07  
-**상태:** ✅ 마이그레이션 완료
+**문서 버전:** 3.0.0  
+**최종 수정일:** 2025-01-XX  
+**상태:** 🚧 진행 중 (Batch 9/15 완료)
