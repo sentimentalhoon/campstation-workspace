@@ -379,18 +379,48 @@
 ---
 
 ### Step 5: S3FileService View URL 메서드 제거
+
+**상태**: ✅ 완료 (2025-01-XX)
+
 **목표**: Presigned URL 관련 모든 메서드 제거
 
 **작업 내용**:
-1. S3FileService.java
-   - `generatePresignedUrlForView()` 메서드 제거
-   - `generatePresignedUrlsForView()` 메서드 제거
-   - `@Value` presigned.view.duration-days 제거
-   - `@Cacheable` presignedUrls 캐시 설정 제거
+1. ✅ S3FileService.java 수정
+   - `generatePresignedUrlForView()` 메서드 제거 (65 lines)
+   - `generatePresignedUrlsForView()` 메서드 제거 (24 lines)
+   - `adjustPresignedUrlPath()` 메서드 제거 (13 lines, Step 2에서 임시 유지했던 것)
+   - `PresignedUrlResponse` 레코드 제거 (5 lines)
+   - `@Value viewDurationDays` 제거 (2 lines)
+   - `@Cacheable` presignedUrls 캐시 어노테이션 제거
+   - 미사용 import 제거 (LinkedHashMap, Map, Cacheable, S3Presigner, GetObjectPresignRequest)
+
+**제거된 코드 요약**:
+- 메서드: 3개 (generatePresignedUrlForView, generatePresignedUrlsForView, adjustPresignedUrlPath)
+- 레코드: 1개 (PresignedUrlResponse)
+- 어노테이션: 2개 (@Value, @Cacheable)
+- Import: 5개
+- 총 라인 수: 109 lines
+
+**중요 의미**:
+- **백엔드 Presigned URL 코드 완전 제거 완료**
+- S3FileService에서 Presigned URL 관련 모든 흔적 제거
+- Step 2에서 임시 유지했던 adjustPresignedUrlPath()도 최종 제거
+
+**커밋**:
+- Hash: 8cc23c6
+- 메시지: "refactor(Step5): S3FileService View URL 메서드 제거"
+- 변경사항: 1 file, -111 deletions
 
 **검증**:
-- 빌드 성공 확인
-- Presigned URL 관련 코드 완전 제거 확인
+- ✅ 빌드 성공 확인 (에러 없음)
+- ✅ S3FileService.java 컴파일 에러 없음
+- ✅ Presigned URL 관련 코드 완전 제거 확인
+- ✅ 모든 미사용 import 정리 완료
+
+**다음 단계**:
+- Step 6: Frontend Batch URL 로직 제거 (fetchBatchPresignedUrls, getImageUrls, getImageUrl)
+
+---
 
 ### Step 6: 프론트엔드 Batch URL 로직 제거
 **목표**: Presigned URL 관련 프론트엔드 코드 정리
