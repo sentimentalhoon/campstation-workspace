@@ -498,18 +498,22 @@ npm run lighthouse
 **완료 파일: 5개**
 
 1. ✅ `login/page.tsx`
+
    - 제거: `sm:px-6`, `lg:px-8` → `px-4`
    - 클래스 제거: 2개
 
 2. ✅ `register/page.tsx`
+
    - 제거: `sm:px-6`, `lg:px-8` → `px-4`
    - 클래스 제거: 2개
 
 3. ✅ `auth/callback/page.tsx`
+
    - 제거: `sm:px-6`, `lg:px-8` → `px-4`
    - 클래스 제거: 2개
 
 4. ✅ `campgrounds/page.tsx`
+
    - Container: `sm:gap-8 sm:pb-24 md:pb-28` → `gap-6 pb-20`
    - Hero section: `sm:rounded-3xl sm:px-6 sm:py-6 md:px-7 md:py-8` → `rounded-2xl px-4 py-5`
    - Heading: `sm:text-4xl` → `text-3xl`
@@ -534,6 +538,7 @@ npm run lighthouse
    - 클래스 제거: 15개
 
 **Batch 9 요약:**
+
 - 파일: 5개 완료
 - 클래스 제거: 30개
 - Git 커밋: d5074c2 (Batch 9 전체)
