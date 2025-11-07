@@ -256,6 +256,22 @@
    - try-catch 및 null 필터 제거
    - 주석 업데이트
 
+**⚠️ Step 8 빌드 검증 중 발견된 누락 파일 (2025-01-XX):**
+
+6. ✅ CampgroundService.java 수정
+   - `generatePresignedUrlForView()` → `generatePublicUrl()` 변경 (6곳)
+   - toCampgroundResponse() 메서드: 메인/썸네일/원본 이미지 URL 변환
+   - toCampgroundResponsesBatch() 메서드: 배치 URL 변환
+   - try-catch 및 null 필터 제거
+   - `.collect(Collectors.toList())` → `.toList()` 변환
+   - 주석 업데이트 ("Presigned URL" → "Public URL")
+7. ✅ CampgroundAdminFacade.java 수정
+   - `generatePresignedUrlForView()` → `generatePublicUrl()` 변경 (3곳)
+   - toResponse() 메서드: 메인/썸네일/원본 이미지 URL 변환
+   - try-catch 및 null 필터 제거
+   - `.collect(Collectors.toList())` → `.toList()` 변환
+   - 주석 업데이트
+
 **발견된 추가 개선사항**:
 
 - `generatePublicUrl()`은 IOException을 발생시키지 않음 (RuntimeException만 발생)
@@ -264,14 +280,24 @@
 
 **커밋**:
 
-- Hash: 8dd1834
+- Hash: 8dd1834 (초기 5개 파일)
 - 메시지: "refactor(Step1): generatePresignedUrlForView → generatePublicUrl 변경"
+- Hash: 4fa75d5 (누락된 2개 파일 - Step 8 발견)
+- 메시지: "fix(Step1): CampgroundService와 CampgroundAdminFacade에 누락된 Step 1 마이그레이션 완료"
 
 **검증**:
 
 - ✅ 빌드 성공 확인
-- ✅ 5개 파일 에러 없음
-- ✅ ReviewService, ReviewAdminFacade, UserResponseDto, UserController, OwnerService 모두 수정 완료
+- ✅ 7개 파일 모두 에러 없음
+- ✅ ReviewService, ReviewAdminFacade, UserResponseDto, UserController, OwnerService 수정 완료 (초기)
+- ✅ CampgroundService, CampgroundAdminFacade 수정 완료 (Step 8에서 발견 및 수정)
+- ✅ compileJava SUCCESSFUL
+
+**교훈**:
+
+- grep 검색으로 파일을 찾았지만 일부 파일이 마이그레이션에서 누락됨
+- Step 완료 전 전체 빌드 검증 필요
+- Campground 관련 서비스도 Review와 동일한 패턴으로 이미지 URL 생성 사용
 
 ---
 
