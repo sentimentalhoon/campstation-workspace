@@ -157,8 +157,12 @@
 - [ ] `page.tsx` (Home) - 홈
 - [x] `campgrounds/page.tsx` - 캠핑장 목록 (9개 sm:/md: 제거)
 - [x] `campgrounds/CampgroundsClient.tsx` - 캠핑장 클라이언트 (15개 sm: 제거)
-- [ ] `campgrounds/[id]/page.tsx` - 캠핑장 상세
-- [ ] `map/page.tsx` - 지도
+- [x] `campgrounds/[id]/CampgroundDetailPage.tsx` - 캠핑장 상세 페이지 (2개 sm: 제거)
+- [x] `campgrounds/[id]/CampgroundDetailView.tsx` - 캠핑장 상세 뷰 (3개 sm:/md: 제거)
+- [x] `campgrounds/[id]/components/EssentialsSection.tsx` - 핵심 정보 섹션 (11개 sm: 제거)
+- [x] `campgrounds/[id]/components/QuickStatsGrid.tsx` - 통계 그리드 (1개 sm: 제거)
+- [x] `campgrounds/[id]/components/ReservationGuidePanel.tsx` - 예약 가이드 패널 (1개 sm: 제거)
+- [x] `map/MapPageClient.tsx` - 지도 페이지 클라이언트 (2개 lg: 제거)
 - [x] `login/page.tsx` - 로그인 (2개 sm:/lg: 제거)
 - [x] `register/page.tsx` - 회원가입 (2개 sm:/lg: 제거)
 - [x] `auth/callback/page.tsx` - OAuth 콜백 (2개 sm:/lg: 제거)
@@ -190,7 +194,7 @@
 
 - [ ] `NaverMap.tsx` - 네이버 지도
 - [ ] `LocationPicker.tsx` - 위치 선택기
-- [ ] `CampgroundSidebar.tsx` - 지도 사이드바
+- [x] `CampgroundList.tsx` - 캠핑장 리스트 (5개 sm: 제거)
 
 #### 4.2 폼 관련
 
@@ -545,6 +549,27 @@ npm run lighthouse
 
 ---
 
+## 📋 Batch 10 작업 기록 (2025-01-XX)
+
+### Batch 10: Map, List & Detail Pages (7 files, 25 classes)
+
+**완료 파일: 7개**
+
+1. ✅ `map/MapPageClient.tsx` (2 classes)
+2. ✅ `campground/CampgroundList.tsx` (5 classes)
+3. ✅ `campgrounds/[id]/CampgroundDetailPage.tsx` (2 classes)
+4. ✅ `campgrounds/[id]/CampgroundDetailView.tsx` (3 classes)
+5. ✅ `campgrounds/[id]/components/EssentialsSection.tsx` (11 classes)
+6. ✅ `campgrounds/[id]/components/QuickStatsGrid.tsx` (1 class)
+7. ✅ `campgrounds/[id]/components/ReservationGuidePanel.tsx` (1 class)
+
+**Batch 10 요약:**
+- 파일: 7개 완료
+- 클래스 제거: 25개
+- Git 커밋: 6f2c937
+
+---
+
 ## 🎯 최종 요약
 
 ### 제거된 반응형 클래스 분포
@@ -554,23 +579,24 @@ Phase 1 (Infrastructure): ~6 classes
 Phase 2 (UI Components): ~80 classes
 Phase 3 Batch 1-8: ~224 classes
 Phase 3 Batch 9: 30 classes
+Phase 3 Batch 10: 25 classes
 ─────────────────────────────
-Total Removed: ~340 classes
-Remaining: ~26 files (estimated 50-100 classes)
+Total Removed: ~365 classes
+Remaining: ~19 files (estimated 100+ classes)
 ```
 
 ### 마이그레이션 성과
 
-- ✅ **340개 제거**: Tailwind 반응형 브레이크포인트
+- ✅ **365개 제거**: Tailwind 반응형 브레이크포인트
 - ✅ **480px 고정**: 일관된 모바일 우선 디자인
-- ✅ **9개 배치**: 체계적인 단계별 마이그레이션 (Batch 1-9 완료)
+- ✅ **10개 배치**: 체계적인 단계별 마이그레이션 (Batch 1-10 완료)
 - ✅ **Git 추적**: 모든 변경사항 커밋 및 문서화
 
 ### 남은 작업 (선택 사항)
 
 ### 남은 작업
 
-- [ ] Batch 10-15 처리 (26 files)
+- [ ] Batch 11-16 처리 (19 files, ~100 classes)
 - [ ] 최종 검증 (grep_search 전체)
 - [ ] 번들 크기 분석
 - [ ] Lighthouse 성능 측정
