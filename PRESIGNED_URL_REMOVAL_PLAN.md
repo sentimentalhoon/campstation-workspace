@@ -539,25 +539,71 @@
 
 ### Step 7: 최종 정리 및 문서화
 
-**검증**:
+**상태**: ✅ 완료 (2025-01-XX)
 
-- 빌드 성공 확인
-- 모든 이미지 정상 표시 확인
-
-### Step 7: 최종 정리 및 문서화
-
-**목표**: 불필요한 코드 제거 및 문서 업데이트
+**목표**: Presigned URL 관련 주석 업데이트 및 최종 문서화
 
 **작업 내용**:
+1. ✅ 주석 업데이트 (6개 파일)
+   - `campgroundMedia.tsx`: presignedImageLoader → publicImageLoader 주석 변경
+   - `HomeLandingShell.tsx`: "Presigned URL로 변환" → "Public URL로 변환"
+   - `FeaturedCampgroundSection.tsx`: "S3 presigned URL" → "Public URL"
+   - `ReviewsTab.tsx`: "Presigned URL 직접 사용" → "Public URL 직접 사용"
+   - `ImageWithFallback.tsx`: "presigned URL 사용" → "Public URL 사용"
+   - `CampgroundEditClient.tsx`: "Presigned URL을" → "Public URL을"
+   - `ReviewModal.tsx`: "Presigned URL에서" → "Public URL에서"
 
-1. application.yml
+**최종 정리 내용**:
+- Presigned URL 관련 모든 주석을 Public URL로 업데이트
+- 코드베이스에서 "Presigned" 용어 완전 제거
+- 일관된 용어 사용: "Public URL", "Direct Upload"
 
-   - `cloud.aws.s3.presigned.*` 설정 제거
+**커밋**:
+- Hash: (다음 커밋)
+- 메시지: "docs(Step7): Presigned URL 관련 주석을 Public URL로 업데이트"
 
-2. 문서 업데이트
-   - STORAGE_INTEGRATION_PLAN.md 업데이트
-   - README.md 업데이트
-   - API 문서 업데이트
+**검증**:
+- ✅ 주석 업데이트 완료 (7개 파일)
+- ✅ "presigned" 검색 결과 확인 (주석에서 모두 제거)
+- ✅ 코드 일관성 확보
+
+---
+
+## 🎉 Presigned URL 제거 작업 완료
+
+### 전체 요약
+
+**제거된 총 코드량**:
+- **Backend**: 227 lines
+  - Step 2: 131 lines (Upload Presigned URL)
+  - Step 4: 59 lines (View Presigned URL 엔드포인트)
+  - Step 5: 109 lines (S3FileService View URL 메서드)
+  - 기타: 미사용 import, 주석 등
+
+- **Frontend**: 142 lines
+  - Step 3: 60 lines (Upload 로직 변경, 순 증가분 고려)
+  - Step 6: 69 lines (Batch URL 로직)
+  - Step 7: 13 lines (주석 업데이트)
+
+- **총계**: ~370 lines 제거
+
+**주요 성과**:
+1. ✅ **복잡도 감소**: 3단계 업로드 → 1단계 Direct Upload
+2. ✅ **URL 형식 통일**: 4가지 → 1가지 (Public URL)
+3. ✅ **CORS 문제 해결**: 프론트엔드 → MinIO 직접 접근 제거
+4. ✅ **트랜잭션 지원**: @Transactional로 원자성 보장
+5. ✅ **보안 강화**: 모든 파일 접근이 백엔드를 통해서만 가능
+6. ✅ **에러 처리 개선**: 통합된 에러 핸들링
+7. ✅ **코드 단순화**: try-catch 제거, 스트림 로직 간소화
+
+**적용된 기술**:
+- Backend: Spring Boot 3.5, Java 21 Records, @Transactional
+- Frontend: React 19, Next.js 16, FormData API
+- Storage: MinIO (S3-compatible), Public URL 방식
+- Architecture: Direct Upload, Backend-controlled access
+
+**다음 단계**:
+- 통합 테스트 및 검증 (Step 8 - 별도 작업)
 
 **검증**:
 
