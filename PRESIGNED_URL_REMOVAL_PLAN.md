@@ -282,24 +282,60 @@
 ---
 
 ### Step 3: 프론트엔드 useImageUpload 훅 수정
-- 직접 업로드 API 정상 작동 확인
+---
 
 ### Step 3: 프론트엔드 Upload 로직 변경
+
+**상태**: ✅ 완료 (2025-01-XX)
+
 **목표**: 직접 업로드 API 사용으로 전환
 
 **작업 내용**:
-1. files.ts
-   - `upload()` 메서드의 Presigned URL 로직 제거
-   - 직접 업로드 로직으로 교체
+1. ✅ files.ts 수정
+   - `fileApi.upload()`: Presigned URL 방식 → Direct Upload 방식
+     - 기존: 1) Presigned URL 요청 → 2) MinIO 직접 업로드 → 3) 파일 경로 반환
+     - 변경: POST /v1/files/upload (FormData 전송)
+   - `fileApi.uploadImagePair()`: 백엔드 uploadImagePair API 호출 함수 추가
+     - POST /v1/files/upload/pair (썸네일 + 원본 동시 처리)
 
-2. useImageUpload.ts (새로 작성)
-   - 직접 업로드 Hook 구현
-   - React 19 useOptimistic 활용
+2. ✅ reviews.ts 수정
+   - `uploadImagePairs()` 프론트엔드 함수 → `fileApi.uploadImagePair()` API 호출로 변경
+   - create(), update() 메서드 모두 적용
+   - 썸네일 생성을 백엔드에서 처리
+
+3. ✅ useCampgroundEdit.ts 수정
+   - 개별 썸네일/원본 업로드 → `fileApi.uploadImagePair()` API 호출로 변경
+   - 썸네일 생성 로직 제거 (백엔드로 이관)
+
+4. ✅ DashboardClient.tsx
+   - 프로필 이미지는 단일 파일이므로 `fileApi.upload()` 그대로 사용
+   - Direct Upload 방식으로 자동 전환됨
+
+**주요 변경사항**:
+- 프론트엔드에서 썸네일 생성 로직 제거
+- 백엔드에서 이미지 처리 (리사이징, 최적화) 수행
+- 업로드 플로우 단순화: 3단계 → 1단계 (Direct API call)
+- FormData 사용으로 파일 전송
+
+**Breaking Changes**:
+- `uploadImagePairs()` 유틸리티 함수 사용 중단 (백엔드 API로 대체)
+- Presigned URL 업로드 플로우 완전 제거
+
+**커밋**:
+- Hash: 7a1b420
+- 메시지: "refactor(Step3): Upload 로직을 Direct Upload API로 변경"
+- 변경사항: 3 files, +59 insertions, -60 deletions
 
 **검증**:
-- Campground 이미지 업로드 테스트
-- Review 이미지 업로드 테스트
-- Profile 이미지 업로드 테스트
+- ✅ 빌드 성공 확인 (에러 없음)
+- ✅ files.ts 컴파일 에러 없음
+- ✅ reviews.ts 컴파일 에러 없음  
+- ✅ useCampgroundEdit.ts 컴파일 에러 없음
+
+**다음 단계**:
+- Step 4: Backend View Presigned URL 엔드포인트 제거
+
+---
 
 ### Step 4: 백엔드 View Presigned URL 엔드포인트 제거
 **목표**: View용 Presigned URL API 완전 제거
