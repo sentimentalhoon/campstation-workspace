@@ -243,21 +243,45 @@
 - 프로필 이미지 표시 확인
 
 ### Step 2: 백엔드 Upload Presigned URL 제거
+
+**상태**: ✅ 완료 (2025-01-XX)
+
 **목표**: 업로드용 Presigned URL 코드 완전 제거
 
 **작업 내용**:
-1. S3FileService.java
-   - `generatePresignedUrlForUpload()` 메서드 제거
-   - `adjustPresignedUrlPath()` 메서드 제거
-   - `PresignedUrlResponse` 레코드 제거
-   - `@Value` presigned.upload.duration-minutes 제거
+1. ✅ S3FileService.java 수정
+   - `generatePresignedUrlForUpload()` 메서드 제거 (58 lines)
+   - `buildFileKey()` 메서드 제거 (Upload 전용, 23 lines)
+   - `PutObjectPresignRequest` import 제거
+   - ⚠️ `adjustPresignedUrlPath()` 유지 (View URL에서 사용 중, Step 5에서 제거 예정)
 
-2. FileController.java
-   - `POST /api/v1/files/presigned-url` 엔드포인트 제거
-   - `PresignedUrlRequest` DTO 제거
+2. ✅ FileController.java 수정
+   - `POST /api/v1/files/presigned-url` 엔드포인트 제거 (31 lines)
+   - `PresignedUrlRequest` DTO 제거 (19 lines)
+
+**발견된 이슈 및 해결**:
+- 문제: `adjustPresignedUrlPath()` 제거 시 컴파일 에러 발생
+- 원인: View Presigned URL 생성(`generatePresignedUrlForView()`)에서 해당 메서드 사용 중
+- 해결: View URL 관련 코드는 Step 4-5에서 제거 예정이므로 `adjustPresignedUrlPath()` 임시 유지
+- 주석 추가: "View URL 생성 시 사용, Step 5에서 제거 예정"
+
+**커밋**:
+- Hash: a08e705
+- 메시지: "refactor(Step2): Upload Presigned URL 관련 코드 제거"
+- 변경사항: 2 files, +1 insertion, -138 deletions
 
 **검증**:
-- 빌드 성공 확인
+- ✅ 빌드 성공 확인 (에러 없음)
+- ✅ S3FileService.java 컴파일 에러 없음
+- ✅ FileController.java 컴파일 에러 없음
+- ✅ Orphaned code 정리 완료 (unused imports, methods)
+
+**다음 단계**:
+- Step 3: Frontend useImageUpload hook 수정 (Upload Presigned URL → Direct Upload)
+
+---
+
+### Step 3: 프론트엔드 useImageUpload 훅 수정
 - 직접 업로드 API 정상 작동 확인
 
 ### Step 3: 프론트엔드 Upload 로직 변경
