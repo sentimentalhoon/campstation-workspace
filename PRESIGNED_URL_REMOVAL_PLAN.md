@@ -337,22 +337,46 @@
 
 ---
 
+---
+
 ### Step 4: 백엔드 View Presigned URL 엔드포인트 제거
+
+**상태**: ✅ 완료 (2025-01-XX)
+
 **목표**: View용 Presigned URL API 완전 제거
 
 **작업 내용**:
-1. FileController.java
-   - `GET /api/v1/files/presigned-url` 엔드포인트 제거
-   - `POST /api/v1/files/presigned-urls/view` 엔드포인트 제거
-   - `PresignedUrlBatchRequest` DTO 제거
-   - `FileUrlResponse` DTO 제거
+1. ✅ FileController.java 수정
+   - `GET /api/v1/files/presigned-url` 엔드포인트 제거 (20 lines)
+   - `POST /api/v1/files/presigned-urls/view` 엔드포인트 제거 (28 lines)
+   - `PresignedUrlBatchRequest` DTO 제거 (7 lines)
+   - `FileUrlResponse` DTO 제거 (3 lines)
+   - 미사용 import 제거 (Map, GetMapping)
 
-2. JwtSecurityConfig.java
-   - Presigned URL 엔드포인트 허용 설정 제거
+2. ✅ JwtSecurityConfig.java 수정
+   - `.requestMatchers(HttpMethod.POST, "/api/v1/files/presigned-urls/view").permitAll()` 제거 (1 line)
+   - View Presigned URL 엔드포인트 인증 예외 설정 제거
+
+**제거된 코드 요약**:
+- 엔드포인트: 2개 (GET, POST)
+- DTO 클래스: 2개 (PresignedUrlBatchRequest, FileUrlResponse)
+- 총 라인 수: 59 lines
+
+**커밋**:
+- Hash: cc6f6bd
+- 메시지: "refactor(Step4): View Presigned URL 엔드포인트 제거"
+- 변경사항: 2 files, -70 deletions
 
 **검증**:
-- 빌드 성공 확인
-- API 엔드포인트 제거 확인
+- ✅ 빌드 성공 확인 (에러 없음)
+- ✅ FileController.java 컴파일 에러 없음
+- ✅ JwtSecurityConfig.java 컴파일 에러 없음
+- ✅ API 엔드포인트 완전 제거 확인
+
+**다음 단계**:
+- Step 5: S3FileService View URL 메서드 제거 (generatePresignedUrlForView, adjustPresignedUrlPath)
+
+---
 
 ### Step 5: S3FileService View URL 메서드 제거
 **목표**: Presigned URL 관련 모든 메서드 제거
