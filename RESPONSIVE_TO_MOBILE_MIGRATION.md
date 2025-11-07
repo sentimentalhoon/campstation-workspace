@@ -202,6 +202,12 @@
 - [ ] `ReservationForm.tsx` - 예약 폼
 - [ ] `CampgroundForm.tsx` - 캠핑장 등록 폼
 
+#### 4.3 요금제 관련
+
+- [x] `PricingManagementClient.tsx` - 요금제 관리 클라이언트 (2개 sm:/lg: 제거)
+- [x] `PricingList.tsx` - 요금제 목록 (1개 sm: 제거)
+- [x] `PricingModal.tsx` - 요금제 모달 (12개 sm: 제거)
+
 ---
 
 ## 🔍 변경 상세 로그
@@ -570,6 +576,30 @@ npm run lighthouse
 
 ---
 
+## 📋 Batch 11 작업 기록 (2025-01-XX)
+
+### Batch 11: Pricing Components (3 files, 15 classes)
+
+**완료 파일: 3개**
+
+1. ✅ `PricingManagementClient.tsx` (2 classes)
+   - Container: `sm:px-6 lg:px-8` → `px-6`
+   - Header: `sm:flex-row sm:items-center sm:justify-between` → `flex-col items-start`
+
+2. ✅ `PricingList.tsx` (1 class)
+   - Stats grid: `sm:grid-cols-4` → `grid-cols-4`
+
+3. ✅ `PricingModal.tsx` (12 classes)
+   - All grid layouts: `sm:grid-cols-*` → `grid-cols-*`
+   - Span utilities: `sm:col-span-2` → `col-span-2`
+
+**Batch 11 요약:**
+- 파일: 3개 완료
+- 클래스 제거: 15개
+- Git 커밋: 9cd3504
+
+---
+
 ## 🎯 최종 요약
 
 ### 제거된 반응형 클래스 분포
@@ -580,23 +610,22 @@ Phase 2 (UI Components): ~80 classes
 Phase 3 Batch 1-8: ~224 classes
 Phase 3 Batch 9: 30 classes
 Phase 3 Batch 10: 25 classes
+Phase 3 Batch 11: 15 classes
 ─────────────────────────────
-Total Removed: ~365 classes
-Remaining: ~19 files (estimated 100+ classes)
+Total Removed: ~380 classes
+Remaining: ~16 files (estimated 85+ classes)
 ```
 
 ### 마이그레이션 성과
 
-- ✅ **365개 제거**: Tailwind 반응형 브레이크포인트
+- ✅ **380개 제거**: Tailwind 반응형 브레이크포인트
 - ✅ **480px 고정**: 일관된 모바일 우선 디자인
-- ✅ **10개 배치**: 체계적인 단계별 마이그레이션 (Batch 1-10 완료)
+- ✅ **11개 배치**: 체계적인 단계별 마이그레이션 (Batch 1-11 완료)
 - ✅ **Git 추적**: 모든 변경사항 커밋 및 문서화
-
-### 남은 작업 (선택 사항)
 
 ### 남은 작업
 
-- [ ] Batch 11-16 처리 (19 files, ~100 classes)
+- [ ] Batch 12-16 처리 (16 files, ~85 classes)
 - [ ] 최종 검증 (grep_search 전체)
 - [ ] 번들 크기 분석
 - [ ] Lighthouse 성능 측정
@@ -611,6 +640,6 @@ Remaining: ~19 files (estimated 100+ classes)
 
 ---
 
-**문서 버전:** 3.0.0  
+**문서 버전:** 3.1.0  
 **최종 수정일:** 2025-01-XX  
-**상태:** 🚧 진행 중 (Batch 9/15 완료)
+**상태:** 🚧 진행 중 (Batch 11/16 완료)
