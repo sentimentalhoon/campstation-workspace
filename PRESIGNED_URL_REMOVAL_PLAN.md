@@ -191,16 +191,47 @@
 
 ## 제거 순서
 
-### Step 1: 백엔드 View URL 로직 변경 (ReviewService, UserResponseDto)
+### Step 1: 백엔드 View URL 로직 변경 (ReviewService, UserResponseDto) ✅ **완료**
 **목표**: `generatePresignedUrlForView()` → `generatePublicUrl()` 변경
 
 **작업 내용**:
-1. ReviewService.java 수정
+1. ✅ ReviewService.java 수정
    - `generatePresignedUrlForView()` → `generatePublicUrl()` 변경 (3곳)
-2. ReviewAdminFacade.java 수정
+   - try-catch 제거 (generatePublicUrl은 예외 발생 안함)
+   - 주석 업데이트 ("Presigned URL로 업로드된" → "업로드된")
+2. ✅ ReviewAdminFacade.java 수정
    - `generatePresignedUrlForView()` → `generatePublicUrl()` 변경 (3곳)
-3. UserResponseDto.java 수정
-   - `generatePresignedUrlForView()` → `generatePublicUrl()` 변경 (1곳)
+   - try-catch 및 null 필터 제거
+   - 주석 업데이트
+3. ✅ UserResponseDto.java 수정
+   - 메서드명 변경: `fromEntityWithPresignedUrl()` → `fromEntity()`
+   - `generatePresignedUrlForView()` → `generatePublicUrl()` 변경
+   - try-catch 제거
+   - 주석 업데이트
+4. ✅ UserController.java 수정
+   - `fromEntityWithPresignedUrl()` → `fromEntity()` 호출 변경 (3곳)
+5. ✅ OwnerService.java 수정
+   - 메인 이미지, 썸네일, 원본 이미지 URL 생성 로직 변경
+   - try-catch 및 null 필터 제거
+   - 주석 업데이트
+
+**발견된 추가 개선사항**:
+- `generatePublicUrl()`은 IOException을 발생시키지 않음 (RuntimeException만 발생)
+- 기존 try-catch 블록이 불필요했음 → 모두 제거하여 코드 단순화
+- null 체크 및 필터링도 불필요 → 제거
+
+**커밋**:
+- Hash: 8dd1834
+- 메시지: "refactor(Step1): generatePresignedUrlForView → generatePublicUrl 변경"
+
+**검증**:
+- ✅ 빌드 성공 확인
+- ✅ 5개 파일 에러 없음
+- ✅ ReviewService, ReviewAdminFacade, UserResponseDto, UserController, OwnerService 모두 수정 완료
+
+---
+
+### Step 2: 백엔드 Upload Presigned URL 제거
    - 메서드명 변경: `fromEntityWithPresignedUrl()` → `fromEntity()`
 4. UserController.java 수정
    - 메서드 호출명 변경 (3곳)
