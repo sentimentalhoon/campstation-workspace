@@ -702,12 +702,14 @@ npm run lighthouse
 **완료 파일: 3개**
 
 1. ✅ `BasicInfoSection.tsx` (9 classes)
+
    - Main grid: `md:grid-cols-2` → `grid-cols-1`
    - All sections: `md:col-span-2` → removed (6 instances)
    - Address flex: `sm:flex-row` → `flex-col`
    - Business info grid: `md:grid-cols-2` → `grid-cols-1`
 
 2. ✅ `ImageSection.tsx` (1 class)
+
    - Image grid: `md:grid-cols-3 lg:grid-cols-4` → `grid-cols-2`
 
 3. ✅ `SiteSection.tsx` (1 class)
@@ -728,10 +730,12 @@ npm run lighthouse
 **완료 파일: 5개**
 
 1. ✅ `OverviewSection.tsx` (2 classes)
+
    - KPI grid: `sm:grid-cols-2 lg:grid-cols-4` → `grid-cols-2`
    - Additional metrics: `sm:grid-cols-2 lg:grid-cols-3` → `grid-cols-2`
 
 2. ✅ `StatCard.tsx` (7 classes)
+
    - Card: `sm:rounded-2xl sm:p-6` → `rounded-2xl p-6`
    - Title: `sm:text-sm` → `text-sm`
    - Value: `sm:mt-2 sm:text-3xl` → `mt-2 text-3xl`
@@ -741,12 +745,14 @@ npm run lighthouse
    - Icon text: `sm:text-2xl` → `text-2xl`
 
 3. ✅ `SectionHeader.tsx` (4 classes)
+
    - Container: `sm:flex-row sm:items-center sm:justify-between` → `flex-col`
    - Title: `sm:text-2xl` → `text-2xl`
    - Subtitle: `sm:text-sm` → `text-sm`
    - Action: `sm:self-auto` → `self-start`
 
 4. ✅ `PaymentsSection.tsx` (1 class)
+
    - Stats grid: `sm:grid-cols-2 lg:grid-cols-4` → `grid-cols-2`
 
 5. ✅ `MetricCard.tsx` (5 classes)
@@ -815,10 +821,12 @@ Remaining: 0 classes (100% complete!)
 ### 남은 responsive 사용
 
 **Prop 기반 사용만 (문제 없음):**
+
 - `LoadingSpinner.tsx`: `size` prop으로 sm/md/lg 사용 (동적)
 - `FavoriteButton.tsx`: `size` prop으로 sm/md/lg 사용 (동적)
 
 **총 제거 클래스:**
+
 - Phase 1-2: 86 classes
 - Phase 3 (Batch 1-16): 381 classes
 - **Total: 467 classes removed ✅**
