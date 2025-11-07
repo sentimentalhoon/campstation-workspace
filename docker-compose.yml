@@ -21,6 +21,7 @@ services:
       - NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME:-CampStation}
       - NEXT_PUBLIC_APP_VERSION=${NEXT_PUBLIC_APP_VERSION:-1.0.0}
       - NEXT_PUBLIC_KAKAO_MAP_API_KEY=${NEXT_PUBLIC_KAKAO_MAP_API_KEY}
+      - NEXT_PUBLIC_NAVER_MAP_API_KEY=${NEXT_PUBLIC_NAVER_MAP_API_KEY}
     depends_on:
       backend:
         condition: service_healthy
