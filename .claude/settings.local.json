@@ -18,7 +18,11 @@
       "Bash(awk:*)",
       "Bash(npm run dev:*)",
       "Bash(git checkout:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(docker builder prune:*)",
+      "Bash(docker compose:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm install)"
     ],
     "deny": [],
     "ask": []

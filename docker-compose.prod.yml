@@ -17,14 +17,14 @@ services:
       target: production
       args:
         - NODE_ENV=production
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://mycamp.duckdns.org/api/}
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://mycamp.duckdns.org/api}
         - NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME:-CampStation}
         - NEXT_PUBLIC_APP_VERSION=${NEXT_PUBLIC_APP_VERSION:-1.0.0}
         - NEXT_PUBLIC_NAVER_MAP_CLIENT_ID=${NEXT_PUBLIC_NAVER_MAP_CLIENT_ID}
         - NEXT_PUBLIC_TOSS_CLIENT_KEY=${NEXT_PUBLIC_TOSS_CLIENT_KEY}
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://mycamp.duckdns.org/api/}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://mycamp.duckdns.org/api}
       - NEXT_TELEMETRY_DISABLED=1
       # SSR에서 Backend 접근용 (Docker 네트워크 내부)
       - INTERNAL_API_URL=http://campstation-backend:8080
