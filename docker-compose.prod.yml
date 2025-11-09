@@ -189,7 +189,7 @@ services:
       - MINIO_REGION=${AWS_S3_REGION:-us-east-1}
       - MINIO_DOMAIN=${MINIO_DOMAIN}
       - MINIO_SERVER_URL=${MINIO_SERVER_URL}
-      - MINIO_BROWSER_REDIRECT_URL=${MINIO_BROWSER_REDIRECT_URL}
+      - MINIO_BROWSER_REDIRECT_URL=${MINIO_BROWSER_REDIRECT_URL:-https://mycamp.duckdns.org/minio-console/}
       - MINIO_API_REQUESTS_MAX=1000
       - MINIO_API_REQUESTS_DEADLINE=1m
     command: server /data --console-address ":9001" --address ":9000"
