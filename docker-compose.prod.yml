@@ -187,9 +187,11 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_REGION=${AWS_S3_REGION:-us-east-1}
-      - MINIO_DOMAIN=${MINIO_DOMAIN}
-      - MINIO_SERVER_URL=${MINIO_SERVER_URL}
-      - MINIO_BROWSER_REDIRECT_URL=${MINIO_BROWSER_REDIRECT_URL:-https://mycamp.duckdns.org/minio-console/}
+      # MINIO_DOMAIN 제거 - 서브도메인 자동 생성 방지
+      # - MINIO_DOMAIN=${MINIO_DOMAIN}
+      # MINIO_SERVER_URL 제거 - API 경로 자동 설정
+      # - MINIO_SERVER_URL=${MINIO_SERVER_URL}
+      - MINIO_BROWSER_REDIRECT_URL=https://mycamp.duckdns.org/minio-console/
       - MINIO_API_REQUESTS_MAX=1000
       - MINIO_API_REQUESTS_DEADLINE=1m
     command: server /data --console-address ":9001" --address ":9000"
