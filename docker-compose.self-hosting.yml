@@ -15,7 +15,7 @@ services:
       target: runtime
       args:
         - NODE_ENV=production
-        - NEXT_PUBLIC_API_URL=https://your-domain.com/api/
+        - NEXT_PUBLIC_API_URL=https://your-domain.com/api
         - NEXT_PUBLIC_APP_NAME=CampStation
         - NEXT_PUBLIC_KAKAO_MAP_API_KEY=${NEXT_PUBLIC_KAKAO_MAP_API_KEY}
         - NEXT_PUBLIC_TOSS_CLIENT_KEY=${NEXT_PUBLIC_TOSS_CLIENT_KEY}
@@ -23,7 +23,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=https://your-domain.com/api/
+      - NEXT_PUBLIC_API_URL=https://your-domain.com/api
       - INTERNAL_API_URL=http://backend:8080
     depends_on:
       - backend
