@@ -94,9 +94,3 @@ uploads/
 # Temporary files
 tmp/
 temp/
-
-.terraform/infrastructure/.terraform/
-infrastructure/terraform.tfstate*
-infrastructure/.terraform.lock.hcl
-terraform.tfstate*
-.terraform/
