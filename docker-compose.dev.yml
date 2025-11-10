@@ -96,10 +96,11 @@ services:
       - AWS_S3_ENDPOINT=http://minio:9000
       - AWS_S3_EXTERNAL_ENDPOINT=http://localhost:9000
       - CLOUD_AWS_S3_PUBLIC_ENDPOINT=http://localhost:9000/campstation-dev
-      - KAKAO_CLIENT_ID=14274277b7b930e3289085afa313c81c
+      - KAKAO_CLIENT_ID=189bc1701403914a5e701d1325db0da5
       - KAKAO_CLIENT_SECRET=l0rNzBb32vgWVgxz7j74WiRDuIyYqkrb
       - NAVER_CLIENT_ID=NvwJHLtK_ttnE3wDTFZj
       - NAVER_CLIENT_SECRET=S_QEyzOOGg
+      - FRONTEND_URL=http://localhost:3000
     depends_on:
       redis:
         condition: service_healthy
