@@ -24,7 +24,9 @@
       "Bash(npm ls:*)",
       "Bash(npm install)",
       "Bash(npm install:*)",
-      "Bash(xargs cat:*)"
+      "Bash(xargs cat:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker logs:*)"
     ],
     "deny": [],
     "ask": []
