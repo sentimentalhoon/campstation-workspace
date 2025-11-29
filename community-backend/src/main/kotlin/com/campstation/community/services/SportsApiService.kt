@@ -13,6 +13,8 @@ import redis.clients.jedis.JedisPool
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+import io.ktor.client.statement.*
+
 interface SportsApiService {
     suspend fun getLiveMatches(): List<Match>
     suspend fun getUpcomingMatches(): List<Match>
@@ -36,7 +38,7 @@ class RealSportsApiService(
 
     // Redis Connection Pool
     private val jedisPool = JedisPool(redisHost, redisPort)
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
     override suspend fun getLiveMatches(): List<Match> {
         val cacheKey = "sports:live"
@@ -63,12 +65,15 @@ class RealSportsApiService(
         // 2. Fetch from API
         println("Fetching live matches from API")
         try {
-            val response: ApiFootballResponse = client.get("https://api-football-v1.p.rapidapi.com/v3/fixtures") {
+            val responseText = client.get("https://api-football-v1.p.rapidapi.com/v3/fixtures") {
                 parameter("live", "all")
                 header("x-rapidapi-host", "api-football-v1.p.rapidapi.com")
                 header("x-rapidapi-key", apiKey)
-            }.body()
+            }.bodyAsText()
 
+            println("Live Matches API Response: $responseText")
+
+            val response = json.decodeFromString<ApiFootballResponse>(responseText)
             val matches = response.response.map { it.toMatch() }
 
             // 3. Save to Redis (TTL: 60 seconds)
@@ -116,12 +121,15 @@ class RealSportsApiService(
         // 2. Fetch from API (Next 10 matches as an example)
         println("Fetching upcoming matches from API")
         try {
-            val response: ApiFootballResponse = client.get("https://api-football-v1.p.rapidapi.com/v3/fixtures") {
+            val responseText = client.get("https://api-football-v1.p.rapidapi.com/v3/fixtures") {
                 parameter("next", "20") // 가져올 경기 수
                 header("x-rapidapi-host", "api-football-v1.p.rapidapi.com")
                 header("x-rapidapi-key", apiKey)
-            }.body()
+            }.bodyAsText()
 
+            println("Upcoming Matches API Response: $responseText")
+
+            val response = json.decodeFromString<ApiFootballResponse>(responseText)
             val matches = response.response.map { it.toMatch() }
 
             // 3. Save to Redis (TTL: 10 minutes)
