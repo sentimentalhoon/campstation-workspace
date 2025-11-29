@@ -40,6 +40,11 @@ class RealSportsApiService(
     private val jedisPool = JedisPool(redisHost, redisPort)
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
+
+// ...
+
     override suspend fun getLiveMatches(): List<Match> {
         val cacheKey = "sports:live"
         
@@ -72,6 +77,15 @@ class RealSportsApiService(
             }.bodyAsText()
 
             println("Live Matches API Response: $responseText")
+
+            // Error Handling for API Response
+            val jsonElement = json.parseToJsonElement(responseText)
+            if (jsonElement is JsonObject && jsonElement.containsKey("message")) {
+                val message = jsonElement["message"]?.jsonPrimitive?.content
+                println("API Error: $message")
+                // API 키 오류 등의 경우 빈 리스트 반환 (크래시 방지)
+                return emptyList()
+            }
 
             val response = json.decodeFromString<ApiFootballResponse>(responseText)
             val matches = response.response.map { it.toMatch() }
@@ -128,6 +142,14 @@ class RealSportsApiService(
             }.bodyAsText()
 
             println("Upcoming Matches API Response: $responseText")
+
+            // Error Handling for API Response
+            val jsonElement = json.parseToJsonElement(responseText)
+            if (jsonElement is JsonObject && jsonElement.containsKey("message")) {
+                val message = jsonElement["message"]?.jsonPrimitive?.content
+                println("API Error: $message")
+                return emptyList()
+            }
 
             val response = json.decodeFromString<ApiFootballResponse>(responseText)
             val matches = response.response.map { it.toMatch() }
