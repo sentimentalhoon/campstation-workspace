@@ -44,10 +44,16 @@ class RealSportsApiService(
         // 1. Try Redis Cache
         try {
             jedisPool.resource.use { jedis ->
+                // Redis 비밀번호 설정이 필요한 경우 auth 호출
+                val redisPassword = System.getenv("REDIS_PASSWORD")
+                if (!redisPassword.isNullOrEmpty()) {
+                    jedis.auth(redisPassword)
+                }
+                
                 val cached = jedis.get(cacheKey)
                 if (cached != null) {
                     println("Returning cached live matches")
-                    return json.decodeFromString(cached)
+                    return json.decodeFromString<List<Match>>(cached)
                 }
             }
         } catch (e: Exception) {
@@ -68,6 +74,10 @@ class RealSportsApiService(
             // 3. Save to Redis (TTL: 60 seconds)
             try {
                 jedisPool.resource.use { jedis ->
+                    val redisPassword = System.getenv("REDIS_PASSWORD")
+                    if (!redisPassword.isNullOrEmpty()) {
+                        jedis.auth(redisPassword)
+                    }
                     jedis.setex(cacheKey, 60, json.encodeToString(matches))
                 }
             } catch (e: Exception) {
@@ -88,10 +98,15 @@ class RealSportsApiService(
         // 1. Try Redis Cache
         try {
             jedisPool.resource.use { jedis ->
+                val redisPassword = System.getenv("REDIS_PASSWORD")
+                if (!redisPassword.isNullOrEmpty()) {
+                    jedis.auth(redisPassword)
+                }
+                
                 val cached = jedis.get(cacheKey)
                 if (cached != null) {
                     println("Returning cached upcoming matches")
-                    return json.decodeFromString(cached)
+                    return json.decodeFromString<List<Match>>(cached)
                 }
             }
         } catch (e: Exception) {
@@ -112,6 +127,10 @@ class RealSportsApiService(
             // 3. Save to Redis (TTL: 10 minutes)
             try {
                 jedisPool.resource.use { jedis ->
+                    val redisPassword = System.getenv("REDIS_PASSWORD")
+                    if (!redisPassword.isNullOrEmpty()) {
+                        jedis.auth(redisPassword)
+                    }
                     jedis.setex(cacheKey, 600, json.encodeToString(matches))
                 }
             } catch (e: Exception) {
