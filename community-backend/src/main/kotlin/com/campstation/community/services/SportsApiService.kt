@@ -91,8 +91,9 @@ class RealSportsApiService(
                 }
                 else -> {
                     val errorBody = response.bodyAsText()
-                    println("API returned status: ${response.status}")
-                    println("Error response body: $errorBody")
+                    println("API Error (${response.status}): $errorBody")
+                    println("Note: If 'not subscribed', visit https://rapidapi.com/api-sports/api/api-football and click Subscribe")
+                    println("Falling back to mock data for live matches")
                     return@withContext mockService.getLiveMatches()
                 }
             }
@@ -135,8 +136,9 @@ class RealSportsApiService(
                 }
                 else -> {
                     val errorBody = response.bodyAsText()
-                    println("API returned status: ${response.status}")
-                    println("Error response body: $errorBody")
+                    println("API Error (${response.status}): $errorBody")
+                    println("Note: If 'not subscribed', visit https://rapidapi.com/api-sports/api/api-football and click Subscribe")
+                    println("Falling back to mock data for upcoming matches")
                     return@withContext mockService.getUpcomingMatches()
                 }
             }
