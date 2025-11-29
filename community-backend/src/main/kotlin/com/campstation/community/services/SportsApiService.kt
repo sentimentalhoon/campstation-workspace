@@ -252,7 +252,6 @@ class MockSportsApiService : SportsApiService {
     }
 
     override suspend fun getLiveMatches(): List<Match> {
-        // ...existing code...
         // 실제 API 호출 대신 더미 데이터 반환
         return listOf(
             Match(
@@ -276,6 +275,50 @@ class MockSportsApiService : SportsApiService {
                 homeScore = 0,
                 awayScore = 0,
                 odds = MatchOdds(2.50, 3.40, 2.80)
+            ),
+            Match(
+                id = "live_3",
+                league = "Premier League",
+                homeTeam = "Manchester City",
+                awayTeam = "Chelsea",
+                startTime = "2024-11-30T19:00:00",
+                status = "LIVE",
+                homeScore = 2,
+                awayScore = 1,
+                odds = MatchOdds(1.85, 3.60, 4.20)
+            ),
+            Match(
+                id = "live_4",
+                league = "Serie A",
+                homeTeam = "Inter Milan",
+                awayTeam = "Napoli",
+                startTime = "2024-11-30T20:45:00",
+                status = "LIVE",
+                homeScore = 1,
+                awayScore = 0,
+                odds = MatchOdds(2.20, 3.30, 3.40)
+            ),
+            Match(
+                id = "live_5",
+                league = "Bundesliga",
+                homeTeam = "Bayern Munich",
+                awayTeam = "Borussia Dortmund",
+                startTime = "2024-11-30T18:30:00",
+                status = "LIVE",
+                homeScore = 3,
+                awayScore = 2,
+                odds = MatchOdds(1.75, 3.80, 4.50)
+            ),
+            Match(
+                id = "live_6",
+                league = "Ligue 1",
+                homeTeam = "PSG",
+                awayTeam = "Marseille",
+                startTime = "2024-11-30T20:00:00",
+                status = "LIVE",
+                homeScore = 2,
+                awayScore = 0,
+                odds = MatchOdds(1.60, 4.00, 5.50)
             )
         )
     }
@@ -290,6 +333,69 @@ class MockSportsApiService : SportsApiService {
                 startTime = "2024-12-01T04:00:00",
                 status = "SCHEDULED",
                 odds = MatchOdds(2.30, 3.10, 3.00)
+            ),
+            Match(
+                id = "upcoming_2",
+                league = "Premier League",
+                homeTeam = "Manchester United",
+                awayTeam = "Tottenham",
+                startTime = "2024-12-01T06:30:00",
+                status = "SCHEDULED",
+                odds = MatchOdds(2.80, 3.20, 2.60)
+            ),
+            Match(
+                id = "upcoming_3",
+                league = "La Liga",
+                homeTeam = "Atletico Madrid",
+                awayTeam = "Sevilla",
+                startTime = "2024-12-01T08:00:00",
+                status = "SCHEDULED",
+                odds = MatchOdds(1.95, 3.40, 3.90)
+            ),
+            Match(
+                id = "upcoming_4",
+                league = "Bundesliga",
+                homeTeam = "RB Leipzig",
+                awayTeam = "Bayer Leverkusen",
+                startTime = "2024-12-01T10:30:00",
+                status = "SCHEDULED",
+                odds = MatchOdds(2.40, 3.30, 2.90)
+            ),
+            Match(
+                id = "upcoming_5",
+                league = "Ligue 1",
+                homeTeam = "Lyon",
+                awayTeam = "Monaco",
+                startTime = "2024-12-01T12:00:00",
+                status = "SCHEDULED",
+                odds = MatchOdds(2.70, 3.10, 2.70)
+            ),
+            Match(
+                id = "upcoming_6",
+                league = "Premier League",
+                homeTeam = "Newcastle",
+                awayTeam = "Aston Villa",
+                startTime = "2024-12-02T04:00:00",
+                status = "SCHEDULED",
+                odds = MatchOdds(2.20, 3.30, 3.30)
+            ),
+            Match(
+                id = "upcoming_7",
+                league = "Serie A",
+                homeTeam = "AS Roma",
+                awayTeam = "Lazio",
+                startTime = "2024-12-02T06:45:00",
+                status = "SCHEDULED",
+                odds = MatchOdds(2.50, 3.20, 2.90)
+            ),
+            Match(
+                id = "upcoming_8",
+                league = "La Liga",
+                homeTeam = "Valencia",
+                awayTeam = "Real Sociedad",
+                startTime = "2024-12-02T09:00:00",
+                status = "SCHEDULED",
+                odds = MatchOdds(2.60, 3.00, 2.80)
             )
         )
     }
