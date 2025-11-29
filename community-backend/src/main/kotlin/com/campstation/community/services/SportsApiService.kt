@@ -14,6 +14,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import io.ktor.client.statement.*
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 interface SportsApiService {
     suspend fun getLiveMatches(): List<Match>
@@ -39,11 +41,6 @@ class RealSportsApiService(
     // Redis Connection Pool
     private val jedisPool = JedisPool(redisHost, redisPort)
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
-
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
-
-// ...
 
     override suspend fun getLiveMatches(): List<Match> {
         val cacheKey = "sports:live"
