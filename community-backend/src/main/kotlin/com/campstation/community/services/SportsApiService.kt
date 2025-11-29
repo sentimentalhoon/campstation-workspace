@@ -70,9 +70,9 @@ class RealSportsApiService(
         // 2. Fetch from API
         println("Fetching live matches from API")
         try {
-            val responseText = client.get("https://api-football-v1.p.rapidapi.com/v3/fixtures") {
+            val responseText = client.get("https://api-football.p.rapidapi.com/v3/fixtures") {
                 parameter("live", "all")
-                header("x-rapidapi-host", "api-football-v1.p.rapidapi.com")
+                header("x-rapidapi-host", "api-football.p.rapidapi.com")
                 header("x-rapidapi-key", apiKey)
             }.bodyAsText()
 
@@ -135,9 +135,9 @@ class RealSportsApiService(
         // 2. Fetch from API (Next 10 matches as an example)
         println("Fetching upcoming matches from API")
         try {
-            val responseText = client.get("https://api-football-v1.p.rapidapi.com/v3/fixtures") {
+            val responseText = client.get("https://api-football.p.rapidapi.com/v3/fixtures") {
                 parameter("next", "20") // 가져올 경기 수
-                header("x-rapidapi-host", "api-football-v1.p.rapidapi.com")
+                header("x-rapidapi-host", "api-football.p.rapidapi.com")
                 header("x-rapidapi-key", apiKey)
             }.bodyAsText()
 
