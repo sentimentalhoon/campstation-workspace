@@ -119,6 +119,10 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-backend
     environment:
       - PORT=8081
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - RAPID_API_KEY=${RAPID_API_KEY}
     restart: always
     logging:
       driver: "json-file"
