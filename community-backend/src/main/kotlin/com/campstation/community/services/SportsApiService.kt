@@ -90,7 +90,9 @@ class RealSportsApiService(
                     }
                 }
                 else -> {
-                    println("API returned status: ${response.status}, falling back to mock data")
+                    val errorBody = response.bodyAsText()
+                    println("API returned status: ${response.status}")
+                    println("Error response body: $errorBody")
                     return@withContext mockService.getLiveMatches()
                 }
             }
@@ -132,7 +134,9 @@ class RealSportsApiService(
                     }
                 }
                 else -> {
-                    println("API returned status: ${response.status}, falling back to mock data")
+                    val errorBody = response.bodyAsText()
+                    println("API returned status: ${response.status}")
+                    println("Error response body: $errorBody")
                     return@withContext mockService.getUpcomingMatches()
                 }
             }
