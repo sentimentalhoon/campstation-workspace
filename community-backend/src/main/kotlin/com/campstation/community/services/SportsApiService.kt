@@ -160,7 +160,7 @@ class RealSportsApiService(
         try {
             jedisPool.resource.use { jedis ->
                 authenticateRedis(jedis)
-                jedis.setex(key, ttl, json.encodeToString(matches))
+                jedis.setex(key, ttl.toLong(), json.encodeToString(matches))
                 println("Cached ${matches.size} matches with key: $key (TTL: ${ttl}s)")
             }
         } catch (e: Exception) {
