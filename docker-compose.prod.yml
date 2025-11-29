@@ -110,6 +110,38 @@ services:
       driver: "json-file"
 
   # ================================
+  # Community Backend (Ktor) - Production
+  # ================================
+  community-backend:
+    build:
+      context: ./community-backend
+      dockerfile: Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-backend
+    environment:
+      - PORT=8081
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ================================
+  # Community Frontend (Vue.js) - Production
+  # ================================
+  community-frontend:
+    build:
+      context: ./community-frontend
+      dockerfile: Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-frontend
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ================================
   # Nginx Reverse Proxy - Production
   # ================================
   nginx:

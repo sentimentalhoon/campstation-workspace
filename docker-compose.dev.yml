@@ -121,6 +121,46 @@ services:
           memory: 1G
 
   # ================================
+  # Community Backend (Ktor) - Development Mode
+  # ================================
+  community-backend:
+    build:
+      context: ./community-backend
+      dockerfile: Dockerfile.dev
+    container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-backend-dev
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./community-backend:/app
+      - /app/.gradle
+    environment:
+      - PORT=8081
+    networks:
+      - campstation-network
+    restart: unless-stopped
+
+  # ================================
+  # Community Frontend (Vue.js) - Development Mode
+  # ================================
+  community-frontend:
+    build:
+      context: ./community-frontend
+      dockerfile: Dockerfile.dev
+    container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-frontend-dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./community-frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8081
+    depends_on:
+      - community-backend
+    networks:
+      - campstation-network
+    restart: unless-stopped
+
+  # ================================
   # Database (PostgreSQL)
   # ================================
   db:
