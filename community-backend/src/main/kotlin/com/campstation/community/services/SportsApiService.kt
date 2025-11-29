@@ -4,18 +4,21 @@ import com.campstation.community.models.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import redis.clients.jedis.JedisPool
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
-import io.ktor.client.statement.*
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
 
 interface SportsApiService {
     suspend fun getLiveMatches(): List<Match>
@@ -28,150 +31,166 @@ class RealSportsApiService(
     private val redisPort: Int
 ) : SportsApiService {
 
-    private val client = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                prettyPrint = true
-                isLenient = true
-            })
+    companion object {
+        private const val API_BASE_URL = "https://api-football.p.rapidapi.com/v3"
+        private const val API_HOST = "api-football.p.rapidapi.com"
+        private const val CACHE_TTL_LIVE = 60 // seconds
+        private const val CACHE_TTL_UPCOMING = 600 // seconds
+        
+        private val json = Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            prettyPrint = false
+            coerceInputValues = true
         }
     }
 
-    // Redis Connection Pool
+    private val client = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(json)
+        }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 15000
+            connectTimeoutMillis = 10000
+            socketTimeoutMillis = 15000
+        }
+        defaultRequest {
+            header("x-rapidapi-host", API_HOST)
+            header("x-rapidapi-key", apiKey)
+        }
+    }
+
     private val jedisPool = JedisPool(redisHost, redisPort)
-    private val json = Json { ignoreUnknownKeys = true; isLenient = true }
-    
-    // Fallback service
     private val mockService = MockSportsApiService()
 
-    override suspend fun getLiveMatches(): List<Match> {
+    override suspend fun getLiveMatches(): List<Match> = withContext(Dispatchers.IO) {
         val cacheKey = "sports:live"
         
         // 1. Try Redis Cache
-        try {
-            jedisPool.resource.use { jedis ->
-                // Redis 비밀번호 설정이 필요한 경우 auth 호출
-                val redisPassword = System.getenv("REDIS_PASSWORD")
-                if (!redisPassword.isNullOrEmpty()) {
-                    jedis.auth(redisPassword)
-                }
-                
-                val cached = jedis.get(cacheKey)
-                if (cached != null) {
-                    println("Returning cached live matches")
-                    return json.decodeFromString<List<Match>>(cached)
-                }
-            }
-        } catch (e: Exception) {
-            println("Redis error: ${e.message}")
-        }
+        getCachedMatches(cacheKey)?.let { return@withContext it }
 
         // 2. Fetch from API
         println("Fetching live matches from API")
         try {
-            val responseText = client.get("https://api-football.p.rapidapi.com/v3/fixtures") {
+            val response = client.get("$API_BASE_URL/fixtures") {
                 parameter("live", "all")
-                header("x-rapidapi-host", "api-football.p.rapidapi.com")
-                header("x-rapidapi-key", apiKey)
-            }.bodyAsText()
-
-            println("Live Matches API Response: $responseText")
-
-            // Error Handling for API Response
-            val jsonElement = json.parseToJsonElement(responseText)
-            if (jsonElement is JsonObject && jsonElement.containsKey("message")) {
-                val message = jsonElement["message"]?.jsonPrimitive?.content
-                println("API Error: $message")
-                println("Falling back to mock data due to API error")
-                return mockService.getLiveMatches()
             }
 
-            val response = json.decodeFromString<ApiFootballResponse>(responseText)
-            val matches = response.response.map { it.toMatch() }
-
-            // 3. Save to Redis (TTL: 60 seconds)
-            try {
-                jedisPool.resource.use { jedis ->
-                    val redisPassword = System.getenv("REDIS_PASSWORD")
-                    if (!redisPassword.isNullOrEmpty()) {
-                        jedis.auth(redisPassword)
+            when (response.status) {
+                HttpStatusCode.OK -> {
+                    val responseText = response.bodyAsText()
+                    println("Live Matches API Response received")
+                    
+                    parseApiResponse(responseText)?.let { matches ->
+                        cacheMatches(cacheKey, matches, CACHE_TTL_LIVE)
+                        return@withContext matches
+                    } ?: run {
+                        println("Failed to parse API response, falling back to mock data")
+                        return@withContext mockService.getLiveMatches()
                     }
-                    jedis.setex(cacheKey, 60, json.encodeToString(matches))
                 }
-            } catch (e: Exception) {
-                println("Redis save error: ${e.message}")
+                else -> {
+                    println("API returned status: ${response.status}, falling back to mock data")
+                    return@withContext mockService.getLiveMatches()
+                }
             }
-
-            return matches
         } catch (e: Exception) {
+            println("Error fetching live matches: ${e.message}")
             e.printStackTrace()
-            return emptyList()
+            return@withContext mockService.getLiveMatches()
         }
     }
 
-    override suspend fun getUpcomingMatches(): List<Match> {
+    override suspend fun getUpcomingMatches(): List<Match> = withContext(Dispatchers.IO) {
         val today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
         val cacheKey = "sports:upcoming:$today"
 
         // 1. Try Redis Cache
+        getCachedMatches(cacheKey)?.let { return@withContext it }
+
+        // 2. Fetch from API
+        println("Fetching upcoming matches from API")
         try {
-            jedisPool.resource.use { jedis ->
-                val redisPassword = System.getenv("REDIS_PASSWORD")
-                if (!redisPassword.isNullOrEmpty()) {
-                    jedis.auth(redisPassword)
+            val response = client.get("$API_BASE_URL/fixtures") {
+                parameter("next", "20")
+            }
+
+            when (response.status) {
+                HttpStatusCode.OK -> {
+                    val responseText = response.bodyAsText()
+                    println("Upcoming Matches API Response received")
+                    
+                    parseApiResponse(responseText)?.let { matches ->
+                        cacheMatches(cacheKey, matches, CACHE_TTL_UPCOMING)
+                        return@withContext matches
+                    } ?: run {
+                        println("Failed to parse API response, falling back to mock data")
+                        return@withContext mockService.getUpcomingMatches()
+                    }
                 }
-                
-                val cached = jedis.get(cacheKey)
-                if (cached != null) {
-                    println("Returning cached upcoming matches")
-                    return json.decodeFromString<List<Match>>(cached)
+                else -> {
+                    println("API returned status: ${response.status}, falling back to mock data")
+                    return@withContext mockService.getUpcomingMatches()
                 }
             }
         } catch (e: Exception) {
-            println("Redis error: ${e.message}")
+            println("Error fetching upcoming matches: ${e.message}")
+            e.printStackTrace()
+            return@withContext mockService.getUpcomingMatches()
         }
+    }
 
-        // 2. Fetch from API (Next 10 matches as an example)
-        println("Fetching upcoming matches from API")
+    // Helper functions for Redis operations
+    private suspend fun getCachedMatches(key: String): List<Match>? = withContext(Dispatchers.IO) {
         try {
-            val responseText = client.get("https://api-football.p.rapidapi.com/v3/fixtures") {
-                parameter("next", "20") // 가져올 경기 수
-                header("x-rapidapi-host", "api-football.p.rapidapi.com")
-                header("x-rapidapi-key", apiKey)
-            }.bodyAsText()
+            jedisPool.resource.use { jedis ->
+                authenticateRedis(jedis)
+                jedis.get(key)?.let { cached ->
+                    println("Cache hit for key: $key")
+                    json.decodeFromString<List<Match>>(cached)
+                }
+            }
+        } catch (e: Exception) {
+            println("Redis get error for key $key: ${e.message}")
+            null
+        }
+    }
 
-            println("Upcoming Matches API Response: $responseText")
+    private suspend fun cacheMatches(key: String, matches: List<Match>, ttl: Int) = withContext(Dispatchers.IO) {
+        try {
+            jedisPool.resource.use { jedis ->
+                authenticateRedis(jedis)
+                jedis.setex(key, ttl, json.encodeToString(matches))
+                println("Cached ${matches.size} matches with key: $key (TTL: ${ttl}s)")
+            }
+        } catch (e: Exception) {
+            println("Redis set error for key $key: ${e.message}")
+        }
+    }
 
-            // Error Handling for API Response
+    private fun authenticateRedis(jedis: redis.clients.jedis.Jedis) {
+        System.getenv("REDIS_PASSWORD")?.takeIf { it.isNotBlank() }?.let { password ->
+            jedis.auth(password)
+        }
+    }
+
+    private fun parseApiResponse(responseText: String): List<Match>? {
+        return try {
             val jsonElement = json.parseToJsonElement(responseText)
+            
+            // Check for API error messages
             if (jsonElement is JsonObject && jsonElement.containsKey("message")) {
                 val message = jsonElement["message"]?.jsonPrimitive?.content
                 println("API Error: $message")
-                println("Falling back to mock data due to API error")
-                return mockService.getUpcomingMatches()
+                return null
             }
 
             val response = json.decodeFromString<ApiFootballResponse>(responseText)
-            val matches = response.response.map { it.toMatch() }
-
-            // 3. Save to Redis (TTL: 10 minutes)
-            try {
-                jedisPool.resource.use { jedis ->
-                    val redisPassword = System.getenv("REDIS_PASSWORD")
-                    if (!redisPassword.isNullOrEmpty()) {
-                        jedis.auth(redisPassword)
-                    }
-                    jedis.setex(cacheKey, 600, json.encodeToString(matches))
-                }
-            } catch (e: Exception) {
-                println("Redis save error: ${e.message}")
-            }
-
-            return matches
+            response.response.map { it.toMatch() }
         } catch (e: Exception) {
+            println("Error parsing API response: ${e.message}")
             e.printStackTrace()
-            return emptyList()
+            null
         }
     }
 
