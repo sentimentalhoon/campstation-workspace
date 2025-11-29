@@ -72,8 +72,10 @@ class RealSportsApiService(
         // 2. Fetch from API
         println("Fetching live matches from API")
         try {
+            val today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
             val response = client.get("$API_BASE_URL/fixtures") {
-                parameter("live", "all")
+                parameter("date", today)
+                parameter("status", "1H-2H-HT-LIVE")
             }
 
             when (response.status) {
@@ -103,6 +105,7 @@ class RealSportsApiService(
 
     override suspend fun getUpcomingMatches(): List<Match> = withContext(Dispatchers.IO) {
         val today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+        val tomorrow = LocalDate.now().plusDays(1).format(DateTimeFormatter.ISO_DATE)
         val cacheKey = "sports:upcoming:$today"
 
         // 1. Try Redis Cache
@@ -112,7 +115,9 @@ class RealSportsApiService(
         println("Fetching upcoming matches from API")
         try {
             val response = client.get("$API_BASE_URL/fixtures") {
-                parameter("next", "20")
+                parameter("from", today)
+                parameter("to", tomorrow)
+                parameter("status", "NS")
             }
 
             when (response.status) {
