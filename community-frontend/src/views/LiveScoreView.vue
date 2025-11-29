@@ -1,96 +1,88 @@
 <script setup>
 import { Calendar, ChevronLeft, ChevronRight, Star } from "lucide-vue-next";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const currentDate = ref("11.30 (토)");
-
-const leagues = ref([
-  {
-    id: 1,
-    name: "Premier League",
-    country: "England",
-    flag: "🇬🇧",
-    matches: [
-      {
-        id: 101,
-        time: "21:30",
-        status: "LIVE",
-        home: "Man City",
-        away: "Liverpool",
-        homeScore: 1,
-        awayScore: 1,
-        timeElapsed: "34'",
-      },
-      {
-        id: 102,
-        time: "23:00",
-        status: "WAIT",
-        home: "Arsenal",
-        away: "Chelsea",
-        homeScore: 0,
-        awayScore: 0,
-        timeElapsed: "",
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "La Liga",
-    country: "Spain",
-    flag: "🇪🇸",
-    matches: [
-      {
-        id: 201,
-        time: "02:00",
-        status: "END",
-        home: "Real Madrid",
-        away: "Barcelona",
-        homeScore: 2,
-        awayScore: 1,
-        timeElapsed: "FT",
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Serie A",
-    country: "Italy",
-    flag: "🇮🇹",
-    matches: [
-      {
-        id: 301,
-        time: "04:45",
-        status: "WAIT",
-        home: "Juventus",
-        away: "AC Milan",
-        homeScore: 0,
-        awayScore: 0,
-        timeElapsed: "",
-      },
-      {
-        id: 302,
-        time: "04:45",
-        status: "WAIT",
-        home: "Napoli",
-        away: "Inter",
-        homeScore: 0,
-        awayScore: 0,
-        timeElapsed: "",
-      },
-    ],
-  },
-]);
+const leagues = ref([]);
 
 const getStatusColor = (status) => {
   switch (status) {
     case "LIVE":
       return "text-named-highlight animate-pulse";
+    case "FINISHED":
     case "END":
       return "text-gray-500";
     default:
       return "text-gray-400";
   }
 };
+
+const fetchLiveMatches = async () => {
+  try {
+    const baseUrl = import.meta.env.VITE_API_URL || '/api/community';
+    const response = await fetch(`${baseUrl}/api/sports/live`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    
+    const data = await response.json();
+    
+    // Group by league
+    const grouped = {};
+    data.forEach(match => {
+      if (!grouped[match.league]) {
+        grouped[match.league] = {
+          id: match.league,
+          name: match.league,
+          country: "World", // 추후 API에서 국가 정보 제공 필요
+          flag: "⚽",
+          matches: []
+        };
+      }
+      
+      // Parse time
+      const timeStr = match.startTime ? match.startTime.substring(11, 16) : "";
+      
+      grouped[match.league].matches.push({
+        id: match.id,
+        time: timeStr,
+        status: match.status,
+        home: match.homeTeam,
+        away: match.awayTeam,
+        homeScore: match.homeScore || 0,
+        awayScore: match.awayScore || 0,
+        timeElapsed: match.status === "LIVE" ? "LIVE" : "" 
+      });
+    });
+    
+    leagues.value = Object.values(grouped);
+  } catch (error) {
+    console.error("Failed to fetch live matches:", error);
+    // Fallback to dummy data if fetch fails (for demo purposes)
+    leagues.value = [
+      {
+        id: 1,
+        name: "Premier League",
+        country: "England",
+        flag: "🇬🇧",
+        matches: [
+          {
+            id: 101,
+            time: "21:30",
+            status: "LIVE",
+            home: "Man City",
+            away: "Liverpool",
+            homeScore: 1,
+            awayScore: 1,
+            timeElapsed: "34'",
+          }
+        ]
+      }
+    ];
+  }
+};
+
+onMounted(() => {
+  fetchLiveMatches();
+});
 </script>
 
 <template>

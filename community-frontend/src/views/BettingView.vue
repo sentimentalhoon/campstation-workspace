@@ -1,43 +1,46 @@
 <script setup>
 import { Coins, Trophy } from "lucide-vue-next";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const myPoints = ref(5400);
+const matches = ref([]);
 
-const matches = ref([
-  {
-    id: 1,
-    league: "Premier League",
-    home: "Man City",
-    away: "Liverpool",
-    odds: { home: 2.1, draw: 3.4, away: 3.1 },
-    selected: null,
-  },
-  {
-    id: 2,
-    league: "La Liga",
-    home: "Real Madrid",
-    away: "Barcelona",
-    odds: { home: 1.95, draw: 3.6, away: 3.5 },
-    selected: null,
-  },
-  {
-    id: 3,
-    league: "Serie A",
-    home: "Juventus",
-    away: "AC Milan",
-    odds: { home: 2.4, draw: 3.1, away: 2.9 },
-    selected: null,
-  },
-  {
-    id: 4,
-    league: "Bundesliga",
-    home: "Bayern Munich",
-    away: "Dortmund",
-    odds: { home: 1.6, draw: 4.2, away: 4.8 },
-    selected: null,
-  },
-]);
+const fetchUpcomingMatches = async () => {
+  try {
+    const baseUrl = import.meta.env.VITE_API_URL || '/api/community';
+    const response = await fetch(`${baseUrl}/api/sports/upcoming`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    
+    const data = await response.json();
+    
+    matches.value = data.map(match => ({
+      id: match.id,
+      league: match.league,
+      home: match.homeTeam,
+      away: match.awayTeam,
+      startTime: match.startTime,
+      odds: { 
+        home: match.odds.homeWin, 
+        draw: match.odds.draw, 
+        away: match.odds.awayWin 
+      },
+      selected: null
+    }));
+  } catch (error) {
+    console.error("Failed to fetch upcoming matches:", error);
+    // Fallback dummy data
+    matches.value = [
+      {
+        id: 1,
+        league: "Premier League",
+        home: "Man City",
+        away: "Liverpool",
+        odds: { home: 2.1, draw: 3.4, away: 3.1 },
+        selected: null,
+      }
+    ];
+  }
+};
 
 const selectOdd = (matchId, type) => {
   const match = matches.value.find((m) => m.id === matchId);
@@ -56,6 +59,10 @@ const getTotalOdds = () => {
     .reduce((acc, curr) => acc * curr.odds[curr.selected], 1)
     .toFixed(2);
 };
+
+onMounted(() => {
+  fetchUpcomingMatches();
+});
 </script>
 
 <template>
