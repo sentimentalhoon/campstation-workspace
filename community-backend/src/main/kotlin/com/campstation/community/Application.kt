@@ -2,6 +2,8 @@ package com.campstation.community
 
 import com.campstation.community.routes.sportsRoutes
 import com.campstation.community.services.MockSportsApiService
+import com.campstation.community.services.RealSportsApiService
+import com.campstation.community.services.SportsApiService
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -45,7 +47,17 @@ fun Application.module() {
     }
 
     // 3. Services
-    val sportsService = MockSportsApiService()
+    // API Key는 환경변수에서 가져오거나 하드코딩 (보안상 환경변수 권장)
+    val rapidApiKey = System.getenv("RAPID_API_KEY") ?: "c2f10b511emshde4ac22de2dc144p15df88jsnd27c9691ecc9"
+    val redisHost = System.getenv("REDIS_HOST") ?: "redis"
+    val redisPort = System.getenv("REDIS_PORT")?.toIntOrNull() ?: 6379
+
+    val sportsService: SportsApiService = try {
+        RealSportsApiService(rapidApiKey, redisHost, redisPort)
+    } catch (e: Exception) {
+        println("Failed to initialize RealSportsApiService, falling back to Mock: ${e.message}")
+        MockSportsApiService()
+    }
 
     // 4. Routing
     routing {

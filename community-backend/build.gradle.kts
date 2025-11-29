@@ -32,6 +32,9 @@ dependencies {
     implementation("io.ktor:ktor-client-core")
     implementation("io.ktor:ktor-client-cio")
     implementation("io.ktor:ktor-client-content-negotiation")
+    
+    // Redis
+    implementation("redis.clients:jedis:5.1.0")
 
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")
