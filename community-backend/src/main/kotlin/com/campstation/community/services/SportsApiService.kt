@@ -32,8 +32,8 @@ class RealSportsApiService(
 ) : SportsApiService {
 
     companion object {
-        private const val API_BASE_URL = "https://api-football.p.rapidapi.com/v3"
-        private const val API_HOST = "api-football.p.rapidapi.com"
+        private const val API_BASE_URL = "https://api-football-v1.p.rapidapi.com/v3"
+        private const val API_HOST = "api-football-v1.p.rapidapi.com"
         private const val CACHE_TTL_LIVE = 60 // seconds
         private const val CACHE_TTL_UPCOMING = 600 // seconds
         
@@ -72,10 +72,8 @@ class RealSportsApiService(
         // 2. Fetch from API
         println("Fetching live matches from API")
         try {
-            val today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
             val response = client.get("$API_BASE_URL/fixtures") {
-                parameter("date", today)
-                parameter("status", "1H-2H-HT-LIVE")
+                parameter("live", "all")
             }
 
             when (response.status) {
@@ -114,10 +112,10 @@ class RealSportsApiService(
         // 2. Fetch from API
         println("Fetching upcoming matches from API")
         try {
+            val nextWeek = LocalDate.now().plusDays(7).format(DateTimeFormatter.ISO_DATE)
             val response = client.get("$API_BASE_URL/fixtures") {
-                parameter("from", today)
-                parameter("to", tomorrow)
-                parameter("status", "NS")
+                parameter("date", today)
+                parameter("timezone", "UTC")
             }
 
             when (response.status) {
