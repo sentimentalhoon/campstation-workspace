@@ -41,6 +41,9 @@ class RealSportsApiService(
     // Redis Connection Pool
     private val jedisPool = JedisPool(redisHost, redisPort)
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
+    
+    // Fallback service
+    private val mockService = MockSportsApiService()
 
     override suspend fun getLiveMatches(): List<Match> {
         val cacheKey = "sports:live"
@@ -80,8 +83,8 @@ class RealSportsApiService(
             if (jsonElement is JsonObject && jsonElement.containsKey("message")) {
                 val message = jsonElement["message"]?.jsonPrimitive?.content
                 println("API Error: $message")
-                // API 키 오류 등의 경우 빈 리스트 반환 (크래시 방지)
-                return emptyList()
+                println("Falling back to mock data due to API error")
+                return mockService.getLiveMatches()
             }
 
             val response = json.decodeFromString<ApiFootballResponse>(responseText)
@@ -145,7 +148,8 @@ class RealSportsApiService(
             if (jsonElement is JsonObject && jsonElement.containsKey("message")) {
                 val message = jsonElement["message"]?.jsonPrimitive?.content
                 println("API Error: $message")
-                return emptyList()
+                println("Falling back to mock data due to API error")
+                return mockService.getUpcomingMatches()
             }
 
             val response = json.decodeFromString<ApiFootballResponse>(responseText)
