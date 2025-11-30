@@ -236,9 +236,8 @@ class RealSportsApiService(
                     println("Live Matches API Response received")
                     
                     parseApiResponse(responseText)?.let { matches ->
-                        val filteredMatches = matches.filter { isMajorLeague(it.league) }
-                        cacheMatches(cacheKey, filteredMatches, CACHE_TTL_LIVE)
-                        return@withContext filteredMatches
+                        cacheMatches(cacheKey, matches, CACHE_TTL_LIVE)
+                        return@withContext matches
                     } ?: run {
                         println("Failed to parse API response, falling back to mock data")
                         return@withContext mockService.getLiveMatches()
@@ -282,9 +281,7 @@ class RealSportsApiService(
                     println("Upcoming Matches API Response received")
                     
                     parseApiResponse(responseText)?.let { matches ->
-                        val filteredMatches = matches.filter { match ->
-                            isMajorLeague(match.league) && match.odds != null
-                        }
+                        val filteredMatches = matches.filter { it.odds != null }
                         cacheMatches(cacheKey, filteredMatches, CACHE_TTL_UPCOMING)
                         return@withContext filteredMatches
                     } ?: run {
@@ -353,7 +350,9 @@ class RealSportsApiService(
             }
 
             val response = json.decodeFromString<ApiFootballResponse>(responseText)
-            response.response.map { it.toMatch() }
+            response.response
+                .filter { isMajorLeague(it.league.name) } // Filter before translation
+                .map { it.toMatch() }
         } catch (e: Exception) {
             println("Error parsing API response: ${e.message}")
             e.printStackTrace()
