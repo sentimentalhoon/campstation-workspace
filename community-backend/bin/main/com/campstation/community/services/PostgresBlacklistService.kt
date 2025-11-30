@@ -99,8 +99,7 @@ class PostgresBlacklistService : BlacklistService {
             }
 
             // Insert images
-            val imagesList = request.images ?: emptyList()
-            imagesList.forEach { imageUrl ->
+            request.images.forEach { imageUrl ->
                 BlacklistImageTable.insert {
                     it[BlacklistImageTable.blacklistId] = blacklistId
                     it[BlacklistImageTable.imageUrl] = imageUrl

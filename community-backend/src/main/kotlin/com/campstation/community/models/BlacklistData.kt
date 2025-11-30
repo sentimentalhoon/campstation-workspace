@@ -36,7 +36,8 @@ data class BlacklistCreateRequest(
     val reason: String,
     val description: String,
     val detailedInfo: String? = null,
-    val reportedBy: String
+    val reportedBy: String,
+    val images: List<String> = emptyList()
 )
 
 @Serializable
