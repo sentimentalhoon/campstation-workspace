@@ -1,5 +1,5 @@
 <script setup>
-import { Activity, Home, MessageSquare, Trophy, User } from "lucide-vue-next";
+import { Shield, Home, Search, Bell, User } from "lucide-vue-next";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
@@ -22,33 +22,30 @@ const isActive = (path) => route.path === path;
       </RouterLink>
 
       <RouterLink
-        to="/livescore"
+        to="/search"
         class="flex flex-col items-center justify-center w-full h-full space-y-1"
-        :class="isActive('/livescore') ? 'text-white' : 'text-gray-500'"
+        :class="isActive('/search') ? 'text-white' : 'text-gray-500'"
       >
-        <Activity :size="20" :stroke-width="isActive('/livescore') ? 2.5 : 2" />
-        <span class="text-[10px] font-medium">스코어</span>
+        <Search :size="20" :stroke-width="isActive('/search') ? 2.5 : 2" />
+        <span class="text-[10px] font-medium">검색</span>
       </RouterLink>
 
       <RouterLink
-        to="/betting"
-        class="flex flex-col items-center justify-center w-full h-full space-y-1"
-        :class="isActive('/betting') ? 'text-white' : 'text-gray-500'"
+        to="/register"
+        class="flex flex-col items-center justify-center w-16 h-16 -mt-8"
       >
-        <Trophy :size="20" :stroke-width="isActive('/betting') ? 2.5 : 2" />
-        <span class="text-[10px] font-medium">승부예측</span>
+        <div class="w-14 h-14 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center shadow-lg transition-all active:scale-95">
+          <span class="text-2xl font-bold text-white">+</span>
+        </div>
       </RouterLink>
 
       <RouterLink
-        to="/community"
+        to="/notifications"
         class="flex flex-col items-center justify-center w-full h-full space-y-1"
-        :class="isActive('/community') ? 'text-white' : 'text-gray-500'"
+        :class="isActive('/notifications') ? 'text-white' : 'text-gray-500'"
       >
-        <MessageSquare
-          :size="20"
-          :stroke-width="isActive('/community') ? 2.5 : 2"
-        />
-        <span class="text-[10px] font-medium">커뮤니티</span>
+        <Bell :size="20" :stroke-width="isActive('/notifications') ? 2.5 : 2" />
+        <span class="text-[10px] font-medium">알림</span>
       </RouterLink>
 
       <RouterLink

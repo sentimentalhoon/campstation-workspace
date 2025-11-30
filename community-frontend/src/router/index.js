@@ -10,19 +10,19 @@ const router = createRouter({
       component: HomeView,
     },
     {
+      path: "/register",
+      name: "register",
+      component: () => import("../views/RegisterBlacklistView.vue"),
+    },
+    {
+      path: "/detail/:id",
+      name: "detail",
+      component: () => import("../views/BlacklistDetailView.vue"),
+    },
+    {
       path: "/community",
       name: "community",
       component: () => import("../views/CommunityView.vue"),
-    },
-    {
-      path: "/livescore",
-      name: "livescore",
-      component: () => import("../views/LiveScoreView.vue"),
-    },
-    {
-      path: "/betting",
-      name: "betting",
-      component: () => import("../views/BettingView.vue"),
     },
     {
       path: "/profile",
