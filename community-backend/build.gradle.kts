@@ -51,6 +51,14 @@ dependencies {
     // Flyway for database migrations
     implementation("org.flywaydb:flyway-core:10.4.1")
     implementation("org.flywaydb:flyway-database-postgresql:10.4.1")
+    
+    // AWS S3 (MinIO compatible)
+    implementation("software.amazon.awssdk:s3:2.25.11")
+    implementation("software.amazon.awssdk:apache-client:2.25.11")
+    
+    // Multipart file upload
+    implementation("io.ktor:ktor-server-status-pages")
+    implementation("io.ktor:ktor-server-multipart")
 
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")

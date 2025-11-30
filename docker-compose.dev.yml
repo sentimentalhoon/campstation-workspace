@@ -140,10 +140,18 @@ services:
       - DB_PASSWORD=F1tpM76EB+Bv0E2sA/axb0AYw92bT7W65WwWdRkO4ms=
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - AWS_ACCESS_KEY_ID=campstation
+      - AWS_SECRET_ACCESS_KEY=campstation123
+      - AWS_REGION=us-east-1
+      - AWS_S3_BUCKET_NAME=campstation-dev
+      - AWS_S3_ENDPOINT=http://minio:9000
+      - CLOUD_AWS_S3_PUBLIC_ENDPOINT=http://localhost:9000/campstation-dev
     depends_on:
       db:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      minio:
         condition: service_healthy
     networks:
       - campstation-network

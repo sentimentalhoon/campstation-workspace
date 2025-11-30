@@ -27,5 +27,6 @@ object BlacklistTable : UUIDTable("blacklists") {
 object BlacklistImageTable : UUIDTable("blacklist_images") {
     val blacklistId = reference("blacklist_id", BlacklistTable)
     val imageUrl = varchar("image_url", 500)
+    val imageType = varchar("image_type", 20).default("original")
     val createdAt = datetime("created_at")
 }

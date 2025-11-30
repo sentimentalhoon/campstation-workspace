@@ -103,6 +103,7 @@ class PostgresBlacklistService : BlacklistService {
                 BlacklistImageTable.insert {
                     it[BlacklistImageTable.blacklistId] = blacklistId
                     it[BlacklistImageTable.imageUrl] = imageUrl
+                    it[BlacklistImageTable.imageType] = "original" // 기본값은 original
                     it[BlacklistImageTable.createdAt] = now
                 }
             }
@@ -148,7 +149,12 @@ class PostgresBlacklistService : BlacklistService {
         val images = transaction {
             BlacklistImageTable
                 .select { BlacklistImageTable.blacklistId eq blacklistId }
-                .map { it[BlacklistImageTable.imageUrl] }
+                .map { 
+                    BlacklistImage(
+                        url = it[BlacklistImageTable.imageUrl],
+                        type = it[BlacklistImageTable.imageType]
+                    )
+                }
         }
 
         return Blacklist(

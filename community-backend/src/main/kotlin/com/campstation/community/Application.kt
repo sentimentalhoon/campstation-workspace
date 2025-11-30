@@ -2,6 +2,7 @@ package com.campstation.community
 
 import com.campstation.community.database.DatabaseFactory
 import com.campstation.community.routes.blacklistRoutes
+import com.campstation.community.routes.imageUploadRoutes
 import com.campstation.community.routes.sportsRoutes
 import com.campstation.community.services.*
 import io.ktor.http.*
@@ -66,6 +67,7 @@ fun Application.module() {
     }
 
     val blacklistService: BlacklistService = PostgresBlacklistService()
+    val imageService = S3ImageService()
 
     // 5. Routing
     routing {
@@ -81,5 +83,8 @@ fun Application.module() {
         
         // Blacklist Routes
         blacklistRoutes(blacklistService)
+        
+        // Image Upload Routes
+        imageUploadRoutes(imageService)
     }
 }

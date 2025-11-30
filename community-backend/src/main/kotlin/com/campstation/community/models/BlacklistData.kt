@@ -2,6 +2,21 @@ package com.campstation.community.models
 
 import kotlinx.serialization.Serializable
 
+enum class ImageType(val value: String) {
+    THUMBNAIL("thumbnail"),
+    ORIGINAL("original");
+
+    companion object {
+        fun fromString(value: String): ImageType = entries.find { it.value == value } ?: ORIGINAL
+    }
+}
+
+@Serializable
+data class BlacklistImage(
+    val url: String,
+    val type: String = "original"
+)
+
 @Serializable
 data class Blacklist(
     val id: String,
@@ -18,7 +33,7 @@ data class Blacklist(
     val date: String, // ISO 8601 format
     val views: Int = 0,
     val verified: Boolean = false,
-    val images: List<String> = emptyList(),
+    val images: List<BlacklistImage> = emptyList(),
     val reportedBy: String,
     val reportDate: String,
     val status: String = "검토 중"
