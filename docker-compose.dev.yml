@@ -136,7 +136,7 @@ services:
     environment:
       - PORT=8081
       - DB_URL=jdbc:postgresql://db:5432/community
-      - DB_USER=campstation
+      - DB_USERNAME=campstation
       - DB_PASSWORD=F1tpM76EB+Bv0E2sA/axb0AYw92bT7W65WwWdRkO4ms=
       - REDIS_HOST=redis
       - REDIS_PORT=6379
