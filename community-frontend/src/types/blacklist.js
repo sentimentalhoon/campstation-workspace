@@ -5,9 +5,7 @@
  */
 export function getThumbnails(images) {
   if (!images || !Array.isArray(images)) return [];
-  return images
-    .filter((img) => img.type === "thumbnail")
-    .map((img) => img.url);
+  return images.filter((img) => img.type === "thumbnail").map((img) => img.url);
 }
 
 /**
@@ -17,9 +15,7 @@ export function getThumbnails(images) {
  */
 export function getOriginals(images) {
   if (!images || !Array.isArray(images)) return [];
-  return images
-    .filter((img) => img.type === "original")
-    .map((img) => img.url);
+  return images.filter((img) => img.type === "original").map((img) => img.url);
 }
 
 /**
@@ -29,13 +25,12 @@ export function getOriginals(images) {
  */
 export function getFirstImage(images) {
   if (!images || !Array.isArray(images)) return null;
-  
+
   const thumbnails = getThumbnails(images);
   if (thumbnails.length > 0) return thumbnails[0];
-  
+
   const originals = getOriginals(images);
   if (originals.length > 0) return originals[0];
-  
+
   return null;
 }
-

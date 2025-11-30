@@ -135,16 +135,27 @@ class S3ImageService(private val s3Client: S3Client = S3Config.createS3Client())
             val writer = writers.next()
             val writeParam = writer.defaultWriteParam
             
-            if (writeParam.canWriteCompressed()) {
-                writeParam.compressionMode = ImageWriteParam.MODE_EXPLICIT
-                writeParam.compressionQuality = WEBP_QUALITY
+            try {
+                if (writeParam.canWriteCompressed()) {
+                    writeParam.compressionMode = ImageWriteParam.MODE_EXPLICIT
+                    // Set compression type before setting quality
+                    val compressionTypes = writeParam.compressionTypes
+                    if (compressionTypes != null && compressionTypes.isNotEmpty()) {
+                        writeParam.compressionType = compressionTypes[0]
+                    }
+                    writeParam.compressionQuality = WEBP_QUALITY
+                }
+                
+                writer.output = MemoryCacheImageOutputStream(outputStream)
+                writer.write(null, javax.imageio.IIOImage(image, null, null), writeParam)
+                writer.dispose()
+                
+                println("Converted image to WebP format with quality $WEBP_QUALITY")
+            } catch (e: Exception) {
+                println("WebP conversion failed: ${e.message}, falling back to JPEG")
+                writer.dispose()
+                return compressImage(image, ".jpg")
             }
-            
-            writer.output = MemoryCacheImageOutputStream(outputStream)
-            writer.write(null, javax.imageio.IIOImage(image, null, null), writeParam)
-            writer.dispose()
-            
-            println("Converted image to WebP format with quality $WEBP_QUALITY")
         } else {
             // WebP writer가 없으면 JPEG으로 폴백
             println("WebP writer not available, falling back to JPEG")
