@@ -61,10 +61,6 @@ dependencies {
     
     // EXIF metadata handling
     implementation("com.drewnoakes:metadata-extractor:2.19.0")
-    
-    // Multipart file upload
-    implementation("io.ktor:ktor-server-status-pages:$ktor_version")
-    implementation("io.ktor:ktor-server-multipart:$ktor_version")
 
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
