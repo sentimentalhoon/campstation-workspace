@@ -147,7 +147,7 @@ services:
     build:
       context: ./community-frontend
       dockerfile: Dockerfile
-      target: production
+      target: production-stage
     container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-frontend
     restart: always
     logging:
