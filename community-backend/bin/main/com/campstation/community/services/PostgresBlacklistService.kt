@@ -11,14 +11,6 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
 import java.util.UUID
 
-interface BlacklistService {
-    suspend fun getAllBlacklists(filter: BlacklistFilterRequest): BlacklistResponse
-    suspend fun getBlacklistById(id: String): Blacklist?
-    suspend fun createBlacklist(request: BlacklistCreateRequest): Blacklist
-    suspend fun incrementViews(id: String): Boolean
-    suspend fun getStats(): BlacklistStats
-}
-
 class PostgresBlacklistService : BlacklistService {
 
     override suspend fun getAllBlacklists(filter: BlacklistFilterRequest): BlacklistResponse = withContext(Dispatchers.IO) {
@@ -45,20 +37,15 @@ class PostgresBlacklistService : BlacklistService {
             // Apply sorting
             query = when (filter.sortBy) {
                 "views" -> query.orderBy(BlacklistTable.views, SortOrder.DESC)
-                "danger" -> query.orderBy(
-                    BlacklistTable.dangerLevel.castTo<String>(VarCharColumnType()).transform(
-                        toColumn = { it },
-                        toReal = { 
-                            when(it) {
-                                "위험" -> "3"
-                                "경고" -> "2"
-                                "주의" -> "1"
-                                else -> "0"
-                            }
-                        }
-                    ),
-                    SortOrder.DESC
-                )
+                "danger" -> {
+                    // Sort by danger level: 위험(3) > 경고(2) > 주의(1)
+                    val dangerOrder = BlacklistTable.dangerLevel.case()
+                        .When(BlacklistTable.dangerLevel eq "위험", intLiteral(3))
+                        .When(BlacklistTable.dangerLevel eq "경고", intLiteral(2))
+                        .When(BlacklistTable.dangerLevel eq "주의", intLiteral(1))
+                        .Else(intLiteral(0))
+                    query.orderBy(dangerOrder, SortOrder.DESC)
+                }
                 else -> query.orderBy(BlacklistTable.createdAt, SortOrder.DESC)
             }
 
@@ -117,7 +104,7 @@ class PostgresBlacklistService : BlacklistService {
             }
 
             // Insert images
-            request.images.forEach { imageUrl ->
+            request.images?.forEach { imageUrl ->
                 BlacklistImageTable.insert {
                     it[BlacklistImageTable.blacklistId] = blacklistId
                     it[BlacklistImageTable.imageUrl] = imageUrl
@@ -132,7 +119,7 @@ class PostgresBlacklistService : BlacklistService {
     override suspend fun incrementViews(id: String): Boolean = withContext(Dispatchers.IO) {
         transaction {
             val updated = BlacklistTable.update({ BlacklistTable.id eq UUID.fromString(id) }) {
-                it[views] = views + 1
+                it[views] = BlacklistTable.views plus 1
                 it[updatedAt] = LocalDateTime.now()
             }
             updated > 0
