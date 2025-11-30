@@ -13,18 +13,18 @@ object DatabaseFactory {
     }
     
     fun init(
-        jdbcUrl: String = dotenv["COMMUNITY_DB_URL"] ?: System.getenv("COMMUNITY_DB_URL") ?: "jdbc:postgresql://localhost:5432/community",
-        dbUser: String = dotenv["COMMUNITY_DB_USER"] ?: System.getenv("COMMUNITY_DB_USER") ?: "postgres",
-        dbPassword: String = dotenv["COMMUNITY_DB_PASSWORD"] ?: System.getenv("COMMUNITY_DB_PASSWORD") ?: "postgres",
+        jdbcUrl: String = dotenv["DB_URL"] ?: System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/community",
+        dbUser: String = dotenv["DB_USER"] ?: System.getenv("DB_USER") ?: "postgres",
+        dbPassword: String = dotenv["DB_PASSWORD"] ?: System.getenv("DB_PASSWORD") ?: "postgres",
         dbDriver: String = "org.postgresql.Driver"
     ) {
         // Log environment variable loading
         println("=== Database Configuration ===")
-        println("dotenv['COMMUNITY_DB_URL']: ${dotenv["COMMUNITY_DB_URL"]}")
-        println("dotenv['COMMUNITY_DB_USER']: ${dotenv["COMMUNITY_DB_USER"]}")
-        println("dotenv['COMMUNITY_DB_PASSWORD']: ${if (dotenv["COMMUNITY_DB_PASSWORD"] != null) "****" else "null"}")
-        println("System.getenv('COMMUNITY_DB_URL'): ${System.getenv("COMMUNITY_DB_URL")}")
-        println("System.getenv('COMMUNITY_DB_USER'): ${System.getenv("COMMUNITY_DB_USER")}")
+        println("dotenv['DB_URL']: ${dotenv["DB_URL"]}")
+        println("dotenv['DB_USER']: ${dotenv["DB_USER"]}")
+        println("dotenv['DB_PASSWORD']: ${if (dotenv["DB_PASSWORD"] != null) "****" else "null"}")
+        println("System.getenv('DB_URL'): ${System.getenv("DB_URL")}")
+        println("System.getenv('DB_USER'): ${System.getenv("DB_USER")}")
         println("Final jdbcUrl: $jdbcUrl")
         println("Final dbUser: $dbUser")
         println("Final dbPassword: ${if (dbPassword.isNotEmpty()) "****" else "empty"}")
