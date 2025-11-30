@@ -54,7 +54,7 @@ fun Application.module() {
     // 빈 문자열("")로 넘어오는 경우를 대비해 takeIf { it.isNotBlank() } 추가
     val apiFootballKey = System.getenv("API_FOOTBALL_KEY")?.takeIf { it.isNotBlank() } 
         ?: System.getenv("RAPID_API_KEY")?.takeIf { it.isNotBlank() }
-        ?: "c2f10b511emshde4ac22de2dc144p15df88jsnd27c9691ecc9"
+        ?: "NULL"
     val redisHost = System.getenv("REDIS_HOST")?.takeIf { it.isNotBlank() } ?: "redis"
     val redisPort = System.getenv("REDIS_PORT")?.toIntOrNull() ?: 6379
 
