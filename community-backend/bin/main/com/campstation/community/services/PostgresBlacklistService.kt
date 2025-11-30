@@ -55,7 +55,7 @@ class PostgresBlacklistService : BlacklistService {
                 .map { row -> rowToBlacklist(row) }
 
             BlacklistResponse(
-                blacklists = results,
+                items = results,
                 total = total,
                 page = filter.page,
                 totalPages = totalPages

@@ -52,7 +52,7 @@ data class BlacklistFilterRequest(
 
 @Serializable
 data class BlacklistResponse(
-    val blacklists: List<Blacklist>,
+    val items: List<Blacklist>,
     val total: Int,
     val page: Int,
     val totalPages: Int
