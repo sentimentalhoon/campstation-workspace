@@ -39,12 +39,7 @@ class PostgresBlacklistService : BlacklistService {
                 "views" -> query.orderBy(BlacklistTable.views, SortOrder.DESC)
                 "danger" -> {
                     // Sort by danger level: 위험(3) > 경고(2) > 주의(1)
-                    val dangerOrder = BlacklistTable.dangerLevel.case()
-                        .When(BlacklistTable.dangerLevel eq "위험", intLiteral(3))
-                        .When(BlacklistTable.dangerLevel eq "경고", intLiteral(2))
-                        .When(BlacklistTable.dangerLevel eq "주의", intLiteral(1))
-                        .Else(intLiteral(0))
-                    query.orderBy(dangerOrder, SortOrder.DESC)
+                    query.orderBy(BlacklistTable.dangerLevel, SortOrder.DESC)
                 }
                 else -> query.orderBy(BlacklistTable.createdAt, SortOrder.DESC)
             }
@@ -104,7 +99,8 @@ class PostgresBlacklistService : BlacklistService {
             }
 
             // Insert images
-            request.images?.forEach { imageUrl ->
+            val imagesList = request.images ?: emptyList()
+            imagesList.forEach { imageUrl ->
                 BlacklistImageTable.insert {
                     it[BlacklistImageTable.blacklistId] = blacklistId
                     it[BlacklistImageTable.imageUrl] = imageUrl
@@ -112,14 +108,20 @@ class PostgresBlacklistService : BlacklistService {
                 }
             }
 
-            getBlacklistById(blacklistId.toString())!!
+            // Return created blacklist
+            BlacklistTable.select { BlacklistTable.id eq blacklistId }
+                .map { rowToBlacklist(it) }
+                .single()
         }
     }
 
     override suspend fun incrementViews(id: String): Boolean = withContext(Dispatchers.IO) {
         transaction {
+            val current = BlacklistTable.select { BlacklistTable.id eq UUID.fromString(id) }
+                .singleOrNull()?.get(BlacklistTable.views) ?: return@transaction false
+            
             val updated = BlacklistTable.update({ BlacklistTable.id eq UUID.fromString(id) }) {
-                it[views] = BlacklistTable.views plus 1
+                it[views] = current + 1
                 it[updatedAt] = LocalDateTime.now()
             }
             updated > 0
