@@ -4,6 +4,7 @@
  * @returns {string[]}
  */
 export function getThumbnails(images) {
+  if (!images || !Array.isArray(images)) return [];
   return images
     .filter((img) => img.type === "thumbnail")
     .map((img) => img.url);
@@ -15,6 +16,7 @@ export function getThumbnails(images) {
  * @returns {string[]}
  */
 export function getOriginals(images) {
+  if (!images || !Array.isArray(images)) return [];
   return images
     .filter((img) => img.type === "original")
     .map((img) => img.url);
@@ -26,6 +28,8 @@ export function getOriginals(images) {
  * @returns {string | null}
  */
 export function getFirstImage(images) {
+  if (!images || !Array.isArray(images)) return null;
+  
   const thumbnails = getThumbnails(images);
   if (thumbnails.length > 0) return thumbnails[0];
   
