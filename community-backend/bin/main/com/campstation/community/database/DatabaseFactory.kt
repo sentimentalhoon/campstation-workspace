@@ -12,6 +12,8 @@ object DatabaseFactory {
         ignoreIfMissing = true
     }
     
+    private var dataSource: HikariDataSource? = null
+    
     fun init(
         jdbcUrl: String = dotenv["DB_URL"] ?: System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/community",
         dbUser: String = dotenv["DB_USERNAME"] ?: System.getenv("DB_USERNAME") ?: "postgres",
@@ -30,11 +32,15 @@ object DatabaseFactory {
         println("Final dbPassword: ${if (dbPassword.isNotEmpty()) "****" else "empty"}")
         println("==============================")
         
-        val database = Database.connect(createHikariDataSource(jdbcUrl, dbUser, dbPassword, dbDriver))
+        // Create datasource
+        dataSource = createHikariDataSource(jdbcUrl, dbUser, dbPassword, dbDriver)
         
-        transaction(database) {
-            SchemaUtils.create(BlacklistTable, BlacklistImageTable)
-        }
+        // Run Flyway migrations
+        FlywayMigration.migrate(dataSource!!)
+        
+        // Connect Exposed to database
+        Database.connect(dataSource!!)
+    }
     }
 
     private fun createHikariDataSource(
