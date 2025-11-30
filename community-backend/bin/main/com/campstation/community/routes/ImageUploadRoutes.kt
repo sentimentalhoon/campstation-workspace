@@ -7,6 +7,25 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ImageUploadResponse(
+    val success: Boolean,
+    val originalUrl: String,
+    val thumbnailUrl: String
+)
+
+@Serializable
+data class ImageDeleteResponse(
+    val success: Boolean,
+    val message: String
+)
+
+@Serializable
+data class ErrorResponse(
+    val error: String
+)
 
 fun Route.imageUploadRoutes(imageService: S3ImageService) {
     route("/api/upload") {
@@ -38,7 +57,7 @@ fun Route.imageUploadRoutes(imageService: S3ImageService) {
                 if (imageBytes == null || originalFilename == null) {
                     return@post call.respond(
                         HttpStatusCode.BadRequest,
-                        mapOf("error" to "No image file provided")
+                        ErrorResponse("No image file provided")
                     )
                 }
 
@@ -49,22 +68,22 @@ fun Route.imageUploadRoutes(imageService: S3ImageService) {
                     folder = folder
                 )
 
-                call.respond(HttpStatusCode.OK, mapOf(
-                    "success" to true,
-                    "originalUrl" to result.originalUrl,
-                    "thumbnailUrl" to result.thumbnailUrl
+                call.respond(HttpStatusCode.OK, ImageUploadResponse(
+                    success = true,
+                    originalUrl = result.originalUrl,
+                    thumbnailUrl = result.thumbnailUrl
                 ))
 
             } catch (e: IllegalArgumentException) {
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    mapOf("error" to (e.message ?: "Invalid image format"))
+                    ErrorResponse(e.message ?: "Invalid image format")
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
                 call.respond(
                     HttpStatusCode.InternalServerError,
-                    mapOf("error" to "Image upload failed: ${e.message}")
+                    ErrorResponse("Image upload failed: ${e.message}")
                 )
             }
         }
@@ -79,7 +98,7 @@ fun Route.imageUploadRoutes(imageService: S3ImageService) {
                 if (originalUrl.isNullOrBlank() && thumbnailUrl.isNullOrBlank()) {
                     return@delete call.respond(
                         HttpStatusCode.BadRequest,
-                        mapOf("error" to "No image URLs provided")
+                        ErrorResponse("No image URLs provided")
                     )
                 }
 
@@ -90,16 +109,16 @@ fun Route.imageUploadRoutes(imageService: S3ImageService) {
                     imageService.deleteFromS3(thumbnailUrl)
                 }
 
-                call.respond(HttpStatusCode.OK, mapOf(
-                    "success" to true,
-                    "message" to "Images deleted successfully"
+                call.respond(HttpStatusCode.OK, ImageDeleteResponse(
+                    success = true,
+                    message = "Images deleted successfully"
                 ))
 
             } catch (e: Exception) {
                 e.printStackTrace()
                 call.respond(
                     HttpStatusCode.InternalServerError,
-                    mapOf("error" to "Image deletion failed: ${e.message}")
+                    ErrorResponse("Image deletion failed: ${e.message}")
                 )
             }
         }
