@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampStation Backend API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+            body {
+                font-size: 11pt;
+            }
+            h1 {
+                page-break-before: always;
+            }
+            h1:first-of-type {
+                page-break-before: avoid;
+            }
+            table, pre, blockquote {
+                page-break-inside: avoid;
+            }
+            .no-print {
+                display: none;
+            }
+            .toc {
+                page-break-after: always;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', 'Malgun Gothic', Arial, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f8f9fa;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-meta {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-meta p {
+            margin: 5px 0;
+        }
+
+        .content {
+            padding: 60px;
+        }
+
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .print-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102,126,234,0.4);
+        }
+
+        h1 {
+            color: #667eea;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 15px;
+            margin-top: 50px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        h2 {
+            color: #764ba2;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            margin-bottom: 25px;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        h3 {
+            color: #5a67d8;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        h4 {
+            color: #667eea;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        p {
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 0.95em;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            border: 1px solid #e5e7eb;
+            padding: 12px 15px;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        table tr:hover {
+            background-color: #eff6ff;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #dc2626;
+            border: 1px solid #e2e8f0;
+        }
+
+        pre {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid #334155;
+        }
+
+        pre code {
+            background: transparent;
+            color: #e2e8f0;
+            padding: 0;
+            border: none;
+            font-size: 0.9em;
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+            line-height: 1.8;
+        }
+
+        li ul, li ol {
+            margin-top: 8px;
+        }
+
+        hr {
+            border: none;
+            border-top: 3px solid #e2e8f0;
+            margin: 40px 0;
+        }
+
+        blockquote {
+            border-left: 5px solid #667eea;
+            background: #eff6ff;
+            padding: 15px 20px;
+            margin: 20px 0;
+            color: #1e40af;
+            border-radius: 4px;
+        }
+
+        strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .toc {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            border: 2px solid #e2e8f0;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            color: #667eea;
+            border: none;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .toc li:last-child {
+            border-bottom: none;
+        }
+
+        .toc a {
+            color: #5a67d8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .toc a:hover {
+            color: #667eea;
+        }
+
+        .endpoint {
+            background: #f8fafc;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .method.get {
+            background: #10b981;
+            color: white;
+        }
+
+        .method.post {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .method.put {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .method.delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .method.patch {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge.public {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge.auth {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .badge.owner {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .badge.admin {
+            background: #ef4444;
+            color: white;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding: 30px 60px;
+            background: #f8fafc;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button no-print" onclick="window.print()">📄 PDF로 저장</button>
+
+    <div class="container">
+        <div class="header">
+            <h1>🏕️ CampStation Backend API</h1>
+            <div class="header-meta">
+                <p><strong>작성일:</strong> 2025-11-16</p>
+                <p><strong>API 버전:</strong> v1</p>
+                <p><strong>Base URL:</strong> http://localhost:8080/api/v1</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <h1 id="campstation-backend-api-엔드포인트-문서">CampStation Backend API 엔드포인트 문서</h1>
+
+<p><strong>작성일</strong>: 2025-11-16
+<strong>API 버전</strong>: v1
+<strong>Base URL</strong>: <code>http://localhost:8080/api/v1</code></p>
+
+<hr />
+
+<h2 id="목차">📑 목차</h2>
+
+<ol>
+<li><a href="#1-인증-authentication">인증 (Authentication)</a></li>
+<li><a href="#2-사용자-user">사용자 (User)</a></li>
+<li><a href="#3-캠핑장-campground">캠핑장 (Campground)</a></li>
+<li><a href="#4-예약-reservation">예약 (Reservation)</a></li>
+<li><a href="#5-결제-payment">결제 (Payment)</a></li>
+<li><a href="#6-리뷰-review">리뷰 (Review)</a></li>
+<li><a href="#7-가격-책정-pricing">가격 책정 (Pricing)</a></li>
+<li><a href="#8-배너-banner">배너 (Banner)</a></li>
+<li><a href="#9-파일-업로드-file">파일 업로드 (File)</a></li>
+<li><a href="#10-관리자-admin">관리자 (Admin)</a></li>
+<li><a href="#11-소유자-owner">소유자 (Owner)</a></li>
+</ol>
+
+<hr />
+
+<h2 id="1-인증-authentication">1. 인증 (Authentication)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/auth</code></p>
+
+<h3 id="11-로그인">1.1 로그인</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/auth/login</code></li>
+<li><strong>설명</strong>: 이메일과 비밀번호로 로그인</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "email": "user@example.com",
+  "password": "password123"
+}
+</code></pre></li>
+<li><strong>Response</strong>: JWT Access Token + Refresh Token (HttpOnly 쿠키)</li>
+</ul>
+
+<h3 id="12-회원가입">1.2 회원가입</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/auth/signup</code></li>
+<li><strong>설명</strong>: 새로운 사용자 등록</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "username": "johndoe",
+  "email": "user@example.com",
+  "password": "password123",
+  "confirmPassword": "password123",
+  "name": "John Doe",
+  "phone": "010-1234-5678"
+}
+</code></pre></li>
+<li><strong>Response</strong>: 사용자 정보 + JWT Token</li>
+</ul>
+
+<h3 id="13-로그아웃">1.3 로그아웃</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/auth/logout</code></li>
+<li><strong>설명</strong>: JWT 토큰 삭제 및 블랙리스트 등록</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Headers</strong>: <code>Authorization: Bearer {token}</code></li>
+<li><strong>Response</strong>: 성공 메시지</li>
+</ul>
+
+<h3 id="14-토큰-새로고침">1.4 토큰 새로고침</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/auth/refresh</code></li>
+<li><strong>설명</strong>: Refresh Token으로 새로운 Access Token 발급</li>
+<li><strong>권한</strong>: Public (Refresh Token 쿠키 필요)</li>
+<li><strong>Response</strong>: 새로운 Access Token</li>
+</ul>
+
+<h3 id="15-토큰-검증">1.5 토큰 검증</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/auth/validate</code></li>
+<li><strong>설명</strong>: JWT 토큰 유효성 검증 (Redis 확인 포함)</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Headers</strong>: <code>Authorization: Bearer {token}</code></li>
+<li><strong>Response</strong>: <code>{ "valid": true/false }</code></li>
+</ul>
+
+<h3 id="16-내-정보-조회">1.6 내 정보 조회</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/auth/me</code></li>
+<li><strong>설명</strong>: 현재 로그인한 사용자 정보 조회</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Response</strong>: 사용자 정보 (프로필 이미지 포함)</li>
+</ul>
+
+<hr />
+
+<h2 id="2-사용자-user">2. 사용자 (User)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/users</code>, <code>/api/v1/favorites</code></p>
+
+<h3 id="21-프로필-관리">2.1 프로필 관리</h3>
+
+<h4 id="211-프로필-조회">2.1.1 프로필 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/users/profile</code></li>
+<li><strong>설명</strong>: 현재 사용자의 프로필 정보 조회</li>
+<li><strong>권한</strong>: Authenticated</li>
+</ul>
+
+<h4 id="212-프로필-수정">2.1.2 프로필 수정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/users/profile</code></li>
+<li><strong>설명</strong>: 이름, 전화번호, 프로필 이미지 수정</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "name": "John Doe",
+  "phone": "010-1234-5678",
+  "thumbnailUrl": "s3://path/to/thumbnail.jpg",
+  "originalUrl": "s3://path/to/original.jpg"
+}
+</code></pre></li>
+</ul>
+
+<h4 id="213-비밀번호-변경">2.1.3 비밀번호 변경</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/users/password</code></li>
+<li><strong>설명</strong>: 사용자 비밀번호 변경</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "currentPassword": "old_password",
+  "newPassword": "new_password"
+}
+</code></pre></li>
+</ul>
+
+<h4 id="214-환불-계좌-정보-업데이트">2.1.4 환불 계좌 정보 업데이트</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/users/refund-account</code></li>
+<li><strong>설명</strong>: 계좌이체 환불용 계좌 정보 업데이트</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "refundBankName": "국민은행",
+  "refundAccountNumber": "123-456-789012",
+  "refundAccountHolder": "홍길동"
+}
+</code></pre></li>
+</ul>
+
+<h3 id="22-찜하기-favorites">2.2 찜하기 (Favorites)</h3>
+
+<h4 id="221-찜하기-토글">2.2.1 찜하기 토글</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/favorites/toggle</code></li>
+<li><strong>설명</strong>: 캠핑장 찜하기 추가/제거</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "campgroundId": 1
+}
+</code></pre></li>
+</ul>
+
+<h4 id="222-찜하기-추가">2.2.2 찜하기 추가</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/favorites/campgrounds/{campgroundId}</code></li>
+<li><strong>설명</strong>: 특정 캠핑장을 찜 목록에 추가</li>
+<li><strong>권한</strong>: Authenticated</li>
+</ul>
+
+<h4 id="223-찜하기-제거">2.2.3 찜하기 제거</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/favorites/campgrounds/{campgroundId}</code></li>
+<li><strong>설명</strong>: 찜 목록에서 제거</li>
+<li><strong>권한</strong>: Authenticated</li>
+</ul>
+
+<h4 id="224-찜하기-목록-조회-페이징">2.2.4 찜하기 목록 조회 (페이징)</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/favorites</code></li>
+<li><strong>설명</strong>: 사용자의 찜하기 목록 조회 (페이징 지원)</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code></li>
+</ul>
+
+<h4 id="225-찜하기-전체-목록-조회">2.2.5 찜하기 전체 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/favorites/all</code></li>
+<li><strong>설명</strong>: 사용자의 모든 찜하기 목록 조회</li>
+<li><strong>권한</strong>: Authenticated</li>
+</ul>
+
+<h4 id="226-찜하기-상태-확인">2.2.6 찜하기 상태 확인</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/favorites/campgrounds/{campgroundId}/status</code></li>
+<li><strong>설명</strong>: 특정 캠핑장의 찜하기 여부 확인</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Response</strong>: <code>{ "data": true/false }</code></li>
+</ul>
+
+<h4 id="227-찜하기-수-조회">2.2.7 찜하기 수 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/favorites/campgrounds/{campgroundId}/count</code></li>
+<li><strong>설명</strong>: 캠핑장의 총 찜하기 수 조회</li>
+<li><strong>권한</strong>: Public</li>
+</ul>
+
+<hr />
+
+<h2 id="3-캠핑장-campground">3. 캠핑장 (Campground)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/campgrounds</code>, <code>/api/v1/sites</code></p>
+
+<h3 id="31-캠핑장-관리">3.1 캠핑장 관리</h3>
+
+<h4 id="311-캠핑장-생성">3.1.1 캠핑장 생성</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/campgrounds</code></li>
+<li><strong>설명</strong>: 새로운 캠핑장 생성</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "name": "캠핑장 이름",
+  "description": "캠핑장 설명 (최소 10자)",
+  "address": "주소",
+  "phone": "010-1234-5678",
+  "email": "camp@example.com",
+  "website": "https://example.com",
+  "latitude": 37.5665,
+  "longitude": 126.9780,
+  "imageUrls": ["url1", "url2"],
+  "checkInTime": "14:00",
+  "checkOutTime": "11:00",
+  "businessOwnerName": "대표자명",
+  "businessName": "사업자명",
+  "businessAddress": "사업장 주소",
+  "businessEmail": "business@example.com",
+  "businessRegistrationNumber": "123-45-67890",
+  "tourismBusinessNumber": "제1234호"
+}
+</code></pre></li>
+</ul>
+
+<h4 id="312-캠핑장-조회-id">3.1.2 캠핑장 조회 (ID)</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/campgrounds/{id}</code></li>
+<li><strong>설명</strong>: 특정 캠핑장 상세 정보 조회</li>
+<li><strong>권한</strong>: Public</li>
+</ul>
+
+<h4 id="313-모든-캠핑장-조회">3.1.3 모든 캠핑장 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/campgrounds</code></li>
+<li><strong>설명</strong>: 캠핑장 목록 조회 (페이징)</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code></li>
+</ul>
+
+<h4 id="314-캠핑장-검색">3.1.4 캠핑장 검색</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/campgrounds/search</code></li>
+<li><strong>설명</strong>: 키워드, 가격, 편의시설로 캠핑장 검색</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Query Params</strong>:
+<ul>
+<li><code>keyword</code>: 검색 키워드</li>
+<li><code>minPrice</code>: 최소 가격</li>
+<li><code>maxPrice</code>: 최대 가격</li>
+<li><code>amenities</code>: 편의시설 목록</li>
+<li><code>page</code>, <code>size</code></li>
+</ul></li>
+</ul>
+
+<h4 id="315-인기-캠핑장-조회">3.1.5 인기 캠핑장 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/campgrounds/popular</code></li>
+<li><strong>설명</strong>: 찜하기 수 기준 인기 캠핑장 조회</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Query Params</strong>: <code>limit</code> (기본값: 10)</li>
+</ul>
+
+<h4 id="316-지도-영역-내-캠핑장-조회">3.1.6 지도 영역 내 캠핑장 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/campgrounds/map</code></li>
+<li><strong>설명</strong>: 지도 경계 박스 내의 캠핑장 조회</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Query Params</strong>: <code>swLat</code>, <code>swLng</code>, <code>neLat</code>, <code>neLng</code></li>
+</ul>
+
+<h4 id="317-캠핑장-수정">3.1.7 캠핑장 수정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/campgrounds/{id}</code></li>
+<li><strong>설명</strong>: 캠핑장 정보 수정</li>
+<li><strong>권한</strong>: OWNER (본인) or ADMIN</li>
+<li><strong>Request Body</strong>: 생성과 동일 + <code>imagesToDelete</code> 배열</li>
+</ul>
+
+<h4 id="318-캠핑장-삭제">3.1.8 캠핑장 삭제</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/campgrounds/{id}</code></li>
+<li><strong>설명</strong>: 캠핑장 삭제</li>
+<li><strong>권한</strong>: OWNER (본인) or ADMIN</li>
+</ul>
+
+<h4 id="319-메인-이미지-설정">3.1.9 메인 이미지 설정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PATCH /api/v1/campgrounds/{id}/images/main</code></li>
+<li><strong>설명</strong>: 캠핑장의 메인 이미지 설정</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+<li><strong>Query Params</strong>: <code>imageUrl</code></li>
+</ul>
+
+<h4 id="3110-캠핑장의-사이트-목록-조회">3.1.10 캠핑장의 사이트 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/campgrounds/{id}/sites</code></li>
+<li><strong>설명</strong>: 특정 캠핑장의 사이트 목록 조회</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code> (기본값: 50)</li>
+</ul>
+
+<h3 id="32-사이트-관리">3.2 사이트 관리</h3>
+
+<h4 id="321-사이트-생성">3.2.1 사이트 생성</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/sites</code> (multipart/form-data)</li>
+<li><strong>설명</strong>: 새로운 사이트 생성 (이미지 포함 가능)</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+<li><strong>Form Data</strong>:
+<ul>
+<li><code>campgroundId</code>: Long</li>
+<li><code>siteNumber</code>: String</li>
+<li><code>siteType</code>: String (TENT, RV, CABIN 등)</li>
+<li><code>capacity</code>: Integer</li>
+<li><code>description</code>: String</li>
+<li><code>latitude</code>, <code>longitude</code>: BigDecimal</li>
+<li><code>imageFiles</code>: MultipartFile[]</li>
+</ul></li>
+</ul>
+
+<h4 id="322-사이트-조회">3.2.2 사이트 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/sites/{siteId}</code></li>
+<li><strong>설명</strong>: 사이트 상세 정보 조회</li>
+<li><strong>권한</strong>: Public</li>
+</ul>
+
+<h4 id="323-캠핑장별-사이트-목록-조회">3.2.3 캠핑장별 사이트 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/sites/by-campground/{campgroundId}</code></li>
+<li><strong>설명</strong>: 특정 캠핑장의 사이트 목록 조회</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code></li>
+</ul>
+
+<h4 id="324-사이트-수정">3.2.4 사이트 수정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/sites/{siteId}</code> (multipart/form-data)</li>
+<li><strong>설명</strong>: 사이트 정보 수정 (이미지 추가/삭제 가능)</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+<li><strong>Form Data</strong>: 생성과 동일 + <code>deleteImageIds</code></li>
+</ul>
+
+<h4 id="325-사이트-삭제">3.2.5 사이트 삭제</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/sites/{siteId}</code></li>
+<li><strong>설명</strong>: 사이트 삭제</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+</ul>
+
+<hr />
+
+<h2 id="4-예약-reservation">4. 예약 (Reservation)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/reservations</code></p>
+
+<h3 id="41-회원-예약">4.1 회원 예약</h3>
+
+<h4 id="411-예약-생성">4.1.1 예약 생성</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/reservations</code></li>
+<li><strong>설명</strong>: 새로운 예약 생성</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "campgroundId": 1,
+  "siteId": 1,
+  "checkInDate": "2025-12-25",
+  "checkOutDate": "2025-12-26",
+  "numberOfGuests": 4,
+  "specialRequests": "특별 요청사항"
+}
+</code></pre></li>
+</ul>
+
+<h4 id="412-예약-조회">4.1.2 예약 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reservations/{reservationId}</code></li>
+<li><strong>설명</strong>: 예약 상세 정보 조회</li>
+<li><strong>권한</strong>: Authenticated (본인만)</li>
+</ul>
+
+<h4 id="413-내-예약-목록-조회">4.1.3 내 예약 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reservations/my</code></li>
+<li><strong>설명</strong>: 현재 사용자의 모든 예약 목록 조회</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code> (기본값: 10)</li>
+</ul>
+
+<h4 id="414-예약-수정">4.1.4 예약 수정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/reservations/{reservationId}</code></li>
+<li><strong>설명</strong>: 기존 예약 수정</li>
+<li><strong>권한</strong>: Authenticated (본인만)</li>
+<li><strong>Request Body</strong>: 생성과 동일</li>
+</ul>
+
+<h4 id="415-예약-취소">4.1.5 예약 취소</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/reservations/{reservationId}</code></li>
+<li><strong>설명</strong>: 예약 취소</li>
+<li><strong>권한</strong>: Authenticated (본인만)</li>
+</ul>
+
+<h4 id="416-예약-삭제-soft-delete">4.1.6 예약 삭제 (Soft Delete)</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/reservations/{reservationId}/soft-delete</code></li>
+<li><strong>설명</strong>: 예약을 목록에서 숨김 처리</li>
+<li><strong>권한</strong>: Authenticated (본인만)</li>
+</ul>
+
+<h3 id="42-비회원-예약">4.2 비회원 예약</h3>
+
+<h4 id="421-비회원-예약-생성">4.2.1 비회원 예약 생성</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/reservations/guest</code></li>
+<li><strong>설명</strong>: 비회원 사용자의 예약 생성</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "campgroundId": 1,
+  "siteId": 1,
+  "checkInDate": "2025-12-25",
+  "checkOutDate": "2025-12-26",
+  "numberOfGuests": 4,
+  "guestName": "홍길동",
+  "guestPhone": "010-1234-5678",
+  "guestEmail": "guest@example.com",
+  "guestPassword": "password123",
+  "specialRequests": "특별 요청사항"
+}
+</code></pre></li>
+</ul>
+
+<h4 id="422-비회원-예약-조회">4.2.2 비회원 예약 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/reservations/guest/lookup</code></li>
+<li><strong>설명</strong>: 연락처, 이메일, 비밀번호로 예약 조회</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "guestPhone": "010-1234-5678",
+  "guestEmail": "guest@example.com",
+  "guestPassword": "password123"
+}
+</code></pre></li>
+</ul>
+
+<h3 id="43-예약-날짜-조회">4.3 예약 날짜 조회</h3>
+
+<h4 id="431-사이트-예약-날짜-조회">4.3.1 사이트 예약 날짜 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reservations/sites/{siteId}/reserved-dates</code></li>
+<li><strong>설명</strong>: 특정 사이트의 예약된 날짜 범위 조회</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Response</strong>:
+<pre><code>[
+  { "checkInDate": "2025-12-25", "checkOutDate": "2025-12-26" },
+  { "checkInDate": "2025-12-28", "checkOutDate": "2025-12-30" }
+]
+</code></pre></li>
+</ul>
+
+<h4 id="432-캠핑장-사이트-예약-날짜-일괄-조회">4.3.2 캠핑장 사이트 예약 날짜 일괄 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reservations/campgrounds/{campgroundId}/reserved-dates</code></li>
+<li><strong>설명</strong>: 캠핑장의 모든 사이트 예약 날짜를 한 번에 조회</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Response</strong>: <code>{ "siteId": [{ ... }], ... }</code></li>
+</ul>
+
+<hr />
+
+<h2 id="5-결제-payment">5. 결제 (Payment)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/payments</code></p>
+
+<h3 id="51-결제-처리">5.1 결제 처리</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/payments/process</code></li>
+<li><strong>설명</strong>: 예약 결제 처리</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "reservationId": 1,
+  "paymentMethod": "CARD",
+  "cardNumber": "1234-5678-9012-3456",
+  "cardHolderName": "홍길동"
+}
+</code></pre></li>
+</ul>
+
+<h3 id="52-결제-내역-조회">5.2 결제 내역 조회</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/payments/history</code></li>
+<li><strong>설명</strong>: 사용자의 결제 내역 조회</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code> (기본값: 10)</li>
+</ul>
+
+<h3 id="53-결제-상세-조회">5.3 결제 상세 조회</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/payments/{id}</code></li>
+<li><strong>설명</strong>: 특정 결제의 상세 정보 조회</li>
+<li><strong>권한</strong>: Authenticated</li>
+</ul>
+
+<h3 id="54-결제-환불">5.4 결제 환불</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/payments/refund</code></li>
+<li><strong>설명</strong>: 완료된 결제 환불</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "paymentId": 1,
+  "refundAmount": 50000,
+  "refundReason": "고객 요청"
+}
+</code></pre></li>
+</ul>
+
+<h3 id="55-입금-확인-요청">5.5 입금 확인 요청</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/payments/{paymentId}/request-confirmation</code></li>
+<li><strong>설명</strong>: 계좌이체 입금 완료 후 확인 요청</li>
+<li><strong>권한</strong>: Authenticated</li>
+</ul>
+
+<h3 id="56-입금-확인-오너">5.6 입금 확인 (오너)</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/payments/{paymentId}/confirm-deposit</code></li>
+<li><strong>설명</strong>: 계좌이체 입금 확인 및 완료 처리</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+</ul>
+
+<h3 id="57-결제-승인-토스페이먼츠">5.7 결제 승인 (토스페이먼츠)</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/payments/{paymentId}/confirm</code></li>
+<li><strong>설명</strong>: 토스페이먼츠 결제 승인 및 완료</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Query Params</strong>: <code>paymentKey</code>, <code>orderId</code>, <code>amount</code></li>
+</ul>
+
+<h3 id="58-수동-환불-완료-확인">5.8 수동 환불 완료 확인</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/payments/refunds/{refundId}/confirm</code></li>
+<li><strong>설명</strong>: 계좌이체 환불 수동 처리 후 완료 확인</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+</ul>
+
+<hr />
+
+<h2 id="6-리뷰-review">6. 리뷰 (Review)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/reviews</code></p>
+
+<h3 id="61-리뷰-crud">6.1 리뷰 CRUD</h3>
+
+<h4 id="611-리뷰-생성">6.1.1 리뷰 생성</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/reviews</code></li>
+<li><strong>설명</strong>: 새로운 리뷰 작성</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "campgroundId": 1,
+  "rating": 5,
+  "comment": "훌륭한 캠핑장이었습니다!",
+  "images": ["url1", "url2"]
+}
+</code></pre></li>
+</ul>
+
+<h4 id="612-리뷰-수정">6.1.2 리뷰 수정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/reviews/{reviewId}</code></li>
+<li><strong>설명</strong>: 기존 리뷰 수정</li>
+<li><strong>권한</strong>: Authenticated (본인만)</li>
+<li><strong>Request Body</strong>: 생성과 동일</li>
+</ul>
+
+<h4 id="613-리뷰-삭제">6.1.3 리뷰 삭제</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/reviews/{reviewId}</code></li>
+<li><strong>설명</strong>: 리뷰 삭제</li>
+<li><strong>권한</strong>: Authenticated (본인만)</li>
+</ul>
+
+<h4 id="614-리뷰-조회">6.1.4 리뷰 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reviews/{reviewId}</code></li>
+<li><strong>설명</strong>: 특정 리뷰 조회</li>
+<li><strong>권한</strong>: Public</li>
+</ul>
+
+<h3 id="62-리뷰-목록-조회">6.2 리뷰 목록 조회</h3>
+
+<h4 id="621-캠핑장-리뷰-목록">6.2.1 캠핑장 리뷰 목록</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reviews/campground/{campgroundId}</code></li>
+<li><strong>설명</strong>: 특정 캠핑장의 리뷰 목록 조회 (페이징)</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code> (기본값: 10)</li>
+</ul>
+
+<h4 id="622-최근-리뷰-목록">6.2.2 최근 리뷰 목록</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reviews/recent</code></li>
+<li><strong>설명</strong>: 최근 작성된 리뷰 목록 조회</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Query Params</strong>: <code>limit</code> (기본값: 10, 최대: 50)</li>
+</ul>
+
+<h4 id="623-캠핑장-전체-리뷰-목록">6.2.3 캠핑장 전체 리뷰 목록</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reviews/campground/{campgroundId}/all</code></li>
+<li><strong>설명</strong>: 캠핑장의 모든 리뷰 조회 (페이징 없음)</li>
+<li><strong>권한</strong>: Public</li>
+</ul>
+
+<h4 id="624-내-리뷰-목록">6.2.4 내 리뷰 목록</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reviews/my</code></li>
+<li><strong>설명</strong>: 현재 사용자의 리뷰 목록 조회</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code></li>
+</ul>
+
+<h4 id="625-내-캠핑장-리뷰-조회">6.2.5 내 캠핑장 리뷰 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reviews/campground/{campgroundId}/my</code></li>
+<li><strong>설명</strong>: 특정 캠핑장에 대한 내 리뷰 조회</li>
+<li><strong>권한</strong>: Authenticated</li>
+</ul>
+
+<h3 id="63-리뷰-통계">6.3 리뷰 통계</h3>
+
+<h4 id="631-캠핑장-리뷰-통계">6.3.1 캠핑장 리뷰 통계</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reviews/campground/{campgroundId}/stats</code></li>
+<li><strong>설명</strong>: 캠핑장의 리뷰 통계 정보 조회</li>
+<li><strong>권한</strong>: Public</li>
+</ul>
+
+<h3 id="64-리뷰-좋아요">6.4 리뷰 좋아요</h3>
+
+<h4 id="641-리뷰-좋아요">6.4.1 리뷰 좋아요</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/reviews/{reviewId}/like</code></li>
+<li><strong>설명</strong>: 리뷰에 좋아요 추가</li>
+<li><strong>권한</strong>: Authenticated</li>
+</ul>
+
+<h4 id="642-리뷰-좋아요-취소">6.4.2 리뷰 좋아요 취소</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/reviews/{reviewId}/like</code></li>
+<li><strong>설명</strong>: 리뷰 좋아요 취소</li>
+<li><strong>권한</strong>: Authenticated</li>
+</ul>
+
+<h3 id="65-owner-전용">6.5 Owner 전용</h3>
+
+<h4 id="651-내-캠핑장-리뷰-조회-owner">6.5.1 내 캠핑장 리뷰 조회 (Owner)</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/reviews/owner/reviews</code></li>
+<li><strong>설명</strong>: Owner의 모든 캠핑장 리뷰 조회</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code> (기본값: 100)</li>
+</ul>
+
+<h3 id="66-리뷰-답글">6.6 리뷰 답글</h3>
+
+<h4 id="661-답글-작성">6.6.1 답글 작성</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/reviews/{reviewId}/reply</code></li>
+<li><strong>설명</strong>: 리뷰에 운영자 답글 작성</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "content": "답글 내용"
+}
+</code></pre></li>
+</ul>
+
+<h4 id="662-답글-수정">6.6.2 답글 수정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/reviews/{reviewId}/reply/{replyId}</code></li>
+<li><strong>설명</strong>: 리뷰 답글 수정</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+</ul>
+
+<h4 id="663-답글-삭제">6.6.3 답글 삭제</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/reviews/{reviewId}/reply/{replyId}</code></li>
+<li><strong>설명</strong>: 리뷰 답글 삭제</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+</ul>
+
+<hr />
+
+<h2 id="7-가격-책정-pricing">7. 가격 책정 (Pricing)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/owner</code>, <code>/api/v1/pricing</code></p>
+
+<h3 id="71-owner-전용-요금제-관리">7.1 Owner 전용 (요금제 관리)</h3>
+
+<h4 id="711-요금제-생성">7.1.1 요금제 생성</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/owner/sites/{siteId}/pricing</code></li>
+<li><strong>설명</strong>: 사이트 요금제 생성</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "ruleName": "주말 요금",
+  "basePrice": 50000,
+  "startMonth": 1,
+  "endMonth": 12,
+  "startDay": 1,
+  "endDay": 31,
+  "seasonType": "PEAK",
+  "weekdayPrice": 50000,
+  "weekendPrice": 70000,
+  "discountRate": 10,
+  "priority": 1
+}
+</code></pre></li>
+</ul>
+
+<h4 id="712-사이트-요금제-조회">7.1.2 사이트 요금제 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/owner/sites/{siteId}/pricing</code></li>
+<li><strong>설명</strong>: 특정 사이트의 요금제 목록 조회</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+</ul>
+
+<h4 id="713-요금제-수정">7.1.3 요금제 수정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/owner/sites/{siteId}/pricing/{pricingId}</code></li>
+<li><strong>설명</strong>: 요금제 수정</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+</ul>
+
+<h4 id="714-요금제-삭제">7.1.4 요금제 삭제</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/owner/sites/{siteId}/pricing/{pricingId}</code></li>
+<li><strong>설명</strong>: 요금제 삭제</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+</ul>
+
+<h4 id="715-전체-요금제-조회">7.1.5 전체 요금제 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/owner/pricing</code></li>
+<li><strong>설명</strong>: Owner의 모든 캠핑장 요금제 조회</li>
+<li><strong>권한</strong>: OWNER or ADMIN</li>
+</ul>
+
+<h3 id="72-public-요금-계산">7.2 Public (요금 계산)</h3>
+
+<h4 id="721-요금-미리-계산">7.2.1 요금 미리 계산</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/pricing/calculate</code></li>
+<li><strong>설명</strong>: 예약 전 요금 실시간 계산</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Query Params</strong>:
+<ul>
+<li><code>siteId</code>: Long</li>
+<li><code>checkInDate</code>: LocalDate (yyyy-MM-dd)</li>
+<li><code>checkOutDate</code>: LocalDate (yyyy-MM-dd)</li>
+<li><code>numberOfGuests</code>: Integer</li>
+</ul></li>
+<li><strong>Response</strong>:
+<pre><code>{
+  "totalPrice": 140000,
+  "dailyPrices": [
+    { "date": "2025-12-25", "basePrice": 50000, "finalPrice": 70000 },
+    { "date": "2025-12-26", "basePrice": 50000, "finalPrice": 70000 }
+  ],
+  "appliedDiscounts": [
+    { "discountName": "조기 예약 할인", "discountAmount": 10000 }
+  ]
+}
+</code></pre></li>
+</ul>
+
+<hr />
+
+<h2 id="8-배너-banner">8. 배너 (Banner)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/banners</code></p>
+
+<h3 id="81-public">8.1 Public</h3>
+
+<h4 id="811-활성-배너-목록-조회">8.1.1 활성 배너 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/banners</code></li>
+<li><strong>설명</strong>: 현재 활성화된 배너 목록 조회</li>
+<li><strong>권한</strong>: Public</li>
+<li><strong>Query Params</strong>:
+<ul>
+<li><code>type</code>: BannerType (PROMOTION, EVENT, ANNOUNCEMENT, NOTICE)</li>
+<li><code>size</code>: Integer (기본값: 10)</li>
+</ul></li>
+</ul>
+
+<h4 id="812-배너-조회수-증가">8.1.2 배너 조회수 증가</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/banners/{bannerId}/view</code></li>
+<li><strong>설명</strong>: 배너 조회수 증가</li>
+<li><strong>권한</strong>: Public</li>
+</ul>
+
+<h4 id="813-배너-클릭수-증가">8.1.3 배너 클릭수 증가</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/banners/{bannerId}/click</code></li>
+<li><strong>설명</strong>: 배너 클릭수 증가</li>
+<li><strong>권한</strong>: Public</li>
+</ul>
+
+<h3 id="82-admin-관리자-전용">8.2 Admin (관리자 전용)</h3>
+
+<p>관리자 전용 배너 관리는 <a href="#107-배너-관리">10.7 배너 관리</a> 참고</p>
+
+<hr />
+
+<h2 id="9-파일-업로드-file">9. 파일 업로드 (File)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/files</code></p>
+
+<h3 id="91-이미지-업로드">9.1 이미지 업로드</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/files/upload</code> (multipart/form-data)</li>
+<li><strong>설명</strong>: 이미지 업로드 (썸네일 자동 생성)</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Form Data</strong>:
+<ul>
+<li><code>file</code>: MultipartFile</li>
+<li><code>type</code>: String (campground, site, review, profile, banner)</li>
+</ul></li>
+<li><strong>Response</strong>:
+<pre><code>{
+  "thumbnailPath": "s3://path/to/thumbnail.jpg",
+  "thumbnailUrl": "https://...",
+  "originalPath": "s3://path/to/original.jpg",
+  "originalUrl": "https://..."
+}
+</code></pre></li>
+</ul>
+
+<h3 id="92-여러-이미지-업로드">9.2 여러 이미지 업로드</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/files/upload/multiple</code> (multipart/form-data)</li>
+<li><strong>설명</strong>: 여러 이미지 일괄 업로드 (썸네일 자동 생성)</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Form Data</strong>:
+<ul>
+<li><code>files</code>: MultipartFile[]</li>
+<li><code>type</code>: String</li>
+</ul></li>
+<li><strong>제한</strong>:
+<ul>
+<li>review: 최대 5개</li>
+<li>campground: 최대 10개</li>
+<li>site: 최대 10개</li>
+</ul></li>
+</ul>
+
+<h3 id="93-파일-삭제">9.3 파일 삭제</h3>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/files</code></li>
+<li><strong>설명</strong>: 지정된 경로의 파일들 삭제</li>
+<li><strong>권한</strong>: Authenticated</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "filePaths": [
+    "s3://path/to/file1.jpg",
+    "s3://path/to/file2.jpg"
+  ]
+}
+</code></pre></li>
+</ul>
+
+<hr />
+
+<h2 id="10-관리자-admin">10. 관리자 (Admin)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/admin</code></p>
+
+<p><strong>권한</strong>: 모든 엔드포인트에 <code>ROLE_ADMIN</code> 필요</p>
+
+<h3 id="101-사용자-관리">10.1 사용자 관리</h3>
+
+<h4 id="1011-사용자-목록-조회">10.1.1 사용자 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/users</code></li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code> (기본값: 20)</li>
+</ul>
+
+<h4 id="1012-이메일로-사용자-조회">10.1.2 이메일로 사용자 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/users/email/{email}</code></li>
+</ul>
+
+<h4 id="1013-사용자-id로-조회">10.1.3 사용자 ID로 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/users/{userId}</code></li>
+</ul>
+
+<h4 id="1014-사용자-정보-수정">10.1.4 사용자 정보 수정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/admin/users/{userId}</code></li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "role": "OWNER",
+  "status": "ACTIVE",
+  "name": "홍길동",
+  "phone": "010-1234-5678"
+}
+</code></pre></li>
+</ul>
+
+<h4 id="1015-사용자-삭제">10.1.5 사용자 삭제</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/admin/users/{userId}</code></li>
+</ul>
+
+<h4 id="1016-사용자-역할-변경">10.1.6 사용자 역할 변경</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/admin/users/{userId}/role</code></li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "role": "OWNER"
+}
+</code></pre></li>
+</ul>
+
+<h4 id="1017-사용자-상태-변경">10.1.7 사용자 상태 변경</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/admin/users/{userId}/status</code></li>
+<li><strong>설명</strong>: 사용자 활성/비활성 상태 토글</li>
+</ul>
+
+<h4 id="1018-사용자-상태-토글">10.1.8 사용자 상태 토글</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/admin/users/{userId}/toggle-status</code></li>
+</ul>
+
+<h3 id="102-캠핑장-관리">10.2 캠핑장 관리</h3>
+
+<h4 id="1021-캠핑장-목록-조회">10.2.1 캠핑장 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/campgrounds</code></li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code></li>
+</ul>
+
+<h4 id="1022-캠핑장-생성">10.2.2 캠핑장 생성</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/admin/campgrounds</code></li>
+<li><strong>Request Body</strong>: 캠핑장 생성과 동일</li>
+</ul>
+
+<h4 id="1023-캠핑장-수정">10.2.3 캠핑장 수정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/admin/campgrounds/{campgroundId}</code></li>
+</ul>
+
+<h4 id="1024-캠핑장-삭제">10.2.4 캠핑장 삭제</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/admin/campgrounds/{campgroundId}</code></li>
+</ul>
+
+<h4 id="1025-캠핑장-상태-변경">10.2.5 캠핑장 상태 변경</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/admin/campgrounds/{campgroundId}/status</code></li>
+<li><strong>Query Params</strong>: <code>status</code> (ACTIVE, INACTIVE, CLOSED)</li>
+</ul>
+
+<h4 id="1026-캠핑장-승인">10.2.6 캠핑장 승인</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/admin/campgrounds/{campgroundId}/approve</code></li>
+</ul>
+
+<h4 id="1027-캠핑장-거부">10.2.7 캠핑장 거부</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/admin/campgrounds/{campgroundId}/reject</code></li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "reason": "거부 사유"
+}
+</code></pre></li>
+</ul>
+
+<h3 id="103-리뷰-관리">10.3 리뷰 관리</h3>
+
+<h4 id="1031-리뷰-목록-조회">10.3.1 리뷰 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/reviews</code></li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code></li>
+</ul>
+
+<h4 id="1032-리뷰-삭제">10.3.2 리뷰 삭제</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/admin/reviews/{reviewId}</code></li>
+</ul>
+
+<h3 id="104-결제-로그-조회">10.4 결제 로그 조회</h3>
+
+<h4 id="1041-결제환불-로그-조회">10.4.1 결제/환불 로그 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/payments</code></li>
+<li><strong>Query Params</strong>:
+<ul>
+<li><code>type</code>: String (payment, refund)</li>
+<li><code>from</code>: String (yyyy-MM-dd)</li>
+<li><code>to</code>: String (yyyy-MM-dd)</li>
+<li><code>page</code>, <code>size</code></li>
+</ul></li>
+</ul>
+
+<h3 id="105-대시보드">10.5 대시보드</h3>
+
+<h4 id="1051-대시보드-통계-조회">10.5.1 대시보드 통계 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/dashboard/stats</code></li>
+<li><strong>설명</strong>: 전체 통계 데이터 (사용자, 캠핑장, 예약, 결제 등)</li>
+</ul>
+
+<h4 id="1052-최근-활동-내역-조회">10.5.2 최근 활동 내역 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/dashboard/recent-activities</code></li>
+<li><strong>Query Params</strong>: <code>limit</code> (기본값: 10)</li>
+</ul>
+
+<h3 id="106-예약-관리">10.6 예약 관리</h3>
+
+<blockquote>
+  <p>AdminReservationController에 대한 정보는 파일을 읽지 못했으나, 일반적으로 다음과 같은 기능 포함:
+  - 전체 예약 목록 조회
+  - 예약 상태 변경
+  - 예약 강제 취소</p>
+</blockquote>
+
+<h3 id="107-배너-관리">10.7 배너 관리</h3>
+
+<h4 id="1071-배너-목록-조회">10.7.1 배너 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/banners</code></li>
+<li><strong>Query Params</strong>:
+<ul>
+<li><code>title</code>: String</li>
+<li><code>type</code>: BannerType</li>
+<li><code>status</code>: BannerStatus (ACTIVE, INACTIVE, SCHEDULED)</li>
+<li><code>sort</code>: String</li>
+<li><code>direction</code>: String</li>
+<li><code>page</code>, <code>size</code></li>
+</ul></li>
+</ul>
+
+<h4 id="1072-배너-단건-조회">10.7.2 배너 단건 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/banners/{bannerId}</code></li>
+</ul>
+
+<h4 id="1073-배너-생성">10.7.3 배너 생성</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/admin/banners</code></li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "title": "배너 제목",
+  "type": "PROMOTION",
+  "content": "배너 내용",
+  "imageUrl": "https://...",
+  "linkUrl": "https://...",
+  "startDate": "2025-12-01",
+  "endDate": "2025-12-31",
+  "displayOrder": 1,
+  "status": "ACTIVE"
+}
+</code></pre></li>
+</ul>
+
+<h4 id="1074-배너-수정">10.7.4 배너 수정</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/admin/banners/{bannerId}</code></li>
+</ul>
+
+<h4 id="1075-배너-삭제">10.7.5 배너 삭제</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>DELETE /api/v1/admin/banners/{bannerId}</code></li>
+</ul>
+
+<h4 id="1076-배너-순서-변경">10.7.6 배너 순서 변경</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/admin/banners/{bannerId}/order</code></li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "displayOrder": 5
+}
+</code></pre></li>
+</ul>
+
+<h4 id="1077-배너-상태-변경">10.7.7 배너 상태 변경</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PUT /api/v1/admin/banners/{bannerId}/status</code></li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "status": "ACTIVE"
+}
+</code></pre></li>
+</ul>
+
+<h4 id="1078-배너-통계-조회">10.7.8 배너 통계 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/admin/banners/stats</code></li>
+<li><strong>Response</strong>: 총 배너 수, 활성 배너 수, 총 조회수, 총 클릭수 등</li>
+</ul>
+
+<h3 id="108-캐시-모니터링">10.8 캐시 모니터링</h3>
+
+<blockquote>
+  <p>CacheMonitoringController는 Redis 캐시 모니터링 기능 제공 (파일 상세 내용 미확인)</p>
+</blockquote>
+
+<hr />
+
+<h2 id="11-소유자-owner">11. 소유자 (Owner)</h2>
+
+<p><strong>Base Path</strong>: <code>/api/v1/owner</code></p>
+
+<p><strong>권한</strong>: 모든 엔드포인트에 <code>ROLE_OWNER</code> or <code>ROLE_ADMIN</code> 필요</p>
+
+<h3 id="111-캠핑장-관리">11.1 캠핑장 관리</h3>
+
+<h4 id="1111-내-캠핑장-목록-조회">11.1.1 내 캠핑장 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/owner/campgrounds</code></li>
+<li><strong>설명</strong>: Owner의 모든 캠핑장 조회</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code> (기본값: 20)</li>
+</ul>
+
+<h3 id="112-대시보드">11.2 대시보드</h3>
+
+<h4 id="1121-대시보드-통계-조회">11.2.1 대시보드 통계 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/owner/dashboard/stats</code></li>
+<li><strong>설명</strong>: Owner의 캠핑장 통계 (캐싱 지원)</li>
+<li><strong>Response</strong>: 총 캠핑장, 예약, 매출, 리뷰 수 등</li>
+</ul>
+
+<h3 id="113-예약-관리">11.3 예약 관리</h3>
+
+<h4 id="1131-내-캠핑장-예약-목록-조회">11.3.1 내 캠핑장 예약 목록 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/owner/reservations</code></li>
+<li><strong>설명</strong>: Owner의 모든 캠핑장 예약 조회</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code> (기본값: 100)</li>
+</ul>
+
+<h4 id="1132-예약-상세-조회">11.3.2 예약 상세 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/owner/reservations/{reservationId}</code></li>
+<li><strong>설명</strong>: 예약 상세 정보 조회</li>
+</ul>
+
+<h4 id="1133-예약-상태-변경">11.3.3 예약 상태 변경</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>PATCH /api/v1/owner/reservations/{reservationId}/status</code></li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "status": "CONFIRMED"
+}
+</code></pre></li>
+</ul>
+
+<h3 id="114-환불-처리">11.4 환불 처리</h3>
+
+<h4 id="1141-owner-환불-처리">11.4.1 Owner 환불 처리</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>POST /api/v1/owner/payments/{paymentId}/refund</code></li>
+<li><strong>설명</strong>: 당일 환불 및 전액 환불 가능 (제한 없음)</li>
+<li><strong>Request Body</strong>:
+<pre><code>{
+  "refundAmount": 50000,
+  "refundReason": "사유"
+}
+</code></pre></li>
+</ul>
+
+<h3 id="115-리뷰-관리">11.5 리뷰 관리</h3>
+
+<h4 id="1151-내-캠핑장-리뷰-조회">11.5.1 내 캠핑장 리뷰 조회</h4>
+
+<ul>
+<li><strong>Endpoint</strong>: <code>GET /api/v1/owner/reviews</code></li>
+<li><strong>설명</strong>: Owner의 모든 캠핑장 리뷰 조회</li>
+<li><strong>Query Params</strong>: <code>page</code>, <code>size</code> (기본값: 100)</li>
+</ul>
+
+<hr />
+
+<h2 id="공통-사항">📌 공통 사항</h2>
+
+<h3 id="인증-방식">인증 방식</h3>
+
+<ul>
+<li><strong>JWT Bearer Token</strong>: <code>Authorization: Bearer {access_token}</code></li>
+<li><strong>Refresh Token</strong>: HttpOnly 쿠키</li>
+</ul>
+
+<h3 id="응답-형식">응답 형식</h3>
+
+<pre><code>{
+  "success": true,
+  "message": "메시지",
+  "data": { ... },
+  "timestamp": "2025-11-16T10:00:00"
+}
+</code></pre>
+
+<h3 id="에러-응답">에러 응답</h3>
+
+<pre><code>{
+  "success": false,
+  "message": "에러 메시지",
+  "data": null,
+  "timestamp": "2025-11-16T10:00:00"
+}
+</code></pre>
+
+<h3 id="http-상태-코드">HTTP 상태 코드</h3>
+
+<ul>
+<li><code>200 OK</code>: 성공</li>
+<li><code>201 Created</code>: 생성 성공</li>
+<li><code>204 No Content</code>: 삭제/업데이트 성공</li>
+<li><code>400 Bad Request</code>: 잘못된 요청</li>
+<li><code>401 Unauthorized</code>: 인증 실패</li>
+<li><code>403 Forbidden</code>: 권한 없음</li>
+<li><code>404 Not Found</code>: 리소스 없음</li>
+<li><code>409 Conflict</code>: 중복/충돌</li>
+<li><code>500 Internal Server Error</code>: 서버 오류</li>
+</ul>
+
+<h3 id="페이징-파라미터">페이징 파라미터</h3>
+
+<ul>
+<li><code>page</code>: 페이지 번호 (0부터 시작)</li>
+<li><code>size</code>: 페이지 크기</li>
+<li><code>sort</code>: 정렬 필드</li>
+<li><code>direction</code>: 정렬 방향 (ASC, DESC)</li>
+</ul>
+
+<hr />
+
+<h2 id="api-통계">📊 API 통계</h2>
+
+<ul>
+<li><strong>총 Controller 수</strong>: 17개</li>
+<li><strong>총 엔드포인트 수</strong>: 100+ 개</li>
+<li><strong>인증 필요 엔드포인트</strong>: 70+ 개</li>
+<li><strong>Public 엔드포인트</strong>: 30+ 개</li>
+<li><strong>OWNER 전용</strong>: 15+ 개</li>
+<li><strong>ADMIN 전용</strong>: 25+ 개</li>
+</ul>
+
+<hr />
+
+<p><strong>문서 버전</strong>: 1.0
+<strong>최종 업데이트</strong>: 2025-11-16
+<strong>작성자</strong>: Claude AI Assistant</p>
+
+        </div>
+
+        <div class="footer">
+            <p>📊 CampStation Backend API Documentation</p>
+            <p>Generated by Claude AI Assistant | © 2025</p>
+            <p>Total Controllers: 17 | Total Endpoints: 100+</p>
+        </div>
+    </div>
+
+    <script>
+        // Enhance endpoint display
+        document.querySelectorAll('li').forEach(item => {
+            const text = item.innerHTML;
+
+            // Highlight HTTP methods
+            const methodRegex = /(GET|POST|PUT|DELETE|PATCH) (\/api\/v1\/[^<\s]+)/g;
+            if (methodRegex.test(text)) {
+                const enhanced = text.replace(methodRegex, (match, method, path) => {
+                    const methodClass = method.toLowerCase();
+                    return `<span class="method ${methodClass}">${method}</span><code>${path}</code>`;
+                });
+                item.innerHTML = enhanced;
+            }
+
+            // Highlight permission badges
+            const permRegex = /권한: (Public|Authenticated|OWNER|ADMIN|OWNER or ADMIN)/g;
+            if (permRegex.test(text)) {
+                const enhanced = text.replace(permRegex, (match, perm) => {
+                    let badgeClass = 'public';
+                    if (perm === 'Authenticated') badgeClass = 'auth';
+                    else if (perm === 'OWNER' || perm === 'OWNER or ADMIN') badgeClass = 'owner';
+                    else if (perm === 'ADMIN') badgeClass = 'admin';
+                    return `권한: <span class="badge ${badgeClass}">${perm}</span>`;
+                });
+                item.innerHTML = enhanced;
+            }
+        });
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

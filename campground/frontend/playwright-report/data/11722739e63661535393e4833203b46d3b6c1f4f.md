@@ -1,0 +1,90 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "CampStation" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e7]
+          - generic [ref=e9]: CampStation
+        - generic [ref=e10]:
+          - link "로그인" [ref=e11] [cursor=pointer]:
+            - /url: /login
+            - button "로그인" [ref=e12]
+          - link "회원가입" [ref=e13] [cursor=pointer]:
+            - /url: /register
+            - button "회원가입" [ref=e14]
+    - main [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]:
+            - heading "자연과 함께하는 특별한 캠핑 경험" [level=1] [ref=e19]:
+              - text: 자연과 함께하는
+              - text: 특별한 캠핑 경험
+            - paragraph [ref=e20]: 전국 최고의 캠핑장을 한눈에 비교하고 예약하세요.
+          - generic [ref=e21]:
+            - link "캠핑장 둘러보기" [ref=e22] [cursor=pointer]:
+              - /url: /campgrounds
+              - button "캠핑장 둘러보기" [ref=e23]
+            - link "지도로 찾기" [ref=e24] [cursor=pointer]:
+              - /url: /map
+              - button "지도로 찾기" [ref=e25]
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - img [ref=e29]
+            - generic [ref=e31]:
+              - heading "쉬운 검색" [level=3] [ref=e32]
+              - paragraph [ref=e33]: 원하는 지역과 조건으로 캠핑장을 빠르게 찾아보세요
+          - generic [ref=e34]:
+            - img [ref=e36]
+            - generic [ref=e38]:
+              - heading "실시간 예약" [level=3] [ref=e39]
+              - paragraph [ref=e40]: 실시간으로 예약 가능 여부를 확인하고 즉시 예약하세요
+          - generic [ref=e41]:
+            - img [ref=e43]
+            - generic [ref=e45]:
+              - heading "안전한 결제" [level=3] [ref=e46]
+              - paragraph [ref=e47]: 다양한 결제 수단으로 안전하게 예약을 완료하세요
+    - contentinfo [ref=e48]:
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - heading "CampStation" [level=3] [ref=e52]
+          - paragraph [ref=e53]: 전국 최고의 캠핑장을 예약하고 자연과 함께하는 특별한 경험을 만들어보세요.
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - heading "둘러보기" [level=3] [ref=e56]
+            - list [ref=e57]:
+              - listitem [ref=e58]:
+                - link "캠핑장 찾기" [ref=e59] [cursor=pointer]:
+                  - /url: /campgrounds
+              - listitem [ref=e60]:
+                - link "지도로 보기" [ref=e61] [cursor=pointer]:
+                  - /url: /map
+              - listitem [ref=e62]:
+                - link "예약 관리" [ref=e63] [cursor=pointer]:
+                  - /url: /reservations
+          - generic [ref=e64]:
+            - heading "고객지원" [level=3] [ref=e65]
+            - list [ref=e66]:
+              - listitem [ref=e67]:
+                - link "자주 묻는 질문" [ref=e68] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e69]:
+                - link "이용약관" [ref=e70] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e71]:
+                - link "개인정보처리방침" [ref=e72] [cursor=pointer]:
+                  - /url: "#"
+        - generic [ref=e73]:
+          - heading "연락처" [level=3] [ref=e74]
+          - list [ref=e75]:
+            - listitem [ref=e76]: "이메일: support@campstation.com"
+            - listitem [ref=e77]: "전화: 1588-0000"
+            - listitem [ref=e78]: "운영시간: 평일 09:00 - 18:00"
+        - paragraph [ref=e80]: © 2025 CampStation. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=e86] [cursor=pointer]:
+    - img [ref=e87]
+  - alert [ref=e90]
+```

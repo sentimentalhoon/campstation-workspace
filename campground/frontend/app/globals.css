@@ -1,0 +1,253 @@
+@import "tailwindcss";
+
+:root {
+  /* ========================================
+     CampStation Design System v1.0
+     Mobile-First (Max 640px)
+     ======================================== */
+
+  /* Colors - Light Mode Only */
+  --background: 0 0% 100%; /* 흰색 배경 */
+  --foreground: 0 0% 9%; /* 거의 검정 텍스트 */
+
+  /* Primary - 캠핑/자연 테마 (녹색) */
+  --primary: 142 76% 36%; /* #16a34a */
+  --primary-foreground: 0 0% 100%; /* 흰색 */
+
+  /* Secondary - 연한 녹색 배경 */
+  --secondary: 142 30% 96%;
+  --secondary-foreground: 142 76% 20%;
+
+  /* Accent - 강조 색상 */
+  --accent: 142 76% 45%;
+  --accent-foreground: 0 0% 100%;
+
+  /* Muted - 비활성/보조 요소 */
+  --muted: 0 0% 96%; /* 연한 회색 배경 */
+  --muted-foreground: 0 0% 45%; /* 중간 회색 텍스트 */
+
+  /* Borders & Inputs */
+  --border: 0 0% 90%; /* 테두리 */
+  --input: 0 0% 90%; /* 입력 필드 테두리 */
+  --ring: 142 76% 36%; /* Focus ring */
+
+  /* Semantic Colors */
+  --success: 142 76% 36%; /* 녹색 */
+  --error: 0 84% 60%; /* #ef4444 빨강 */
+  --warning: 38 92% 50%; /* #f97316 주황 */
+  --info: 221 83% 53%; /* #3b82f6 파랑 */
+
+  /* Card - 카드 배경 */
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+
+  /* Popover/Modal */
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+
+  /* Destructive - 삭제/위험 액션 */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* Spacing & Layout */
+  --radius: 0.5rem; /* 8px - 기본 둥근 모서리 */
+
+  /* Safe Area (iOS 노치 대응) */
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+}
+
+@theme inline {
+  /* Color Tokens */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-success: hsl(var(--success));
+  --color-error: hsl(var(--error));
+  --color-warning: hsl(var(--warning));
+  --color-info: hsl(var(--info));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  /* Font Families */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ========================================
+   Global Styles
+   ======================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* 부드러운 스크롤 */
+  scroll-behavior: smooth;
+  /* 텍스트 렌더링 최적화 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* 모바일 탭 하이라이트 제거 */
+  -webkit-tap-highlight-color: transparent;
+  /* 수평 스크롤 방지 */
+  overflow-x: hidden;
+}
+
+body {
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  min-height: 100vh;
+  /* iOS Safe Area 대응 */
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  /* 수평 스크롤 방지 */
+  overflow-x: hidden;
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
+
+/* Scrollbar 숨김 */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Safe Area 대응 (iOS 노치) */
+.pt-safe {
+  padding-top: var(--safe-area-inset-top);
+}
+
+.pb-safe {
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* 터치 영역 최적화 */
+.touch-area {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* 모바일 컨테이너 (최대 640px) */
+.container-mobile {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem; /* 16px */
+  padding-right: 1rem; /* 16px */
+}
+
+/* Focus visible (키보드 접근성) */
+*:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* 선택 영역 스타일 */
+::selection {
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
+}
+
+/* ========================================
+   Animation Utilities
+   ======================================== */
+
+/* 페이드 인 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 200ms ease-in-out;
+}
+
+/* 슬라이드 업 */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 300ms ease-out;
+}
+
+/* 스케일 (터치 피드백) */
+.active-scale {
+  transition: transform 150ms ease;
+}
+
+.active-scale:active {
+  transform: scale(0.95);
+}
+
+/* ========================================
+   Scrollbar Utilities
+   ======================================== */
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

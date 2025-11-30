@@ -1,0 +1,405 @@
+# ================================
+# CampStation Backend - Local Development Environment Configuration (Spring Boot 3.x)
+# ================================
+# 로컬 개발 환경 최적화 설정
+# - H2 인메모리 DB 사용
+# - 로컬 Redis 사용
+# - 모든 개발 편의 기능 활성화
+# - 상세 로깅 및 디버깅 지원
+
+spring:
+  # ================================
+  # Threads Configuration (Local)
+  # ================================
+  threads:
+    virtual:
+      enabled: true
+
+  # ================================
+  # Multipart File Upload Configuration (Local Development)
+  # ================================
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: ${MULTIPART_MAX_FILE_SIZE:100MB} # 개별 파일 최대 크기 (100MB - 로컬 개발용 확대)
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:200MB} # 요청당 최대 크기 (200MB)
+      file-size-threshold: ${MULTIPART_FILE_SIZE_THRESHOLD:1MB} # 메모리 임계값
+      location: ${MULTIPART_LOCATION:./uploads/temp}
+
+  # ================================
+  # Database Configuration (H2 for Local Development)
+  # ================================
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:campstation;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    hikari:
+      pool-name: CampStationLocalHikariPool
+      maximum-pool-size: ${DB_POOL_SIZE:5}
+      minimum-idle: ${DB_POOL_MIN_IDLE:1}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      leak-detection-threshold: ${DB_LEAK_DETECTION_THRESHOLD:60000}
+      validation-timeout: ${DB_VALIDATION_TIMEOUT:5000}
+      connection-test-query: SELECT 1
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+
+  # ================================
+  # Redis Configuration (Local - Spring Boot 3.x)
+  # ================================
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: ${REDIS_TIMEOUT:5000ms}
+    database: ${REDIS_DATABASE:0}
+    connect-timeout: ${REDIS_CONNECT_TIMEOUT:2000ms}
+    lettuce:
+      pool:
+        max-active: ${REDIS_POOL_MAX_ACTIVE:8}
+        max-idle: ${REDIS_POOL_MAX_IDLE:8}
+        min-idle: ${REDIS_POOL_MIN_IDLE:0}
+        max-wait: ${REDIS_POOL_MAX_WAIT:-1ms}
+        time-between-eviction-runs: ${REDIS_POOL_TIME_BETWEEN_EVICTION:10s}
+      shutdown-timeout: ${REDIS_SHUTDOWN_TIMEOUT:100ms}
+      client-name: ${REDIS_CLIENT_NAME:campstation-local}
+
+  # ================================
+  # JPA/Hibernate Configuration (Local)
+  # ================================
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:create-drop}
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    show-sql: ${SHOW_SQL:true}
+    open-in-view: ${JPA_OPEN_IN_VIEW:true} # 로컬 개발에서는 편의를 위해 OSIV 활성화
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: ${FORMAT_SQL:true}
+        generate_statistics: ${HIBERNATE_STATISTICS:true}
+        jdbc:
+          batch_size: ${JDBC_BATCH_SIZE:25}
+          order_inserts: ${JDBC_ORDER_INSERTS:true}
+          order_updates: ${JDBC_ORDER_UPDATES:true}
+          batch_versioned_data: ${JDBC_BATCH_VERSIONED_DATA:true}
+        query:
+          in_clause_parameter_padding: ${QUERY_IN_CLAUSE_PADDING:true}
+        connection:
+          provider_disables_autocommit: ${HIBERNATE_AUTOCOMMIT:false}
+
+  # ================================
+  # Cache Configuration (Local)
+  # ================================
+  cache:
+    type: ${CACHE_TYPE:redis}
+    redis:
+      time-to-live: ${CACHE_TTL:3600000} # 1시간
+      key-prefix: "${spring.application.name}-local:cache:"
+      use-key-prefix: true
+      cache-null-values: ${CACHE_NULL_VALUES:false}
+      enable-statistics: ${CACHE_STATISTICS:true}
+      enable-time-to-idle: ${CACHE_TIME_TO_IDLE:true}
+
+  # ================================
+  # Flyway Configuration (Local)
+  # ================================
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true} # 로컬에서는 Flyway 활성화
+    url: ${DB_URL:jdbc:h2:mem:campstation;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    user: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: false
+
+  # ================================
+  # Mail Configuration (Local)
+  # ================================
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+        debug: ${MAIL_DEBUG:true}
+
+  # ================================
+  # H2 Console Configuration (Local Only)
+  # ================================
+  h2:
+    console:
+      enabled: ${H2_CONSOLE_ENABLED:true}
+      path: ${H2_CONSOLE_PATH:/h2-console}
+      settings:
+        web-allow-others: ${H2_CONSOLE_ALLOW_OTHERS:true}
+        trace: ${H2_CONSOLE_TRACE:false}
+
+  # ================================
+  # Security Configuration (Local)
+  # ================================
+  security:
+    user:
+      name: ${ADMIN_USERNAME:admin}
+      password: ${ADMIN_PASSWORD:campstation2024}
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:local-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:local-google-client-secret}
+            scope: openid,email,profile
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID:local-kakao-client-id}
+            client-secret: ${KAKAO_CLIENT_SECRET:local-kakao-client-secret}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: ${KAKAO_REDIRECT_URI:http://localhost:8080/login/oauth2/code/kakao}
+            scope: profile_nickname,profile_image,account_email
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+# ================================
+# JWT Configuration (Local)
+# ================================
+# 로컬 개발 환경: 운영과 동일한 보안 정책 적용
+jwt:
+  secret: ${JWT_SECRET:campstation-local-development-super-secret-key-for-jwt-token-generation-must-be-at-least-64-bytes-long-hs512}
+  expiration: ${JWT_EXPIRATION:900000} # 15분 (운영과 동일 - 보안 강화)
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:2592000000} # 30일
+
+# ================================
+# CORS Configuration (Local)
+# ================================
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080,http://frontend:3000,http://127.0.0.1:3000}
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+  allowed-headers: "*"
+  allow-credentials: true
+  max-age: 3600
+
+# ================================
+# File Upload Configuration (Local)
+# ================================
+file:
+  upload:
+    path: ${FILE_UPLOAD_PATH:file:./uploads/} # 로컬 파일 시스템 사용
+    max-size: ${FILE_MAX_SIZE_BYTES:104857600} # 100MB (로컬 개발용 확대)
+    max-request-size: ${FILE_MAX_REQUEST_SIZE:104857600}
+
+# ================================
+# AWS S3 Configuration (Local - MinIO)
+# ================================
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET_NAME:campstation-local}
+      endpoint: ${AWS_S3_ENDPOINT:http://localhost:9000}
+      region: ${AWS_REGION:us-east-1}
+      path-style-access-enabled: ${AWS_S3_PATH_STYLE:true}
+    stack:
+      auto: false
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID:campstation}
+      secret-key: ${AWS_SECRET_ACCESS_KEY:campstation123}
+    region:
+      static: ${AWS_REGION:us-east-1}
+
+# ================================
+# Logging Configuration (Local - Detailed)
+# ================================
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+    com.campstation: ${APP_LOG_LEVEL:DEBUG}
+    org.springframework.security: ${SECURITY_LOG_LEVEL:DEBUG}
+    org.springframework.web: ${WEB_LOG_LEVEL:DEBUG}
+    org.springframework.data.redis: ${REDIS_LOG_LEVEL:DEBUG}
+    org.hibernate: ${HIBERNATE_LOG_LEVEL:INFO}
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:DEBUG}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${SQL_BINDING_LOG_LEVEL:TRACE}
+    io.lettuce: ${LETTUCE_LOG_LEVEL:DEBUG}
+    software.amazon.awssdk: ${AWS_LOG_LEVEL:INFO}
+    com.zaxxer.hikari: ${HIKARI_LOG_LEVEL:DEBUG}
+    org.springframework.boot.autoconfigure: ${AUTO_CONFIG_LOG_LEVEL:INFO}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE:./logs/campstation-local.log}
+  logback:
+    rollingpolicy:
+      max-file-size: ${LOG_MAX_FILE_SIZE:10MB}
+      max-history: ${LOG_MAX_HISTORY:7}
+      total-size-cap: ${LOG_TOTAL_SIZE_CAP:100MB}
+      file-name-pattern: ${LOG_FILE_PATTERN:%d{yyyy-MM-dd}.%i.gz}
+
+# ================================
+# Management Configuration (Local - All Endpoints)
+# ================================
+management:
+  server:
+    # port: ${MANAGEMENT_PORT:8081} # 주석 처리하여 메인 포트와 동일하게 사용
+    # address: ${MANAGEMENT_ADDRESS:0.0.0.0} # 로컬에서는 외부 접근 허용
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_INCLUDE:*}
+      base-path: /actuator
+      cors:
+        allowed-origins: ${MANAGEMENT_CORS_ORIGINS:http://localhost:3000,http://localhost:8080}
+        allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  endpoint:
+    health:
+      enabled: ${MANAGEMENT_HEALTH_ENABLED:true}
+      show-details: ${MANAGEMENT_HEALTH_SHOW_DETAILS:always} # 로컬에서는 항상 상세 정보 표시
+      probes:
+        enabled: ${MANAGEMENT_HEALTH_PROBES_ENABLED:true}
+    metrics:
+      enabled: ${MANAGEMENT_METRICS_ENABLED:true}
+    prometheus:
+      enabled: ${MANAGEMENT_PROMETHEUS_ENABLED:true}
+    info:
+      enabled: ${MANAGEMENT_INFO_ENABLED:true}
+      env:
+        enabled: ${MANAGEMENT_INFO_ENV_ENABLED:true}
+      java:
+        enabled: ${MANAGEMENT_INFO_JAVA_ENABLED:true}
+      os:
+        enabled: ${MANAGEMENT_INFO_OS_ENABLED:true}
+  metrics:
+    export:
+      prometheus:
+        enabled: ${MANAGEMENT_PROMETHEUS_ENABLED:true}
+        descriptions: true
+        histogram-flavor: prometheus
+    tags:
+      application: ${spring.application.name}
+      environment: local
+      profile: local
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        http.server.duration: true
+        redis.commands: true
+      percentiles:
+        http.server.requests: 0.5,0.9,0.95,0.99
+        http.server.duration: 0.5,0.9,0.95,0.99
+        redis.commands: 0.5,0.9,0.95,0.99
+      slo:
+        http.server.requests: 50ms,100ms,200ms,500ms
+        http.server.duration: 50ms,100ms,200ms,500ms
+
+# ================================
+# Server Configuration (Local)
+# ================================
+server:
+  port: ${SERVER_PORT:8080}
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:/}
+    session:
+      timeout: ${SERVER_SESSION_TIMEOUT:60m} # 로컬 개발용 연장
+      cookie:
+        http-only: true
+        secure: ${SERVER_SESSION_COOKIE_SECURE:false}
+        same-site: ${SERVER_SESSION_COOKIE_SAMESITE:Lax}
+  compression:
+    enabled: ${SERVER_COMPRESSION_ENABLED:true}
+    mime-types: ${SERVER_COMPRESSION_MIME_TYPES:text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml,application/xml+rss}
+    min-response-size: ${SERVER_COMPRESSION_MIN_RESPONSE_SIZE:1024}
+  error:
+    include-message: ${SERVER_ERROR_INCLUDE_MESSAGE:always} # 로컬에서는 에러 메시지 표시
+    include-binding-errors: ${SERVER_ERROR_INCLUDE_BINDING_ERRORS:always}
+    include-stacktrace: ${SERVER_ERROR_INCLUDE_STACKTRACE:on_param}
+    include-exception: ${SERVER_ERROR_INCLUDE_EXCEPTION:true}
+  shutdown: ${SERVER_SHUTDOWN:graceful}
+  tomcat:
+    threads:
+      max: ${TOMCAT_THREADS_MAX:100} # 로컬용 축소
+      min-spare: ${TOMCAT_THREADS_MIN_SPARE:5}
+    connection-timeout: ${TOMCAT_CONNECTION_TIMEOUT:20000}
+    keep-alive-timeout: ${TOMCAT_KEEP_ALIVE_TIMEOUT:20000}
+    max-http-header-size: ${TOMCAT_MAX_HTTP_HEADER_SIZE:8192}
+    max-swallow-size: ${TOMCAT_MAX_SWALLOW_SIZE:2MB}
+    accept-count: ${TOMCAT_ACCEPT_COUNT:50}
+    processor-cache: ${TOMCAT_PROCESSOR_CACHE:100}
+
+# ================================
+# Local Development Specific Properties
+# ================================
+app:
+  name: ${spring.application.name}
+  version: ${APP_VERSION:1.0.0-SNAPSHOT}
+  description: CampStation Backend (Local Development)
+  environment: local
+  debug:
+    enabled: ${DEBUG_ENABLED:true}
+    show-sql: ${DEBUG_SHOW_SQL:true}
+    show-bindings: ${DEBUG_SHOW_BINDINGS:true}
+  security:
+    jwt:
+      secret: ${JWT_SECRET:campstation-local-development-super-secret-key-for-jwt-token-generation-must-be-at-least-64-bytes-long-hs512}
+      expiration: ${JWT_EXPIRATION:900000}
+      refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080,http://frontend:3000,http://127.0.0.1:3000}
+  cache:
+    redis:
+      enabled: ${CACHE_REDIS_ENABLED:true}
+      ttl: ${CACHE_TTL:3600000}
+  database:
+    init:
+      enabled: ${DB_INIT_ENABLED:true}
+      schema: ${DB_INIT_SCHEMA:classpath:schema-local.sql}
+      data: ${DB_INIT_DATA:classpath:data-local.sql}
+  file:
+    upload:
+      max-size: ${FILE_MAX_SIZE_BYTES:104857600}
+      allowed-extensions: ${FILE_ALLOWED_EXTENSIONS:jpg,jpeg,png,gif,pdf,doc,docx,txt,zip}
+  mail:
+    enabled: ${MAIL_ENABLED:true}
+    from: ${MAIL_FROM:local@campstation.com}
+  external:
+    apis:
+      weather:
+        url: ${WEATHER_API_URL:http://api.openweathermap.org/data/2.5}
+        key: ${WEATHER_API_KEY:local-weather-api-key}
+      map:
+        kakao:
+          key: ${KAKAO_MAP_API_KEY:local-kakao-map-key}
+  monitoring:
+    enabled: ${MONITORING_ENABLED:true}
+    metrics:
+      enabled: ${METRICS_ENABLED:true}
+    tracing:
+      enabled: ${TRACING_ENABLED:false}
+  features:
+    swagger:
+      enabled: ${SWAGGER_ENABLED:true}
+      path: ${SWAGGER_PATH:/swagger-ui.html}
+    actuator:
+      enabled: ${ACTUATOR_ENABLED:true}
+      sensitive: ${ACTUATOR_SENSITIVE:false}

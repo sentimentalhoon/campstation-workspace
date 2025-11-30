@@ -1,0 +1,386 @@
+# ================================
+# CampStation Backend - Docker Environment Configuration (Spring Boot 3.x)
+# ================================
+# Docker 컨테이너 환경 최적화 설정
+# - PostgreSQL DB 사용
+# - Redis 캐시 사용
+# - MinIO S3 호환 스토리지
+# - 컨테이너 최적화 설정
+
+spring:
+  # ================================
+  # Threads Configuration (Docker)
+  # ================================
+  threads:
+    virtual:
+      enabled: true
+
+  # ================================
+  # Database Configuration (PostgreSQL for Docker)
+  # ================================
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://db:5432/campstation}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    username: ${DB_USERNAME:campstation}
+    password: ${DB_PASSWORD:campstation2024}
+    hikari:
+      pool-name: CampStationDockerHikariPool
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      leak-detection-threshold: ${DB_LEAK_DETECTION_THRESHOLD:60000}
+      validation-timeout: ${DB_VALIDATION_TIMEOUT:5000}
+      connection-test-query: SELECT 1
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        reWriteBatchedInserts: true
+
+  # ================================
+  # Redis Configuration (Docker - Spring Boot 3.x)
+  # ================================
+  redis:
+    host: ${REDIS_HOST:redis}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: ${REDIS_TIMEOUT:2000ms}
+    database: ${REDIS_DATABASE:0}
+    connect-timeout: ${REDIS_CONNECT_TIMEOUT:2000ms}
+    lettuce:
+      pool:
+        max-active: ${REDIS_POOL_MAX_ACTIVE:8}
+        max-idle: ${REDIS_POOL_MAX_IDLE:8}
+        min-idle: ${REDIS_POOL_MIN_IDLE:0}
+        max-wait: ${REDIS_POOL_MAX_WAIT:-1ms}
+        time-between-eviction-runs: ${REDIS_POOL_TIME_BETWEEN_EVICTION:10s}
+      shutdown-timeout: ${REDIS_SHUTDOWN_TIMEOUT:100ms}
+      client-name: ${REDIS_CLIENT_NAME:campstation-docker}
+
+  # ================================
+  # JPA/Hibernate Configuration (Docker)
+  # ================================
+  jpa:
+    hibernate:
+      ddl-auto: none # Flyway가 스키마를 관리하므로 none으로 설정
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    show-sql: ${SHOW_SQL:false}
+    open-in-view: ${JPA_OPEN_IN_VIEW:false}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: ${FORMAT_SQL:false}
+        generate_statistics: ${HIBERNATE_STATISTICS:false}
+        jdbc:
+          batch_size: ${JDBC_BATCH_SIZE:20}
+          order_inserts: ${JDBC_ORDER_INSERTS:true}
+          order_updates: ${JDBC_ORDER_UPDATES:true}
+          batch_versioned_data: ${JDBC_BATCH_VERSIONED_DATA:true}
+        query:
+          in_clause_parameter_padding: ${QUERY_IN_CLAUSE_PADDING:true}
+        connection:
+          provider_disables_autocommit: ${HIBERNATE_AUTOCOMMIT:false}
+
+  # ================================
+  # Cache Configuration (Docker)
+  # ================================
+  cache:
+    type: ${CACHE_TYPE:redis}
+    redis:
+      time-to-live: ${CACHE_TTL:3600000} # 1시간
+      key-prefix: "${spring.application.name}-docker:cache:"
+      use-key-prefix: true
+      cache-null-values: ${CACHE_NULL_VALUES:false}
+      enable-statistics: ${CACHE_STATISTICS:false}
+      enable-time-to-idle: ${CACHE_TIME_TO_IDLE:true}
+
+  # ================================
+  # Flyway Configuration (Docker)
+  # ================================
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true} # Docker 환경에서도 Flyway 활성화
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    out-of-order: false
+    clean-disabled: true
+
+  # ================================
+  # Mail Configuration (Docker)
+  # ================================
+  mail:
+    host: ${MAIL_HOST:mailhog}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+        debug: ${MAIL_DEBUG:false}
+
+  # ================================
+  # Security Configuration (Docker)
+  # ================================
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:docker-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:docker-google-client-secret}
+            scope: openid,email,profile
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID:docker-kakao-client-id}
+            client-secret: ${KAKAO_CLIENT_SECRET:docker-kakao-client-secret}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: ${KAKAO_REDIRECT_URI:http://localhost:8080/login/oauth2/code/kakao}
+            scope: profile_nickname,profile_image,account_email
+            client-name: Kakao
+
+  # ================================
+  # H2 Database Console (Development Only)
+  # ================================
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+        trace: false
+# ================================
+# JWT Configuration (Docker)
+# ================================
+jwt:
+  secret: ${JWT_SECRET:campstation-docker-secret-key-this-is-for-docker-environment-please-change-in-production-must-be-at-least-64-bytes-long-hs512}
+  expiration: ${JWT_EXPIRATION:3600000} # 1시간
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7일
+
+# ================================
+# CORS Configuration (Docker)
+# ================================
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080,http://frontend:3000}
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+  allowed-headers: "*"
+  allow-credentials: true
+  max-age: 3600
+
+# ================================
+# File Upload Configuration (Docker)
+# ================================
+file:
+  upload:
+    path: ${FILE_UPLOAD_PATH:s3://campstation-dev/}
+    max-size: ${FILE_MAX_SIZE_BYTES:10485760} # 10MB
+    max-request-size: ${FILE_MAX_REQUEST_SIZE:10485760}
+
+# ================================
+# AWS S3 / MinIO Configuration (Docker)
+# ================================
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET_NAME:campstation-dev}
+      endpoint: ${AWS_S3_ENDPOINT:http://minio:9000}
+      external-endpoint: ${AWS_S3_EXTERNAL_ENDPOINT:http://localhost:9000}
+      region: ${AWS_REGION:us-east-1}
+      path-style-access-enabled: ${AWS_S3_PATH_STYLE:true}
+    stack:
+      auto: false
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID:campstation}
+      secret-key: ${AWS_SECRET_ACCESS_KEY:campstation123}
+    region:
+      static: ${AWS_REGION:us-east-1}
+
+# ================================
+# Logging Configuration (Docker)
+# ================================
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+    com.campstation: ${APP_LOG_LEVEL:INFO}
+    org.springframework.security: ${SECURITY_LOG_LEVEL:INFO}
+    org.springframework.web: ${WEB_LOG_LEVEL:INFO}
+    org.springframework.data.redis: ${REDIS_LOG_LEVEL:INFO}
+    org.hibernate: ${HIBERNATE_LOG_LEVEL:INFO}
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:WARN}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${SQL_BINDING_LOG_LEVEL:WARN}
+    io.lettuce: ${LETTUCE_LOG_LEVEL:INFO}
+    software.amazon.awssdk: ${AWS_LOG_LEVEL:INFO}
+    com.zaxxer.hikari: ${HIKARI_LOG_LEVEL:INFO}
+    org.springframework.boot.autoconfigure: ${AUTO_CONFIG_LOG_LEVEL:INFO}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE:/app/logs/campstation-docker.log}
+  logback:
+    rollingpolicy:
+      max-file-size: ${LOG_MAX_FILE_SIZE:10MB}
+      max-history: ${LOG_MAX_HISTORY:7}
+      total-size-cap: ${LOG_TOTAL_SIZE_CAP:100MB}
+      file-name-pattern: ${LOG_FILE_PATTERN:%d{yyyy-MM-dd}.%i.gz}
+
+# ================================
+# Management Configuration (Docker)
+# ================================
+management:
+  server:
+    port: ${MANAGEMENT_PORT:8081}
+    address: ${MANAGEMENT_ADDRESS:0.0.0.0}
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_INCLUDE:health,info,metrics,prometheus,env,configprops,loggers,threaddump,heapdump,flyway}
+      base-path: /actuator
+      cors:
+        allowed-origins: ${MANAGEMENT_CORS_ORIGINS:http://localhost:3000,http://localhost:8080}
+        allowed-methods: GET,POST,OPTIONS
+  endpoint:
+    health:
+      enabled: ${MANAGEMENT_HEALTH_ENABLED:true}
+      show-details: ${MANAGEMENT_HEALTH_SHOW_DETAILS:when-authorized}
+      probes:
+        enabled: ${MANAGEMENT_HEALTH_PROBES_ENABLED:true}
+    metrics:
+      enabled: ${MANAGEMENT_METRICS_ENABLED:true}
+    prometheus:
+      enabled: ${MANAGEMENT_PROMETHEUS_ENABLED:true}
+    info:
+      enabled: ${MANAGEMENT_INFO_ENABLED:true}
+      env:
+        enabled: ${MANAGEMENT_INFO_ENV_ENABLED:true}
+      java:
+        enabled: ${MANAGEMENT_INFO_JAVA_ENABLED:true}
+      os:
+        enabled: ${MANAGEMENT_INFO_OS_ENABLED:true}
+  metrics:
+    export:
+      prometheus:
+        enabled: ${MANAGEMENT_PROMETHEUS_ENABLED:true}
+        descriptions: true
+        histogram-flavor: prometheus
+    tags:
+      application: ${spring.application.name}
+      environment: docker
+      profile: docker
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        http.server.duration: true
+        redis.commands: true
+      percentiles:
+        http.server.requests: 0.5,0.9,0.95,0.99
+        http.server.duration: 0.5,0.9,0.95,0.99
+        redis.commands: 0.5,0.9,0.95,0.99
+      slo:
+        http.server.requests: 50ms,100ms,200ms,500ms
+        http.server.duration: 50ms,100ms,200ms,500ms
+
+# ================================
+# Server Configuration (Docker)
+# ================================
+server:
+  port: ${SERVER_PORT:8080}
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:/}
+    session:
+      timeout: ${SERVER_SESSION_TIMEOUT:30m}
+      cookie:
+        http-only: true
+        secure: ${SERVER_SESSION_COOKIE_SECURE:false}
+        same-site: ${SERVER_SESSION_COOKIE_SAMESITE:Lax}
+  compression:
+    enabled: ${SERVER_COMPRESSION_ENABLED:true}
+    mime-types: ${SERVER_COMPRESSION_MIME_TYPES:text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml,application/xml+rss}
+    min-response-size: ${SERVER_COMPRESSION_MIN_RESPONSE_SIZE:1024}
+  error:
+    include-message: ${SERVER_ERROR_INCLUDE_MESSAGE:never}
+    include-binding-errors: ${SERVER_ERROR_INCLUDE_BINDING_ERRORS:never}
+    include-stacktrace: ${SERVER_ERROR_INCLUDE_STACKTRACE:never}
+    include-exception: ${SERVER_ERROR_INCLUDE_EXCEPTION:false}
+  shutdown: ${SERVER_SHUTDOWN:graceful}
+  tomcat:
+    threads:
+      max: ${TOMCAT_THREADS_MAX:200}
+      min-spare: ${TOMCAT_THREADS_MIN_SPARE:10}
+    connection-timeout: ${TOMCAT_CONNECTION_TIMEOUT:20000}
+    keep-alive-timeout: ${TOMCAT_KEEP_ALIVE_TIMEOUT:20000}
+    max-http-header-size: ${TOMCAT_MAX_HTTP_HEADER_SIZE:8192}
+    max-swallow-size: ${TOMCAT_MAX_SWALLOW_SIZE:2MB}
+    accept-count: ${TOMCAT_ACCEPT_COUNT:100}
+    processor-cache: ${TOMCAT_PROCESSOR_CACHE:200}
+
+# ================================
+# Docker Specific Properties
+# ================================
+app:
+  name: ${spring.application.name}
+  version: ${APP_VERSION:1.0.0-SNAPSHOT}
+  description: CampStation Backend (Docker)
+  environment: docker
+  debug:
+    enabled: ${DEBUG_ENABLED:false}
+    show-sql: ${DEBUG_SHOW_SQL:false}
+    show-bindings: ${DEBUG_SHOW_BINDINGS:false}
+  security:
+    jwt:
+      secret: ${JWT_SECRET:campstation-docker-secret-key-this-is-for-docker-environment-please-change-in-production-must-be-at-least-64-bytes-long-hs512}
+      expiration: ${JWT_EXPIRATION:3600000}
+      refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080,http://frontend:3000}
+  cache:
+    redis:
+      enabled: ${CACHE_REDIS_ENABLED:true}
+      ttl: ${CACHE_TTL:3600000}
+  database:
+    init:
+      enabled: ${DB_INIT_ENABLED:false}
+  file:
+    upload:
+      max-size: ${FILE_MAX_SIZE_BYTES:10485760}
+      allowed-extensions: ${FILE_ALLOWED_EXTENSIONS:jpg,jpeg,png,gif,pdf,doc,docx,txt,zip}
+  mail:
+    enabled: ${MAIL_ENABLED:true}
+    from: ${MAIL_FROM:docker@campstation.com}
+  external:
+    apis:
+      weather:
+        url: ${WEATHER_API_URL:http://api.openweathermap.org/data/2.5}
+        key: ${WEATHER_API_KEY:docker-weather-api-key}
+      map:
+        kakao:
+          key: ${KAKAO_MAP_API_KEY:docker-kakao-map-key}
+  monitoring:
+    enabled: ${MONITORING_ENABLED:true}
+    metrics:
+      enabled: ${METRICS_ENABLED:true}
+    tracing:
+      enabled: ${TRACING_ENABLED:false}
+  features:
+    swagger:
+      enabled: ${SWAGGER_ENABLED:false}
+      path: ${SWAGGER_PATH:/swagger-ui.html}
+    actuator:
+      enabled: ${ACTUATOR_ENABLED:true}
+      sensitive: ${ACTUATOR_SENSITIVE:true}
+    software.amazon.awssdk: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

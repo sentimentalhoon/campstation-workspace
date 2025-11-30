@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+
+# Gradle
+.gradle
+build/
+!build/libs/*.jar
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env.local
+.env.development
+.env.test
+
+# Documentation
+README.md
+HELP.md
+
+# Test files
+src/test/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# Node modules (if any)
+node_modules/
+
+# Uploads
+uploads/

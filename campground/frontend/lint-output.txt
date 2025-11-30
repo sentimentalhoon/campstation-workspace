@@ -1,0 +1,19 @@
+
+> campstation-frontend@0.1.0 lint
+> eslint
+
+
+C:\Users\say4u\WorkSpace\frontend\__tests__\components\features\GuestCounter.test.tsx
+   17:9  error  Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+   36:9  error  Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+   58:9  error  Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+   77:9  error  Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+   97:9  error  Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+  119:9  error  Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+  138:9  error  Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+  156:9  error  Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+  179:9  error  Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+  194:9  error  Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+
+??10 problems (10 errors, 0 warnings)
+

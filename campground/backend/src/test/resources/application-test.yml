@@ -1,0 +1,219 @@
+# ================================
+# CampStation Backend - Test Environment Configuration
+# ================================
+# 테스트 환경 최적화 설정
+# - H2 인메모리 DB 사용 (빠른 테스트)
+# - Flyway 비활성화 (테스트 데이터 독립성)
+# - 최소 리소스 사용
+# - 상세 로깅
+
+spring:
+  # ================================
+  # Test Profile Configuration
+  # ================================
+  config:
+    activate:
+      on-profile: test
+
+  # ================================
+  # Threads Configuration (Test)
+  # ================================
+  threads:
+    virtual:
+      enabled: true
+
+  # ================================
+  # Database Configuration (H2 for Testing)
+  # ================================
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+    hikari:
+      pool-name: TestHikariPool
+      maximum-pool-size: 2
+      minimum-idle: 1
+      connection-timeout: 10000
+      idle-timeout: 300000
+      max-lifetime: 600000
+
+  # ================================
+  # JPA Configuration (Test)
+  # ================================
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop # 테스트마다 스키마 재생성
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        show_sql: false
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+    show-sql: false
+    open-in-view: false
+
+  # ================================
+  # H2 Console (Disabled for Tests)
+  # ================================
+  h2:
+    console:
+      enabled: false
+
+  # ================================
+  # Flyway Configuration (Disabled for Tests)
+  # ================================
+  flyway:
+    enabled: false # 테스트에서는 JPA가 스키마 생성
+
+  # ================================
+  # Redis Configuration (Embedded for Tests)
+  # ================================
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 3000ms
+    database: 1 # 테스트용 별도 DB
+
+  # ================================
+  # Cache Configuration (Test)
+  # ================================
+  cache:
+    type: simple # 단순 캐시 사용 (Redis 대신)
+    cache-names:
+      - campgrounds
+      - sites
+      - reviews
+      - ownerDashboardStats
+
+  # ================================
+  # Mail Configuration (Test - No Real Sending)
+  # ================================
+  mail:
+    host: localhost
+    port: 1025
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+    test-connection: false
+
+  # ================================
+  # MinIO Configuration (Test - Mock)
+  # ================================
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  # ================================
+  # Security Configuration (Test)
+  # ================================
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: test-kakao-client-id
+            client-secret: test-kakao-secret
+            redirect-uri: http://localhost:3000/login/oauth2/code/kakao
+            authorization-grant-type: authorization_code
+            client-name: Kakao
+            scope:
+              - profile_nickname
+              - account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+# ================================
+# Application Configuration (Test)
+# ================================
+app:
+  # JWT Settings (Test)
+  jwt:
+    secret: test-secret-key-for-jwt-token-generation-minimum-256-bits-required-for-hs256-algorithm
+    access-token-validity: 3600000 # 1시간
+    refresh-token-validity: 86400000 # 24시간
+
+  # CORS Settings (Test - Allow All)
+  cors:
+    allowed-origins: "*"
+    allowed-methods: "*"
+    allowed-headers: "*"
+    allow-credentials: false
+    max-age: 3600
+
+  # File Upload (Test - Mock)
+  file:
+    upload-dir: ./test-uploads
+    max-size: 10485760 # 10MB
+    allowed-extensions: jpg,jpeg,png,gif,pdf
+
+  # MinIO (Test - Mock)
+  minio:
+    endpoint: http://localhost:9000
+    access-key: test-access-key
+    secret-key: test-secret-key
+    bucket-name: test-campstation
+    region: us-east-1
+
+  # Payment (Test - Mock)
+  payment:
+    toss:
+      client-key: test-client-key
+      secret-key: test-secret-key
+      success-url: http://localhost:3000/payment/success
+      fail-url: http://localhost:3000/payment/fail
+
+# ================================
+# Logging Configuration (Test)
+# ================================
+logging:
+  level:
+    root: INFO
+    com.campstation.camp: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.springframework.transaction: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# ================================
+# Management & Actuator (Disabled for Tests)
+# ================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+# ================================
+# Server Configuration (Test)
+# ================================
+server:
+  port: 0 # 랜덤 포트 사용 (테스트 격리)
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+    include-exception: true

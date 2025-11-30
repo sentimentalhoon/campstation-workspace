@@ -1,0 +1,1 @@
+export { BannerTable } from "./BannerTable";

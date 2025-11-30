@@ -1,0 +1,435 @@
+# ================================
+# CampStation Backend - Production Environment Configuration (Spring Boot 3.x)
+# ================================
+# 운영 환경 보안 및 성능 최적화 설정
+# - PostgreSQL 사용
+# - 보안 강화
+# - 모니터링 강화
+# - 성능 최적화
+# - Spring Boot 3.x 최신 기능 적용
+
+spring:
+  # ================================
+  # Threads Configuration (Production)
+  # ================================
+  threads:
+    virtual:
+      enabled: true
+
+  # ================================
+  # Multipart File Upload Configuration (Production)
+  # ================================
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: ${MULTIPART_MAX_FILE_SIZE:50MB} # 개별 파일 최대 크기 (50MB - 프로덕션용 확대)
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:100MB} # 요청당 최대 크기 (100MB)
+      file-size-threshold: ${MULTIPART_FILE_SIZE_THRESHOLD:2MB} # 메모리 임계값
+      location: ${MULTIPART_LOCATION:/tmp/uploads}
+
+  # ================================
+  # Database Configuration (PostgreSQL for Production)
+  # ================================
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://db:5432/campstation}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    username: ${DB_USERNAME:campstation_prod}
+    password: ${DB_PASSWORD:}
+    hikari:
+      pool-name: CampStationProdHikariPool
+      maximum-pool-size: ${DB_POOL_SIZE:50}
+      minimum-idle: ${DB_POOL_MIN_IDLE:10}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      leak-detection-threshold: ${DB_LEAK_DETECTION_THRESHOLD:60000}
+      validation-timeout: ${DB_VALIDATION_TIMEOUT:5000}
+      connection-test-query: SELECT 1
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        reWriteBatchedInserts: true
+        ssl: ${DB_SSL:false}
+        sslmode: ${DB_SSL_MODE:disable}
+
+  # ================================
+  # Redis Configuration (Production - Spring Boot 3.x)
+  # ================================
+  redis:
+    host: ${REDIS_HOST:redis}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: ${REDIS_TIMEOUT:2000ms}
+    database: ${REDIS_DATABASE:0}
+    connect-timeout: ${REDIS_CONNECT_TIMEOUT:2000ms}
+    lettuce:
+      pool:
+        max-active: ${REDIS_POOL_MAX_ACTIVE:20}
+        max-idle: ${REDIS_POOL_MAX_IDLE:10}
+        min-idle: ${REDIS_POOL_MIN_IDLE:5}
+        max-wait: ${REDIS_POOL_MAX_WAIT:5000ms}
+        time-between-eviction-runs: ${REDIS_POOL_TIME_BETWEEN_EVICTION:10s}
+      shutdown-timeout: ${REDIS_SHUTDOWN_TIMEOUT:100ms}
+      client-name: ${REDIS_CLIENT_NAME:campstation-prod}
+
+  # ================================
+  # JPA/Hibernate Configuration (Production)
+  # LazyInitializationException 방지 및 성능 최적화
+  # ================================
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:none}
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    show-sql: ${SHOW_SQL:false}
+    open-in-view: ${JPA_OPEN_IN_VIEW:false} # OSIV 비활성화 - 트랜잭션 경계 명확화
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: ${FORMAT_SQL:false}
+        generate_statistics: ${HIBERNATE_STATISTICS:false}
+        enable_lazy_load_no_trans: false # LazyInitializationException 엄격 모드
+        jdbc:
+          batch_size: ${JDBC_BATCH_SIZE:25}
+          order_inserts: ${JDBC_ORDER_INSERTS:true}
+          order_updates: ${JDBC_ORDER_UPDATES:true}
+          batch_versioned_data: ${JDBC_BATCH_VERSIONED_DATA:true}
+        query:
+          in_clause_parameter_padding: ${QUERY_IN_CLAUSE_PADDING:true}
+          fail_on_pagination_over_collection_fetch: true # 컬렉션 페치 시 페이징 경고
+        connection:
+          provider_disables_autocommit: ${HIBERNATE_AUTOCOMMIT:false}
+
+  # ================================
+  # Flyway Configuration (Production)
+  # ================================
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    out-of-order: false
+    clean-disabled: true
+
+  # ================================
+  # Cache Configuration (Production)
+  # ================================
+  cache:
+    type: ${CACHE_TYPE:redis}
+    redis:
+      time-to-live: ${CACHE_TTL:7200000} # 2시간
+      key-prefix: "${spring.application.name}-prod:cache:"
+      use-key-prefix: true
+      cache-null-values: ${CACHE_NULL_VALUES:false}
+      enable-statistics: ${CACHE_STATISTICS:false}
+      enable-time-to-idle: ${CACHE_TIME_TO_IDLE:true}
+
+  # ================================
+  # Mail Configuration (Production)
+  # ================================
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+        debug: ${MAIL_DEBUG:false}
+
+  # ================================
+  # Security Configuration (Production)
+  # ================================
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:}
+            client-secret: ${GOOGLE_CLIENT_SECRET:}
+            scope: openid,email,profile
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID:}
+            client-secret: ${KAKAO_CLIENT_SECRET:}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: ${KAKAO_REDIRECT_URI:https://yourdomain.com/login/oauth2/code/kakao}
+            scope: profile_nickname,profile_image,account_email
+            client-name: Kakao
+            provider: kakao
+          naver:
+            client-id: ${NAVER_CLIENT_ID:}
+            client-secret: ${NAVER_CLIENT_SECRET:}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: ${NAVER_REDIRECT_URI:https://yourdomain.com/login/oauth2/code/naver}
+            scope: name,email,profile_image
+            client-name: Naver
+            provider: naver
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+          naver:
+            authorization-uri: https://nid.naver.com/oauth2.0/authorize
+            token-uri: https://nid.naver.com/oauth2.0/token
+            user-info-uri: https://openapi.naver.com/v1/nid/me
+            user-name-attribute: response
+
+# ================================
+# JWT Configuration (Production)
+# ================================
+# 보안 강화: 액세스 토큰 만료 시간 단축
+jwt:
+  secret: ${JWT_SECRET:}
+  expiration: ${JWT_EXPIRATION:900000} # 15분 (보안 강화 - XSS 공격 피해 최소화)
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:2592000000} # 30일
+
+# ================================
+# CORS Configuration (Production)
+# ================================
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:https://yourdomain.com,https://www.yourdomain.com}
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+  allowed-headers: Content-Type,Authorization,X-Requested-With,Accept,Origin,X-Forwarded-For,X-Real-IP
+  allow-credentials: true
+  max-age: 3600
+
+# ================================
+# File Upload Configuration (Production)
+# ================================
+file:
+  upload:
+    path: ${FILE_UPLOAD_PATH:s3://campstation-prod/}
+    max-size: ${FILE_MAX_SIZE_BYTES:52428800} # 50MB
+    max-request-size: ${FILE_MAX_REQUEST_SIZE:52428800}
+
+# ================================
+# AWS S3 Configuration (Production)
+# ================================
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET_NAME:campstation-prod}
+      endpoint: ${AWS_S3_ENDPOINT:http://campstation-minio:9000} # MinIO HTTP endpoint
+      external-endpoint: ${AWS_S3_EXTERNAL_ENDPOINT:http://campstation-minio:9000}
+      public-endpoint: ${AWS_S3_PUBLIC_ENDPOINT:}
+      region: ${AWS_REGION:us-east-1}
+      path-style-access-enabled: ${AWS_S3_PATH_STYLE:true} # MinIO requires path-style access
+    stack:
+      auto: false
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID:}
+      secret-key: ${AWS_SECRET_ACCESS_KEY:}
+    region:
+      static: ${AWS_REGION:us-east-1}
+
+# ================================
+# Logging Configuration (Production)
+# ================================
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+    com.campstation: ${APP_LOG_LEVEL:INFO}
+    org.springframework.security: ${SECURITY_LOG_LEVEL:WARN}
+    org.springframework.web: ${WEB_LOG_LEVEL:WARN}
+    org.springframework.data.redis: ${REDIS_LOG_LEVEL:WARN}
+    org.hibernate: ${HIBERNATE_LOG_LEVEL:WARN}
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:WARN}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${SQL_BINDING_LOG_LEVEL:WARN}
+    io.lettuce: ${LETTUCE_LOG_LEVEL:WARN}
+    software.amazon.awssdk: ${AWS_LOG_LEVEL:WARN}
+    com.zaxxer.hikari: ${HIKARI_LOG_LEVEL:WARN}
+    org.springframework.boot.autoconfigure: ${AUTO_CONFIG_LOG_LEVEL:WARN}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE:/app/logs/campstation-prod.log}
+  logback:
+    rollingpolicy:
+      max-file-size: ${LOG_MAX_FILE_SIZE:50MB}
+      max-history: ${LOG_MAX_HISTORY:30}
+      total-size-cap: ${LOG_TOTAL_SIZE_CAP:1GB}
+      file-name-pattern: ${LOG_FILE_PATTERN:%d{yyyy-MM-dd}.%i.gz}
+
+# ================================
+# Management Configuration (Production)
+# ================================
+management:
+  # server.port를 설정하지 않으면 메인 서버 포트(8080) 사용
+  # 같은 포트 사용 시 address 설정 불가
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_INCLUDE:health,info,metrics,prometheus,env,configprops,loggers}
+      base-path: /actuator
+      cors:
+        allowed-origins: ${MANAGEMENT_CORS_ORIGINS:}
+        allowed-methods: GET,OPTIONS
+  endpoint:
+    health:
+      enabled: ${MANAGEMENT_HEALTH_ENABLED:true}
+      show-details: ${MANAGEMENT_HEALTH_SHOW_DETAILS:never}
+      probes:
+        enabled: ${MANAGEMENT_HEALTH_PROBES_ENABLED:true}
+    metrics:
+      enabled: ${MANAGEMENT_METRICS_ENABLED:true}
+    prometheus:
+      enabled: ${MANAGEMENT_PROMETHEUS_ENABLED:true}
+    info:
+      enabled: ${MANAGEMENT_INFO_ENABLED:true}
+      env:
+        enabled: ${MANAGEMENT_INFO_ENV_ENABLED:false}
+      java:
+        enabled: ${MANAGEMENT_INFO_JAVA_ENABLED:true}
+      os:
+        enabled: ${MANAGEMENT_INFO_OS_ENABLED:true}
+  metrics:
+    export:
+      prometheus:
+        enabled: ${MANAGEMENT_PROMETHEUS_ENABLED:true}
+        descriptions: true
+        histogram-flavor: prometheus
+    tags:
+      application: ${spring.application.name}
+      environment: production
+      profile: prod
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        http.server.duration: true
+        redis.commands: true
+      percentiles:
+        http.server.requests: 0.5,0.9,0.95,0.99
+        http.server.duration: 0.5,0.9,0.95,0.99
+        redis.commands: 0.5,0.9,0.95,0.99
+      slo:
+        http.server.requests: 100ms,200ms,500ms,1000ms
+        http.server.duration: 100ms,200ms,500ms,1000ms
+  security:
+    enabled: ${MANAGEMENT_SECURITY_ENABLED:true}
+
+# ================================
+# Server Configuration (Production)
+# ================================
+server:
+  port: ${SERVER_PORT:8080}
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:/}
+    session:
+      timeout: ${SERVER_SESSION_TIMEOUT:30m}
+      cookie:
+        http-only: true
+        secure: ${SERVER_SESSION_COOKIE_SECURE:true}
+        same-site: ${SERVER_SESSION_COOKIE_SAMESITE:Strict}
+  compression:
+    enabled: ${SERVER_COMPRESSION_ENABLED:true}
+    mime-types: ${SERVER_COMPRESSION_MIME_TYPES:text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml,application/xml+rss}
+    min-response-size: ${SERVER_COMPRESSION_MIN_RESPONSE_SIZE:1024}
+  error:
+    include-message: ${SERVER_ERROR_INCLUDE_MESSAGE:never}
+    include-binding-errors: ${SERVER_ERROR_INCLUDE_BINDING_ERRORS:never}
+    include-stacktrace: ${SERVER_ERROR_INCLUDE_STACKTRACE:never}
+    include-exception: ${SERVER_ERROR_INCLUDE_EXCEPTION:false}
+  shutdown: ${SERVER_SHUTDOWN:graceful}
+  tomcat:
+    threads:
+      max: ${TOMCAT_THREADS_MAX:400}
+      min-spare: ${TOMCAT_THREADS_MIN_SPARE:20}
+    connection-timeout: ${TOMCAT_CONNECTION_TIMEOUT:20000}
+    keep-alive-timeout: ${TOMCAT_KEEP_ALIVE_TIMEOUT:20000}
+    max-http-header-size: ${TOMCAT_MAX_HTTP_HEADER_SIZE:8192}
+    max-swallow-size: ${TOMCAT_MAX_SWALLOW_SIZE:2MB}
+    accept-count: ${TOMCAT_ACCEPT_COUNT:200}
+    processor-cache: ${TOMCAT_PROCESSOR_CACHE:400}
+  forward-headers-strategy: ${SERVER_FORWARD_HEADERS_STRATEGY:framework}
+
+# ================================
+# Production Specific Properties
+# ================================
+app:
+  name: ${spring.application.name}
+  version: ${APP_VERSION:1.0.0}
+  description: CampStation Backend (Production)
+  environment: production
+  debug:
+    enabled: ${DEBUG_ENABLED:false}
+    show-sql: ${DEBUG_SHOW_SQL:false}
+    show-bindings: ${DEBUG_SHOW_BINDINGS:false}
+  security:
+    jwt:
+      secret: ${JWT_SECRET:}
+      expiration: ${JWT_EXPIRATION:1800000}
+      refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:https://yourdomain.com,https://www.yourdomain.com}
+  cache:
+    redis:
+      enabled: ${CACHE_REDIS_ENABLED:true}
+      ttl: ${CACHE_TTL:7200000}
+  database:
+    init:
+      enabled: ${DB_INIT_ENABLED:false}
+  file:
+    upload:
+      max-size: ${FILE_MAX_SIZE_BYTES:52428800}
+      allowed-extensions: ${FILE_ALLOWED_EXTENSIONS:jpg,jpeg,png,gif,pdf,doc,docx,txt,zip}
+  mail:
+    enabled: ${MAIL_ENABLED:true}
+    from: ${MAIL_FROM:noreply@yourdomain.com}
+  external:
+    apis:
+      weather:
+        url: ${WEATHER_API_URL:http://api.openweathermap.org/data/2.5}
+        key: ${WEATHER_API_KEY:}
+      map:
+        kakao:
+          key: ${KAKAO_MAP_API_KEY:}
+  monitoring:
+    enabled: ${MONITORING_ENABLED:true}
+    metrics:
+      enabled: ${METRICS_ENABLED:true}
+    tracing:
+      enabled: ${TRACING_ENABLED:true}
+  features:
+    swagger:
+      enabled: ${SWAGGER_ENABLED:false}
+      path: ${SWAGGER_PATH:/swagger-ui.html}
+    actuator:
+      enabled: ${ACTUATOR_ENABLED:true}
+      sensitive: ${ACTUATOR_SENSITIVE:true}
+
+# ================================
+# Rate Limiting Configuration (Production)
+# ================================
+# 운영 환경: 보안 및 리소스 보호를 위한 엄격한 제한
+rate-limit:
+  auth:
+    capacity: ${RATE_LIMIT_AUTH_CAPACITY:50} # 인증 API: 50 req/min (보안 강화)
+    duration-minutes: ${RATE_LIMIT_AUTH_DURATION:1} # 1분당
+  payment:
+    capacity: ${RATE_LIMIT_PAYMENT_CAPACITY:30} # 결제 API: 30 req/min (민감한 작업)
+    duration-minutes: ${RATE_LIMIT_PAYMENT_DURATION:1} # 1분당
+  api:
+    capacity: ${RATE_LIMIT_API_CAPACITY:300} # 일반 API: 300 req/min
+    duration-minutes: ${RATE_LIMIT_API_DURATION:1} # 1분당
+
+# ================================
+# JVM Configuration (Production)
+# ================================
+JAVA_OPTS: ${JAVA_OPTS:-Xmx2048m -Xms1024m -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app/logs/heapdump.hprof -Djava.security.egd=file:/dev/./urandom -Dspring.jmx.enabled=false -XX:+DisableExplicitGC -XX:+UseStringDeduplication -XX:+OptimizeStringConcat}

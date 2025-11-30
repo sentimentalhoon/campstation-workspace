@@ -1,0 +1,592 @@
+# ================================
+# CampStation Backend - Main Application Configuration (Spring Boot 3.x)
+# ================================
+# 메인 애플리케이션 설정 파일
+# - 기본 프로필: dev (개발 환경)
+# - 환경별 설정은 application-{profile}.yml에서 오버라이드됨
+# - Spring Boot 3.x의 최신 기능들을 활용한 최적화 설정
+
+spring:
+  application:
+    name: campstation # 애플리케이션 이름 (서비스 디스커버리, 메트릭 등에 사용)
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev} # 활성화할 프로필 (dev/docker/prod/local)
+
+  # ================================
+  # Threads Configuration (Spring Boot 3.x)
+  # ================================
+  # Spring Boot 3.x의 Virtual Threads 기능 활성화
+  # - 경량 스레드로 높은 동시성 처리 가능
+  # - 기존 플랫폼 스레드보다 메모리 효율적
+  threads:
+    virtual:
+      enabled: true # Virtual Threads 활성화
+
+  # ================================
+  # Multipart File Upload Configuration (Spring Boot 3.x)
+  # ================================
+  # 파일 업로드 처리 설정
+  # - 이미지, 문서 등 멀티파트 요청 처리
+  # - 보안 및 성능을 위한 크기 제한 설정
+  servlet:
+    multipart:
+      enabled: true # 멀티파트 업로드 활성화
+      max-file-size: ${MULTIPART_MAX_FILE_SIZE:10MB} # 개별 파일 최대 크기 (10MB)
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:50MB} # 요청당 최대 크기 (50MB)
+      file-size-threshold: ${MULTIPART_FILE_SIZE_THRESHOLD:1MB} # 메모리 임계값 (1MB 이상은 디스크에 저장)
+      location: ${MULTIPART_LOCATION:${java.io.tmpdir}} # 임시 파일 저장 위치
+
+  # ================================
+  # Database Configuration
+  # ================================
+  # 데이터베이스 연결 설정 (환경 변수로 오버라이드 가능)
+  # - 기본값: H2 인메모리 DB (로컬 개발용)
+  # - 프로필별로 다른 DB로 변경 가능
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:campstation} # DB 연결 URL
+    username: ${DB_USERNAME:sa} # DB 사용자명
+    password: ${DB_PASSWORD:} # DB 비밀번호
+    driver-class-name: ${DB_DRIVER:org.h2.Driver} # JDBC 드라이버 클래스
+    hikari: # HikariCP 커넥션 풀 설정 (고성능 DB 커넥션 풀)
+      pool-name: CampStationHikariPool # 커넥션 풀 이름
+      maximum-pool-size: ${DB_POOL_SIZE:20} # 최대 커넥션 수
+      minimum-idle: ${DB_POOL_MIN_IDLE:5} # 최소 유휴 커넥션 수
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000} # 커넥션 타임아웃 (30초)
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000} # 유휴 타임아웃 (10분)
+      max-lifetime: ${DB_MAX_LIFETIME:1800000} # 최대 수명 (30분)
+      leak-detection-threshold: 60000 # 커넥션 누수 감지 임계값 (60초)
+      validation-timeout: 5000 # 유효성 검증 타임아웃 (5초)
+      connection-test-query: SELECT 1 # 커넥션 테스트 쿼리
+      data-source-properties: # 추가 데이터소스 속성
+        cachePrepStmts: true # PreparedStatement 캐싱 활성화
+        prepStmtCacheSize: 250 # 캐시 크기
+        prepStmtCacheSqlLimit: 2048 # SQL 길이 제한
+        useServerPrepStmts: true # 서버 사이드 PreparedStatement 사용
+
+  # ================================
+  # Redis Configuration (Spring Boot 3.x 최적화)
+  # ================================
+  # Redis 캐시/세션 저장소 설정
+  # - Spring Boot 3.x의 Lettuce 드라이버 사용 (비동기, Netty 기반)
+  # - 커넥션 풀을 통한 효율적인 Redis 연결 관리
+  redis:
+    host: ${REDIS_HOST:redis} # Redis 서버 호스트
+    port: ${REDIS_PORT:6379} # Redis 서버 포트
+    password: ${REDIS_PASSWORD:} # Redis 비밀번호 (없으면 빈 값)
+    timeout: ${REDIS_TIMEOUT:5000ms} # Redis 명령어 타임아웃
+    database: ${REDIS_DATABASE:0} # Redis 데이터베이스 번호 (0-15)
+    connect-timeout: 2000ms # 초기 연결 타임아웃
+    lettuce: # Lettuce 클라이언트 설정
+      pool: # 커넥션 풀 설정
+        max-active: ${REDIS_POOL_MAX_ACTIVE:8} # 최대 활성 커넥션
+        max-idle: ${REDIS_POOL_MAX_IDLE:8} # 최대 유휴 커넥션
+        min-idle: ${REDIS_POOL_MIN_IDLE:0} # 최소 유휴 커넥션
+        max-wait: -1ms # 커넥션 대기 시간 (-1: 무제한)
+        time-between-eviction-runs: 10s # 제거 스레드 실행 간격
+      shutdown-timeout: 100ms # 셧다운 타임아웃
+      client-name: campstation-backend # 클라이언트 식별자
+
+  # ================================
+  # Cache Configuration (Spring Boot 3.x)
+  # ================================
+  # Spring Cache 추상화를 통한 캐시 관리
+  # - Redis를 캐시 저장소로 사용
+  # - 애플리케이션 전역 캐시 설정
+  cache:
+    type: ${CACHE_TYPE:redis} # 캐시 타입 (redis, caffeine, none 등)
+    redis: # Redis 캐시 설정
+      time-to-live: ${CACHE_TTL:7200000} # 캐시 항목의 기본 TTL (2시간)
+      key-prefix: "${spring.application.name}:cache:" # 캐시 키 접두사
+      use-key-prefix: true # 키 접두사 사용 여부
+      cache-null-values: false # null 값 캐싱 여부
+      enable-statistics: ${CACHE_STATISTICS:false} # 캐시 통계 수집
+      enable-time-to-idle: true # 유휴 시간 기반 만료
+
+  # ================================
+  # JPA/Hibernate Configuration (Spring Boot 3.x)
+  # ================================
+  # JPA(Java Persistence API) 및 Hibernate ORM 설정
+  # - 데이터베이스 스키마 자동 관리
+  # - SQL 쿼리 최적화 및 로깅
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:validate} # 스키마 자동 생성 전략 (validate/validate/update/create-drop)
+      naming: # 네이밍 전략 설정
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy # 물리적 네이밍 전략 (카멜케이스 -> 스네이크케이스)
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy # 암시적 네이밍 전략
+    show-sql: ${SHOW_SQL:false} # SQL 쿼리 로깅 여부
+    open-in-view: false # Open Session in View 패턴 비활성화 (성능 및 메모리 누수 방지)
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect # Hibernate 방언 (DB 종류에 따라 자동 설정)
+        format_sql: ${FORMAT_SQL:false} # SQL 포맷팅 여부
+        generate_statistics: ${HIBERNATE_STATISTICS:false} # Hibernate 통계 수집
+        jdbc:
+          batch_size: ${JDBC_BATCH_SIZE:25} # JDBC 배치 크기
+          order_inserts: true # INSERT 문 순서 최적화
+          order_updates: true # UPDATE 문 순서 최적화
+          batch_versioned_data: true # 버전이 있는 데이터 배치 처리
+          time_zone: UTC # JDBC 타임존 설정 (UTC)
+        query:
+          in_clause_parameter_padding: true # IN 절 파라미터 패딩 최적화
+        connection:
+          provider_disables_autocommit: true # 자동 커밋 비활성화
+
+  # ================================
+  # Jackson Configuration
+  # ================================
+  # JSON 직렬화/역직렬화 설정
+  jackson:
+    time-zone: UTC # Jackson 타임존 설정 (UTC)
+    date-format: yyyy-MM-dd'T'HH:mm:ss'Z' # 날짜 포맷 (ISO-8601 with UTC indicator)
+    serialization:
+      write-dates-as-timestamps: false # 날짜를 타임스탬프가 아닌 ISO-8601 형식으로 직렬화
+
+  # ================================
+  # Flyway Configuration (Spring Boot 3.x)
+  # ================================
+  # 데이터베이스 마이그레이션 도구 설정
+  # - DB 스키마 버전 관리 및 마이그레이션 자동화
+  # - 프로덕션 환경에서 안전한 DB 변경
+  flyway:
+    enabled: ${FLYWAY_ENABLED:false} # Flyway 활성화 여부
+    locations: classpath:db/migration # 마이그레이션 파일 위치
+    baseline-on-migrate: true # 기존 DB에 대한 베이스라인 생성
+    validate-on-migrate: true # 마이그레이션 전 검증
+    out-of-order: false # 순서 없는 마이그레이션 허용 여부
+    clean-disabled: ${FLYWAY_CLEAN_DISABLED:true} # clean 명령어 비활성화 (프로덕션 안전)
+    sql-migration-prefix: V # SQL 마이그레이션 파일 접두사
+    sql-migration-separator: __ # 버전과 설명 구분자
+    sql-migration-suffixes: .sql # 마이그레이션 파일 확장자
+    placeholder-replacement: true # 플레이스홀더 교체 활성화
+    mixed: false # Java와 SQL 마이그레이션 혼용 여부
+
+  # ================================
+  # Mail Configuration (Spring Boot 3.x)
+  # ================================
+  # 이메일 발송 설정 (SMTP)
+  # - 사용자 알림, 인증 메일 등에 사용
+  # - 개발 환경에서는 MailHog 사용 권장
+  mail:
+    host: ${MAIL_HOST:mailhog} # SMTP 서버 호스트
+    port: ${MAIL_PORT:1025} # SMTP 서버 포트
+    username: ${MAIL_USERNAME:} # SMTP 인증 사용자명
+    password: ${MAIL_PASSWORD:} # SMTP 인증 비밀번호
+    protocol: smtp # 메일 프로토콜
+    properties:
+      mail:
+        smtp:
+          auth: false # SMTP 인증 사용 여부
+          starttls: # STARTTLS 설정
+            enable: false # STARTTLS 활성화 여부
+          connectiontimeout: 5000 # 연결 타임아웃 (5초)
+          timeout: 3000 # 읽기 타임아웃 (3초)
+          writetimeout: 5000 # 쓰기 타임아웃 (5초)
+        debug: ${MAIL_DEBUG:true} # SMTP 디버그 모드
+
+# ================================
+# JWT Configuration
+# ================================
+# JSON Web Token 설정
+# - 사용자 인증 및 권한 부여에 사용
+# - 액세스 토큰과 리프레시 토큰 관리
+# - 보안 강화: 액세스 토큰 만료 시간 단축 (30분 → 15분)
+jwt:
+  secret: ${JWT_SECRET:} # JWT 서명에 사용할 시크릿 키 (필수)
+  expiration: ${JWT_EXPIRATION:900000} # 액세스 토큰 만료 시간 (15분 - 보안 강화)
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:2592000000} # 리프레시 토큰 만료 시간 (30일)
+
+# ================================
+# CORS Configuration
+# ================================
+# Cross-Origin Resource Sharing 설정
+# - 프론트엔드와 백엔드 간 크로스 도메인 요청 허용
+# - 보안과 개발 편의성 간의 균형
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080} # 허용할 Origin 목록
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH # 허용할 HTTP 메소드
+  allowed-headers: "*" # 허용할 헤더 (*: 모든 헤더 허용)
+  allow-credentials: true # 쿠키/인증 정보 포함 여부
+  max-age: 3600 # preflight 요청 캐시 시간 (1시간)
+
+# ================================
+# File Upload Configuration
+# ================================
+# 파일 업로드 설정
+# - 이미지, 문서 등 파일 업로드 처리
+# - 보안 및 성능을 위한 크기 제한
+# - S3 또는 로컬 파일 시스템 저장
+file:
+  upload:
+    path: ${FILE_UPLOAD_PATH:s3://campstation/} # 파일 저장 경로 (S3 버킷 또는 로컬 경로)
+    allowed-extensions: jpg,jpeg,png,gif,webp # 허용할 파일 확장자
+    max-size: ${FILE_MAX_SIZE_BYTES:52428800} # 개별 파일 최대 크기 (50MB)
+    max-request-size: ${FILE_MAX_REQUEST_SIZE:52428800} # 요청당 최대 크기 (50MB)
+
+# ================================
+# AWS S3 Configuration
+# ================================
+# Amazon S3 클라우드 스토리지 설정
+# - 파일 업로드 및 정적 리소스 저장
+# - 고가용성 및 확장성 제공
+cloud:
+  aws:
+    s3: # S3 서비스 설정
+      bucket: ${AWS_S3_BUCKET_NAME:campstation} # S3 버킷 이름
+      endpoint: ${CLOUD_AWS_S3_ENDPOINT:https://s3.amazonaws.com} # S3 엔드포인트 URL
+      external-endpoint: ${CLOUD_AWS_S3_EXTERNAL_ENDPOINT:http://localhost:9000} # Internal MinIO endpoint
+      public-endpoint: ${CLOUD_AWS_S3_PUBLIC_ENDPOINT:https://localhost/storage} # Public HTTPS endpoint
+      region: ${AWS_REGION:us-east-1} # AWS 리전
+      path-style-access-enabled: ${AWS_S3_PATH_STYLE:false} # 경로 스타일 액세스 사용 여부
+    stack:
+      auto: false # 자동 AWS 서비스 스택 생성 비활성화
+    credentials: # AWS 인증 정보
+      access-key: ${AWS_ACCESS_KEY_ID:} # AWS 액세스 키 ID
+      secret-key: ${AWS_SECRET_ACCESS_KEY:} # AWS 시크릿 액세스 키
+    region:
+      static: ${AWS_REGION:us-east-1} # 고정 리전 설정
+
+# ================================
+# Logging Configuration (Spring Boot 3.x)
+# ================================
+# 애플리케이션 로깅 설정
+# - 구조화된 로그 포맷팅 및 레벨 관리
+# - 파일 롤링 및 보존 정책
+# - 성능 모니터링을 위한 상세 로깅
+logging:
+  level: # 로거별 로그 레벨 설정
+    root: ${LOG_LEVEL:INFO} # 기본 로그 레벨
+    com.campstation: ${APP_LOG_LEVEL:INFO} # 애플리케이션 패키지 로그 레벨
+    org.springframework.security: ${SECURITY_LOG_LEVEL:WARN} # Spring Security 로그 레벨
+    org.springframework.web: ${WEB_LOG_LEVEL:WARN} # Spring Web 로그 레벨
+    org.springframework.data.redis: ${REDIS_LOG_LEVEL:WARN} # Redis 관련 로그 레벨
+    org.hibernate: ${HIBERNATE_LOG_LEVEL:WARN} # Hibernate ORM 로그 레벨
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:WARN} # SQL 쿼리 로그 레벨
+    org.hibernate.type.descriptor.sql.BasicBinder: ${SQL_BINDING_LOG_LEVEL:TRACE} # SQL 파라미터 바인딩 로그
+    io.lettuce: ${LETTUCE_LOG_LEVEL:WARN} # Lettuce Redis 클라이언트 로그 레벨
+    software.amazon.awssdk: ${AWS_LOG_LEVEL:WARN} # AWS SDK 로그 레벨
+    com.zaxxer.hikari: ${HIKARI_LOG_LEVEL:INFO} # HikariCP 커넥션 풀 로그 레벨
+  pattern: # 로그 포맷 패턴
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" # 콘솔 로그 포맷
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" # 파일 로그 포맷
+  file: # 파일 로그 설정
+    name: ${LOG_FILE:/app/logs/campstation.log} # 로그 파일 경로
+  logback: # Logback 설정
+    rollingpolicy: # 로그 파일 롤링 정책
+      max-file-size: ${LOG_MAX_FILE_SIZE:50MB} # 개별 로그 파일 최대 크기
+      max-history: ${LOG_MAX_HISTORY:30} # 보존할 로그 파일 수
+      total-size-cap: ${LOG_TOTAL_SIZE_CAP:1GB} # 총 로그 파일 크기 제한
+      file-name-pattern: ${LOG_FILE_PATTERN:%d{yyyy-MM-dd}.%i.gz} # 롤링 파일 이름 패턴
+
+# ================================
+# Management Configuration (Spring Boot 3.x Actuator)
+# ================================
+# Spring Boot Actuator 모니터링 엔드포인트 설정
+# - 애플리케이션 상태 모니터링 및 관리
+# - 메트릭 수집 및 Prometheus 연동
+# - 운영 환경 모니터링을 위한 헬스체크
+management:
+  # server: # 관리 서버 설정 (메인 서버와 동일 포트 사용)
+  # port: ${MANAGEMENT_PORT:8081}  # 메인 포트와 동일하게 사용
+  # address: ${MANAGEMENT_ADDRESS:127.0.0.1}  # 별도 포트가 아니므로 address도 설정 불가
+  endpoints: # Actuator 엔드포인트 설정
+    web: # 웹 엔드포인트 설정
+      exposure: # 엔드포인트 노출 설정
+        include: ${MANAGEMENT_ENDPOINTS_INCLUDE:health,info,metrics,prometheus,env,configprops,loggers,threaddump,heapdump} # 노출할 엔드포인트 목록
+      base-path: /actuator # Actuator 기본 경로
+      cors: # CORS 설정
+        allowed-origins: ${MANAGEMENT_CORS_ORIGINS:http://localhost:3000} # 허용할 Origin
+        allowed-methods: GET,POST # 허용할 HTTP 메소드
+  endpoint: # 개별 엔드포인트 설정
+    health: # 헬스체크 엔드포인트
+      enabled: ${MANAGEMENT_HEALTH_ENABLED:true} # 헬스체크 활성화
+      show-details: ${MANAGEMENT_HEALTH_SHOW_DETAILS:when-authorized} # 상세 정보 표시 조건
+      probes: # 헬스 프로브 설정 (Kubernetes용)
+        enabled: ${MANAGEMENT_HEALTH_PROBES_ENABLED:true} # 프로브 활성화
+    metrics: # 메트릭 엔드포인트
+      enabled: ${MANAGEMENT_METRICS_ENABLED:true} # 메트릭 활성화
+    prometheus: # Prometheus 메트릭 엔드포인트
+      enabled: ${MANAGEMENT_PROMETHEUS_ENABLED:true} # Prometheus 활성화
+    info: # 애플리케이션 정보 엔드포인트
+      enabled: ${MANAGEMENT_INFO_ENABLED:true} # 정보 엔드포인트 활성화
+      env: # 환경 정보 포함
+        enabled: ${MANAGEMENT_INFO_ENV_ENABLED:true} # 환경 변수 정보 활성화
+  metrics: # 메트릭 수출 설정
+    export:
+      prometheus: # Prometheus 메트릭 수출
+        enabled: ${MANAGEMENT_PROMETHEUS_ENABLED:true} # Prometheus 수출 활성화
+        descriptions: true # 메트릭 설명 포함
+        histogram-flavor: prometheus # 히스토그램 형식
+    tags: # 메트릭 태그
+      application: ${spring.application.name} # 애플리케이션 태그
+      environment: ${SPRING_PROFILES_ACTIVE:default} # 환경 태그
+    distribution: # 메트릭 분포 설정
+      percentiles-histogram: # 백분위수 히스토그램
+        http.server.requests: true # HTTP 요청 히스토그램
+        http.server.duration: true # HTTP 응답 시간 히스토그램
+      percentiles: # 백분위수 값
+        http.server.requests: 0.5,0.9,0.95,0.99 # HTTP 요청 백분위수
+        http.server.duration: 0.5,0.9,0.95,0.99 # HTTP 응답 시간 백분위수
+      slo: # Service Level Objective
+        http.server.requests: 100ms,500ms,1000ms,2000ms # HTTP 요청 SLO
+        http.server.duration: 100ms,500ms,1000ms,2000ms # HTTP 응답 시간 SLO
+
+# ================================
+# Server Configuration (Spring Boot 3.x)
+# ================================
+# 내장 Tomcat 서버 설정
+# - HTTP 요청 처리 및 응답 최적화
+# - 보안 및 성능 튜닝
+server:
+  port: ${SERVER_PORT:8080} # 서버 포트
+  address: ${SERVER_ADDRESS:0.0.0.0} # 바인딩 주소 (0.0.0.0: 모든 인터페이스)
+  servlet: # 서블릿 설정
+    context-path: ${SERVER_CONTEXT_PATH:/} # 컨텍스트 경로
+    session: # 세션 설정
+      timeout: ${SERVER_SESSION_TIMEOUT:30m} # 세션 타임아웃 (30분)
+      cookie: # 세션 쿠키 설정
+        http-only: true # HttpOnly 플래그 (XSS 방지)
+        secure: ${SERVER_SESSION_COOKIE_SECURE:false} # Secure 플래그 (HTTPS에서만 전송)
+        same-site: ${SERVER_SESSION_COOKIE_SAMESITE:Lax} # SameSite 속성
+  compression: # 응답 압축 설정
+    enabled: ${SERVER_COMPRESSION_ENABLED:true} # 압축 활성화
+    mime-types: ${SERVER_COMPRESSION_MIME_TYPES:text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml,application/xml+rss} # 압축할 MIME 타입
+    min-response-size: ${SERVER_COMPRESSION_MIN_RESPONSE_SIZE:1024} # 최소 압축 크기 (1KB)
+  error: # 에러 페이지 설정
+    include-message: ${SERVER_ERROR_INCLUDE_MESSAGE:never} # 에러 메시지 포함 여부
+    include-binding-errors: ${SERVER_ERROR_INCLUDE_BINDING_ERRORS:never} # 바인딩 에러 포함 여부
+    include-stacktrace: ${SERVER_ERROR_INCLUDE_STACKTRACE:never} # 스택 트레이스 포함 여부
+    include-exception: ${SERVER_ERROR_INCLUDE_EXCEPTION:false} # 예외 정보 포함 여부
+  shutdown: ${SERVER_SHUTDOWN:graceful} # 셧다운 모드 (graceful: 정상 종료)
+  tomcat: # Tomcat 서버 설정
+    threads: # 스레드 풀 설정
+      max: ${TOMCAT_THREADS_MAX:200} # 최대 스레드 수
+      min-spare: ${TOMCAT_THREADS_MIN_SPARE:10} # 최소 대기 스레드 수
+    connection-timeout: ${TOMCAT_CONNECTION_TIMEOUT:20000} # 연결 타임아웃 (20초)
+    keep-alive-timeout: ${TOMCAT_KEEP_ALIVE_TIMEOUT:20000} # Keep-Alive 타임아웃 (20초)
+    max-http-header-size: ${TOMCAT_MAX_HTTP_HEADER_SIZE:8192} # 최대 HTTP 헤더 크기 (8KB)
+    max-swallow-size: ${TOMCAT_MAX_SWALLOW_SIZE:2MB} # 최대 요청 본문 크기
+    accept-count: ${TOMCAT_ACCEPT_COUNT:100} # 대기 큐 크기
+    processor-cache: ${TOMCAT_PROCESSOR_CACHE:200} # 프로세서 캐시 크기
+
+# ================================
+# Info Configuration
+# ================================
+info:
+  app:
+    name: ${spring.application.name}
+    description: CampStation Backend Application
+    version: ${APP_VERSION:@project.version@}
+    java:
+      version: ${java.version}
+    build:
+      time: ${APP_BUILD_TIME:@build.timestamp@}
+
+# ================================
+# Custom Application Properties
+# ================================
+# 애플리케이션 전용 사용자 정의 속성
+# - Spring Boot 표준 속성 외의 커스텀 설정
+# - 비즈니스 로직 관련 설정들
+app:
+  name: ${spring.application.name} # 애플리케이션 이름
+  version: ${APP_VERSION:1.0.0} # 애플리케이션 버전
+  description: CampStation - Camping Site Reservation Platform # 애플리케이션 설명
+  security: # 보안 관련 설정
+    jwt: # JWT 설정
+      secret: ${JWT_SECRET:} # JWT 서명 시크릿 키
+      expiration: ${JWT_EXPIRATION:1800000} # 액세스 토큰 만료 시간
+      refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 리프레시 토큰 만료 시간
+    cors: # CORS 설정
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080} # 허용할 Origin
+  cache: # 캐시 설정
+    redis: # Redis 캐시 설정
+      enabled: ${CACHE_REDIS_ENABLED:true} # Redis 캐시 활성화
+      ttl: ${CACHE_TTL:7200000} # 캐시 TTL (기본값 2시간)
+  database: # 데이터베이스 설정
+    init: # DB 초기화 설정
+      enabled: ${DB_INIT_ENABLED:false} # DB 초기화 활성화 여부
+  file: # 파일 관련 설정
+    upload: # 파일 업로드 설정
+      max-size: ${FILE_MAX_SIZE_BYTES:52428800} # 최대 파일 크기
+      allowed-extensions: ${FILE_ALLOWED_EXTENSIONS:jpg,jpeg,png,gif,pdf,doc,docx} # 허용 확장자
+  mail: # 메일 설정
+    enabled: ${MAIL_ENABLED:false} # 메일 기능 활성화
+    from: ${MAIL_FROM:noreply@campstation.com} # 발신자 이메일
+  external: # 외부 API 설정
+    apis: # 외부 API 연동 설정
+      weather: # 날씨 API 설정
+        url: ${WEATHER_API_URL:} # 날씨 API URL
+        key: ${WEATHER_API_KEY:} # 날씨 API 키
+      map: # 지도 API 설정
+        kakao: # Kakao 지도 API 설정
+          key: ${KAKAO_MAP_API_KEY:} # Kakao 지도 API 키
+  monitoring: # 모니터링 설정
+    enabled: ${MONITORING_ENABLED:true} # 모니터링 활성화
+    metrics: # 메트릭 설정
+      enabled: ${METRICS_ENABLED:true} # 메트릭 수집 활성화
+    tracing: # 트레이싱 설정
+      enabled: ${TRACING_ENABLED:false} # 분산 트레이싱 활성화
+      time-to-live: 3600000ms # 트레이스 데이터 TTL (1시간)
+      key-prefix: "campstation:" # 캐시 키 접두사
+      use-key-prefix: true # 키 접두사 사용
+      cache-null-values: false # null 값 캐싱
+      enable-statistics: true # 통계 수집 활성화
+
+  # ================================
+  # JPA/Hibernate Configuration
+  # ================================
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:update}
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    show-sql: ${SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: ${FORMAT_SQL:false}
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+          order_inserts: true
+          order_updates: true
+        generate_statistics: ${HIBERNATE_STATISTICS:false}
+    open-in-view: false
+
+  # ================================
+  # Task Execution Configuration
+  # ================================
+  task:
+    execution:
+      pool:
+        core-size: 8
+        max-size: 32
+        queue-capacity: 100
+        thread-name-prefix: campstation-task-
+      shutdown:
+        await-termination: true
+        await-termination-period: 60s
+
+  # ================================
+  # Web Configuration
+  # ================================
+  # 웹 관련 설정 (Spring MVC, 정적 리소스 등)
+  # - 정적 리소스 캐싱 및 최적화
+  # - 국제화 및 지역화 설정
+  web:
+    resources: # 정적 리소스 설정
+      cache: # 캐시 설정
+        cachecontrol: # Cache-Control 헤더 설정
+          max-age: 31536000 # 최대 캐시 시간 (1년)
+          cache-public: true # public 캐시 허용
+      static-locations: classpath:/static/,classpath:/public/,classpath:/resources/,classpath:/META-INF/resources/ # 정적 리소스 위치
+    locale: ko_KR # 기본 로케일 (한국어)
+    locale-resolver: accept-header # 로케일 결정 방식 (Accept-Language 헤더)
+
+# ================================
+# OpenAPI/Swagger Configuration
+# ================================
+# API 문서화 도구 설정 (SpringDoc OpenAPI)
+# - REST API 자동 문서화 및 테스트 인터페이스 제공
+# - 개발 및 협업을 위한 API 명세서 생성
+springdoc:
+  api-docs: # OpenAPI 명세서 설정
+    path: /api-docs # API 문서 경로
+    enabled: true # API 문서 활성화
+  swagger-ui: # Swagger UI 설정
+    path: /swagger-ui.html # Swagger UI 경로
+    enabled: true # Swagger UI 활성화
+    operations-sorter: method # API 정렬 방식 (HTTP 메소드 기준)
+    tags-sorter: alpha # 태그 정렬 방식 (알파벳순)
+    disable-swagger-default-url: true # 기본 URL 비활성화
+    doc-expansion: none # 문서 확장 모드 (접혀있는 상태)
+  show-actuator: true # Actuator 엔드포인트 표시
+
+  # ================================
+  # Auto Configuration Exclude
+  # ================================
+  # Spring Boot 자동 구성 제외 설정
+  # - 특정 자동 구성을 비활성화하여 수동 설정 적용
+  # - Redis 자동 구성을 제외하고 커스텀 Redis 설정 사용
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration # Redis 자동 구성 제외
+
+  # ================================
+  # OAuth2 Client Configuration
+  # ================================
+  # 소셜 로그인 (Google, GitHub 등) 설정
+  # - 각 제공자의 Client ID와 Secret은 환경변수로 설정
+  # - 개발/운영 환경에서 다른 값 사용 가능
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:your-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:your-google-client-secret}
+            redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8080/login/oauth2/code/google}
+            scope:
+              - openid
+              - email
+              - profile
+
+          github:
+            client-id: ${GITHUB_CLIENT_ID:your-github-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:your-github-client-secret}
+            redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:8080/login/oauth2/code/github}
+            scope:
+              - user:email
+              - read:user
+
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID:your-kakao-client-id}
+            client-secret: ${KAKAO_CLIENT_SECRET:your-kakao-client-secret}
+            redirect-uri: ${KAKAO_REDIRECT_URI:http://localhost:8080/login/oauth2/code/kakao}
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
+            scope:
+              - account_email
+              - profile_nickname
+            provider: kakao
+          naver:
+            client-id: ${NAVER_CLIENT_ID:your-naver-client-id}
+            client-secret: ${NAVER_CLIENT_SECRET:your-naver-client-secret}
+            redirect-uri: ${NAVER_REDIRECT_URI:http://localhost:8080/login/oauth2/code/naver}
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
+            scope:
+              - name
+              - email
+              - profile_image
+            provider: naver
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+          naver:
+            authorization-uri: https://nid.naver.com/oauth2.0/authorize
+            token-uri: https://nid.naver.com/oauth2.0/token
+            user-info-uri: https://openapi.naver.com/v1/nid/me
+            user-name-attribute: response
+
+  # ================================
+  # Toss Payments Configuration
+  # ================================
+  # 토스페이먼츠 PG 설정 (https://docs.tosspayments.com)
+  # - 테스트 환경: 샌드박스 모드로 실제 결제 없이 테스트 가능
+  # - 글로벌 결제 지원: Visa, Mastercard, PayPal 등
+  # - API 키: 토스페이먼츠 개발자센터에서 발급
+toss:
+  payments:
+    secret-key: ${TOSS_SECRET_KEY:test_sk_ALnQvDd2VJ6GD4DevYvaVMj7X41m} # 시크릿 키 (테스트용)
+    client-key: ${TOSS_CLIENT_KEY:test_ck_Ba5PzR0ArnWxBomvJB1z8vmYnNeD} # 클라이언트 키 (테스트용)
+    base-url: ${TOSS_BASE_URL:https://api.tosspayments.com} # API 기본 URL
+    success-url: ${PAYMENT_SUCCESS_URL:http://localhost:3000/payment/success} # 결제 성공 URL
+    fail-url: ${PAYMENT_FAIL_URL:http://localhost:3000/payment/fail} # 결제 실패 URL
+    timeout: 30000 # API 타임아웃 (30초)

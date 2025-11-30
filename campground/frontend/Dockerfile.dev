@@ -1,0 +1,44 @@
+# ================================
+# CampStation Frontend - Development Dockerfile
+# ================================
+# 개발 환경용 Dockerfile
+# - Hot reload 지원
+# - 개발 도구 포함
+# - 볼륨 마운트로 실시간 코드 변경 반영
+
+# ================================
+# Development Stage
+# ================================
+FROM node:22-alpine AS development
+
+LABEL maintainer="CampStation Team" \
+      description="CampStation Frontend Development Environment" \
+      version="1.0.0"
+
+# npm 업데이트 (최신 버전으로)
+RUN npm install -g npm@latest
+
+# 개발 도구 설치
+RUN apk add --no-cache \
+    curl \
+    wget \
+    git \
+    && rm -rf /var/cache/apk/*
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 의존성 파일 복사
+COPY package.json package-lock.json ./
+
+# 모든 의존성 설치
+RUN npm ci
+
+# 소스 코드는 볼륨 마운트로 처리
+# docker-compose.dev.yml에서 volumes로 마운트됨
+
+# 포트 노출
+EXPOSE 3000
+
+# 개발 서버 실행
+CMD ["npm", "run", "dev"]

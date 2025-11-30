@@ -1,0 +1,165 @@
+# ================================
+# CampStation - Self Hosting Docker Compose
+# ================================
+# AWS 없이 순수 서버 호스팅 구성
+# ================================
+
+services:
+  # ================================
+  # Frontend (Next.js)
+  # ================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: runtime
+      args:
+        - NODE_ENV=production
+        - NEXT_PUBLIC_API_URL=https://your-domain.com/api
+        - NEXT_PUBLIC_APP_NAME=CampStation
+        - NEXT_PUBLIC_KAKAO_MAP_API_KEY=${NEXT_PUBLIC_KAKAO_MAP_API_KEY}
+        - NEXT_PUBLIC_TOSS_CLIENT_KEY=${NEXT_PUBLIC_TOSS_CLIENT_KEY}
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://your-domain.com/api
+      - INTERNAL_API_URL=http://backend:8080
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - campstation
+
+  # ================================
+  # Backend (Spring Boot)
+  # ================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: runtime
+    ports:
+      - "8080:8080"
+    environment:
+      # Database
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/campstation
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+
+      # Redis
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+
+      # MinIO (내부 접근)
+      - CLOUD_AWS_S3_ENDPOINT=http://minio:9000
+      - CLOUD_AWS_S3_EXTERNAL_ENDPOINT=http://minio:9000
+      # MinIO (외부 접근 - Nginx를 통한 Public URL)
+      - CLOUD_AWS_S3_PUBLIC_ENDPOINT=https://your-domain.com/storage
+      - AWS_S3_BUCKET_NAME=campstation
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_ROOT_PASSWORD}
+
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-3600000}
+
+      # OAuth2
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_NAVER_CLIENT_ID=${NAVER_CLIENT_ID}
+      - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET}
+
+      # CORS
+      - CORS_ALLOWED_ORIGINS=https://your-domain.com,https://www.your-domain.com
+
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    restart: always
+    networks:
+      - campstation
+
+  # ================================
+  # PostgreSQL Database
+  # ================================
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=campstation
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - campstation
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ================================
+  # Redis Cache
+  # ================================
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks:
+      - campstation
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ================================
+  # MinIO (S3 호환 스토리지)
+  # ================================
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000" # API
+      - "9001:9001" # Console
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_REGION=us-east-1
+      - MINIO_DOMAIN=your-domain.com
+      - MINIO_SERVER_URL=https://your-domain.com/storage
+      - MINIO_BROWSER_REDIRECT_URL=https://your-domain.com/minio-console
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    restart: always
+    networks:
+      - campstation
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+
+networks:
+  campstation:
+    driver: bridge
