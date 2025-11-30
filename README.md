@@ -1,8 +1,28 @@
-# CampStation
+# CampStation Workspace
 
-> 🏕️ 모바일 우선 캠핑장 예약 플랫폼
+두 개의 독립적인 프로젝트를 포함하는 모노레포입니다.
 
-Spring Boot + Next.js 기반의 풀스택 캠핑장 예약 관리 시스템입니다.
+## 📁 프로젝트 구조
+
+```
+WorkSpace/
+├── campground/          # 🏕️ 캠프장 예약 시스템
+│   ├── backend/        # Spring Boot + PostgreSQL
+│   ├── frontend/       # Next.js + React
+│   ├── infrastructure/ # Nginx 설정
+│   └── docker-compose.yml
+│
+├── community/          # 💬 PC방 블랙리스트 커뮤니티
+│   ├── backend/        # Ktor + PostgreSQL
+│   ├── frontend/       # Vue.js
+│   └── docker-compose.yml
+│
+└── README.md (this file)
+```
+
+---
+
+## 🏕️ Campground - 캠프장 예약 시스템
 
 ## 📚 프로젝트 문서
 
@@ -319,11 +339,73 @@ curl -w "@curl-format.txt" http://localhost:8080/api/v1/campgrounds
 
 ---
 
+## 💬 Community - PC방 블랙리스트 커뮤니티
+
+PC방 업주들을 위한 블랙리스트 공유 플랫폼
+
+### 기술 스택
+
+- **Backend**: Ktor 2.3.8 (Kotlin)
+- **Frontend**: Vue 3 + Vite
+- **Database**: PostgreSQL 16
+- **Storage**: MinIO (S3 호환)
+
+### 주요 기능
+
+- 블랙리스트 등록 및 조회
+- 이미지 업로드 (썸네일 자동 생성, WebP 변환)
+- 지역별 필터링
+- 위험도별 분류 (위험/경고/주의)
+
+### 빠른 시작
+
+```bash
+cd community
+docker-compose up -d
+
+# 접속
+# Frontend: http://localhost:3001
+# Backend: http://localhost:8081
+# MinIO Console: http://localhost:9003
+```
+
+**자세한 문서**: [community/README.md](./community/README.md)
+
+---
+
+## 🔧 공통 개발 가이드
+
+### 포트 할당
+
+| 서비스        | Campground | Community |
+| ------------- | ---------- | --------- |
+| Frontend      | 3000       | 3001      |
+| Backend       | 8080       | 8081      |
+| PostgreSQL    | 5432       | 5433      |
+| Redis         | 6379       | 6380      |
+| MinIO API     | 9000       | 9002      |
+| MinIO Console | 9001       | 9003      |
+
+### Git 커밋 컨벤션
+
+```
+feat: 새로운 기능 추가
+fix: 버그 수정
+docs: 문서 변경
+style: 코드 포맷팅
+refactor: 코드 리팩토링
+test: 테스트 추가/수정
+chore: 빌드 설정 변경
+```
+
+---
+
 ## 📞 지원
 
-- 이슈 등록: [GitHub Issues](https://github.com/your-repo/issues)
-- 문서: [docs/](./frontend/docs/)
-- API 문서: http://localhost:8080/swagger-ui.html
+- GitHub Issues: 각 프로젝트별 이슈 등록
+- 문서:
+  - Campground: [campground/frontend/docs/](./campground/frontend/docs/)
+  - Community: [community/README.md](./community/README.md)
 
 ---
 
