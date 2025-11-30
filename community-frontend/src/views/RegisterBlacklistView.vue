@@ -12,6 +12,7 @@ import {
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { createBlacklist } from "../services/api";
+import { deleteImage, uploadImage } from "../services/imageApi";
 
 const router = useRouter();
 
@@ -143,7 +144,7 @@ const selectReason = (reason) => {
   errors.value.reason = "";
 };
 
-const handleImageUpload = (event) => {
+const handleImageUpload = async (event) => {
   const files = Array.from(event.target.files);
   const maxImages = 5;
 
@@ -152,25 +153,48 @@ const handleImageUpload = (event) => {
     return;
   }
 
-  files.forEach((file) => {
+  for (const file of files) {
     if (file.size > 5 * 1024 * 1024) {
       alert("이미지 파일은 5MB 이하만 업로드 가능합니다");
-      return;
+      continue;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
+    try {
+      // Upload to server and get URLs
+      const { originalUrl, thumbnailUrl } = await uploadImage(
+        file,
+        "blacklists"
+      );
+
+      // Store both URLs with preview
       formData.value.images.push({
         id: Date.now() + Math.random(),
-        url: e.target.result,
+        thumbnailUrl,
+        originalUrl,
         file,
       });
-    };
-    reader.readAsDataURL(file);
-  });
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      alert(`이미지 업로드 실패: ${error.message}`);
+    }
+  }
+
+  // Clear file input
+  event.target.value = "";
 };
 
-const removeImage = (id) => {
+const removeImage = async (id) => {
+  const image = formData.value.images.find((img) => img.id === id);
+
+  if (image && image.originalUrl) {
+    try {
+      await deleteImage(image.originalUrl, image.thumbnailUrl);
+    } catch (error) {
+      console.error("Failed to delete image from server:", error);
+      // Continue with local removal even if server deletion fails
+    }
+  }
+
   formData.value.images = formData.value.images.filter((img) => img.id !== id);
 };
 
@@ -185,7 +209,7 @@ const handleSubmit = async () => {
   submitError.value = null;
 
   try {
-    // Prepare data for API
+    // Prepare data for API - send original image URLs
     const submitData = {
       name: formData.value.name,
       age: parseInt(formData.value.age),
@@ -196,7 +220,7 @@ const handleSubmit = async () => {
       dangerLevel: formData.value.dangerLevel,
       reason: formData.value.reason,
       description: formData.value.description,
-      images: formData.value.images.map((img) => img.url), // For now, using data URLs
+      images: formData.value.images.map((img) => img.originalUrl),
     };
 
     const response = await createBlacklist(submitData);
@@ -527,7 +551,7 @@ const isFormValid = computed(() => {
             class="relative aspect-square rounded-lg overflow-hidden bg-gray-800"
           >
             <img
-              :src="image.url"
+              :src="image.thumbnailUrl"
               alt="증거 사진"
               class="w-full h-full object-cover"
             />

@@ -19,6 +19,7 @@ import {
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { fetchBlacklistById } from "../services/api";
+import { getOriginals } from "../types/blacklist";
 
 const router = useRouter();
 const route = useRoute();
@@ -89,6 +90,12 @@ const dangerColors = computed(() => {
   return getDangerColor(blacklist.value.dangerLevel);
 });
 
+// Get original images only for detail view
+const originalImages = computed(() => {
+  if (!blacklist.value || !blacklist.value.images) return [];
+  return getOriginals(blacklist.value.images);
+});
+
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   const year = date.getFullYear();
@@ -116,13 +123,13 @@ const closeImageModal = () => {
 
 const nextImage = () => {
   currentImageIndex.value =
-    (currentImageIndex.value + 1) % blacklist.value.images.length;
+    (currentImageIndex.value + 1) % originalImages.value.length;
 };
 
 const prevImage = () => {
   currentImageIndex.value =
-    (currentImageIndex.value - 1 + blacklist.value.images.length) %
-    blacklist.value.images.length;
+    (currentImageIndex.value - 1 + originalImages.value.length) %
+    originalImages.value.length;
 };
 
 const handleShare = () => {
@@ -333,10 +340,7 @@ const handleReport = () => {
       </div>
 
       <!-- Evidence Images -->
-      <div
-        v-if="blacklist.images && blacklist.images.length > 0"
-        class="px-4 pb-4"
-      >
+      <div v-if="originalImages.length > 0" class="px-4 pb-4">
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center space-x-2">
@@ -344,13 +348,13 @@ const handleReport = () => {
               <span class="text-sm font-bold text-white">증거 사진</span>
             </div>
             <span class="text-xs text-gray-500"
-              >{{ blacklist.images.length }}장</span
+              >{{ originalImages.length }}장</span
             >
           </div>
 
           <div class="grid grid-cols-3 gap-2">
             <div
-              v-for="(image, index) in blacklist.images"
+              v-for="(image, index) in originalImages"
               :key="index"
               @click="openImageModal(index)"
               class="aspect-square rounded-lg overflow-hidden bg-gray-800 cursor-pointer hover:opacity-80 transition-opacity"
@@ -427,7 +431,7 @@ const handleReport = () => {
       <!-- Image Modal -->
       <Teleport to="body">
         <div
-          v-if="showImageModal && blacklist"
+          v-if="showImageModal && originalImages.length > 0"
           class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center"
           @click="closeImageModal"
         >
@@ -439,7 +443,7 @@ const handleReport = () => {
           </button>
 
           <button
-            v-if="blacklist.images && blacklist.images.length > 1"
+            v-if="originalImages.length > 1"
             @click.stop="prevImage"
             class="absolute left-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors"
           >
@@ -448,17 +452,17 @@ const handleReport = () => {
 
           <div class="max-w-screen-lg w-full px-4" @click.stop>
             <img
-              :src="blacklist.images[currentImageIndex]"
+              :src="originalImages[currentImageIndex]"
               alt="증거 사진"
               class="w-full h-auto rounded-lg"
             />
             <div class="text-center mt-4 text-white">
-              {{ currentImageIndex + 1 }} / {{ blacklist.images.length }}
+              {{ currentImageIndex + 1 }} / {{ originalImages.length }}
             </div>
           </div>
 
           <button
-            v-if="blacklist.images && blacklist.images.length > 1"
+            v-if="originalImages.length > 1"
             @click.stop="nextImage"
             class="absolute right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors"
           >

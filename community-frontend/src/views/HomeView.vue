@@ -13,6 +13,7 @@ import {
 import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { fetchBlacklists, fetchStats } from "../services/api";
+import { getFirstImage } from "../types/blacklist";
 
 const router = useRouter();
 
@@ -305,73 +306,88 @@ const navigateToRegister = () => {
         v-for="item in blacklistData"
         :key="item.id"
         @click="navigateToDetail(item.id)"
-        class="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-red-500/30 transition-all cursor-pointer"
+        class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-red-500/30 transition-all cursor-pointer"
       >
-        <!-- Header -->
-        <div class="flex items-start justify-between mb-3">
-          <div class="flex items-start space-x-3 flex-1">
-            <div class="p-2 bg-red-500/10 rounded-lg">
-              <UserX :size="20" class="text-red-500" />
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center space-x-2 mb-1">
-                <h3 class="text-white font-bold">{{ item.name }}</h3>
-                <span class="text-xs text-gray-500"
-                  >{{ item.age }}세 · {{ item.gender }}</span
-                >
-                <span
-                  v-if="item.verified"
-                  class="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full"
-                >
-                  인증됨
-                </span>
-              </div>
-              <div class="flex items-center space-x-2 text-xs text-gray-400">
-                <MapPin :size="12" />
-                <span>{{ item.region }} · {{ item.pcCafe }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="px-3 py-1.5 rounded-lg text-xs font-bold border"
-            :class="getDangerColor(item.dangerLevel)"
-          >
-            {{ item.dangerLevel }}
-          </div>
+        <!-- Thumbnail Image (if exists) -->
+        <div
+          v-if="getFirstImage(item.images)"
+          class="w-full h-48 bg-gray-800 overflow-hidden"
+        >
+          <img
+            :src="getFirstImage(item.images)"
+            :alt="item.reason"
+            class="w-full h-full object-cover"
+          />
         </div>
 
-        <!-- Reason -->
-        <div class="mb-3">
-          <div
-            class="inline-block px-3 py-1.5 bg-gray-800 rounded-lg text-sm font-medium text-white mb-2"
-          >
-            {{ item.reason }}
-          </div>
-          <p class="text-sm text-gray-300 leading-relaxed line-clamp-2">
-            {{ item.description }}
-          </p>
-        </div>
+        <!-- Content -->
+        <div class="p-4">
+          <!-- Header -->
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-start space-x-3 flex-1">
+              <div class="p-2 bg-red-500/10 rounded-lg">
+                <UserX :size="20" class="text-red-500" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center space-x-2 mb-1">
+                  <h3 class="text-white font-bold">{{ item.name }}</h3>
+                  <span class="text-xs text-gray-500"
+                    >{{ item.age }}세 · {{ item.gender }}</span
+                  >
+                  <span
+                    v-if="item.verified"
+                    class="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full"
+                  >
+                    인증됨
+                  </span>
+                </div>
+                <div class="flex items-center space-x-2 text-xs text-gray-400">
+                  <MapPin :size="12" />
+                  <span>{{ item.region }} · {{ item.pcCafe }}</span>
+                </div>
+              </div>
+            </div>
 
-        <!-- Footer -->
-        <div class="flex items-center justify-between text-xs text-gray-500">
-          <div class="flex items-center space-x-3">
-            <div class="flex items-center space-x-1">
-              <Calendar :size="12" />
-              <span>{{ formatDate(item.date) }}</span>
-            </div>
-            <div class="flex items-center space-x-1">
-              <TrendingUp :size="12" />
-              <span>{{ formatViews(item.views) }}</span>
-            </div>
-            <span
-              v-if="item.images && item.images.length > 0"
-              class="text-blue-400"
+            <div
+              class="px-3 py-1.5 rounded-lg text-xs font-bold border"
+              :class="getDangerColor(item.dangerLevel)"
             >
-              📷 {{ item.images.length }}
-            </span>
+              {{ item.dangerLevel }}
+            </div>
           </div>
-          <div class="text-gray-600">{{ item.phone }}</div>
+
+          <!-- Reason -->
+          <div class="mb-3">
+            <div
+              class="inline-block px-3 py-1.5 bg-gray-800 rounded-lg text-sm font-medium text-white mb-2"
+            >
+              {{ item.reason }}
+            </div>
+            <p class="text-sm text-gray-300 leading-relaxed line-clamp-2">
+              {{ item.description }}
+            </p>
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between text-xs text-gray-500">
+            <div class="flex items-center space-x-3">
+              <div class="flex items-center space-x-1">
+                <Calendar :size="12" />
+                <span>{{ formatDate(item.date) }}</span>
+              </div>
+              <div class="flex items-center space-x-1">
+                <TrendingUp :size="12" />
+                <span>{{ formatViews(item.views) }}</span>
+              </div>
+              <span
+                v-if="item.images && item.images.length > 0"
+                class="text-blue-400"
+              >
+                📷 {{ item.images.length / 2 }}
+              </span>
+            </div>
+            <div class="text-gray-600">{{ item.phone }}</div>
+          </div>
         </div>
       </div>
     </div>
