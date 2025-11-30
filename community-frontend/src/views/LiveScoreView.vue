@@ -1,8 +1,17 @@
 <script setup>
 import { Calendar, ChevronLeft, ChevronRight, Star } from "lucide-vue-next";
-import { ref, onMounted } from "vue";
+import { onMounted, ref } from "vue";
 
-const currentDate = ref("11.30 (토)");
+const formatDate = () => {
+  const date = new Date();
+  const days = ["일", "월", "화", "수", "목", "금", "토"];
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const dayOfWeek = days[date.getDay()];
+  return `${month}.${day} (${dayOfWeek})`;
+};
+
+const currentDate = ref(formatDate());
 const leagues = ref([]);
 
 const getStatusColor = (status) => {
@@ -19,28 +28,28 @@ const getStatusColor = (status) => {
 
 const fetchLiveMatches = async () => {
   try {
-    const baseUrl = import.meta.env.VITE_API_URL || '/api/community';
+    const baseUrl = import.meta.env.VITE_API_URL || "/api/community";
     const response = await fetch(`${baseUrl}/api/sports/live`);
-    if (!response.ok) throw new Error('Network response was not ok');
-    
+    if (!response.ok) throw new Error("Network response was not ok");
+
     const data = await response.json();
-    
+
     // Group by league
     const grouped = {};
-    data.forEach(match => {
+    data.forEach((match) => {
       if (!grouped[match.league]) {
         grouped[match.league] = {
           id: match.league,
           name: match.league,
           country: "World", // 추후 API에서 국가 정보 제공 필요
           flag: "⚽",
-          matches: []
+          matches: [],
         };
       }
-      
+
       // Parse time
       const timeStr = match.startTime ? match.startTime.substring(11, 16) : "";
-      
+
       grouped[match.league].matches.push({
         id: match.id,
         time: timeStr,
@@ -49,14 +58,25 @@ const fetchLiveMatches = async () => {
         away: match.awayTeam,
         homeScore: match.homeScore || 0,
         awayScore: match.awayScore || 0,
-        timeElapsed: match.status === "LIVE" ? "LIVE" : "" 
+        timeElapsed: match.status === "LIVE" ? "LIVE" : "",
+        startTime: match.startTime,
       });
     });
-    
-    leagues.value = Object.values(grouped);
+
+    // Sort matches by time within each league
+    const leaguesArray = Object.values(grouped);
+    leaguesArray.forEach((league) => {
+      league.matches.sort((a, b) => {
+        if (!a.startTime || !b.startTime) return 0;
+        return new Date(a.startTime) - new Date(b.startTime);
+      });
+    });
+
+    leagues.value = leaguesArray;
   } catch (error) {
     console.error("Failed to fetch live matches:", error);
     // Fallback to dummy data if fetch fails (for demo purposes)
+    const now = new Date();
     leagues.value = [
       {
         id: 1,
@@ -66,16 +86,17 @@ const fetchLiveMatches = async () => {
         matches: [
           {
             id: 101,
-            time: "21:30",
+            time: now.toTimeString().substring(0, 5),
             status: "LIVE",
             home: "Man City",
             away: "Liverpool",
             homeScore: 1,
             awayScore: 1,
             timeElapsed: "34'",
-          }
-        ]
-      }
+            startTime: now.toISOString(),
+          },
+        ],
+      },
     ];
   }
 };

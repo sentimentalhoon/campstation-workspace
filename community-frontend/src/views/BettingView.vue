@@ -5,6 +5,20 @@ import { onMounted, ref } from "vue";
 const myPoints = ref(5400);
 const matches = ref([]);
 
+const formatDateTime = (isoString) => {
+  if (!isoString) return "";
+  try {
+    const date = new Date(isoString);
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${month}.${day} ${hours}:${minutes}`;
+  } catch (e) {
+    return "";
+  }
+};
+
 const fetchUpcomingMatches = async () => {
   try {
     const baseUrl = import.meta.env.VITE_API_URL || "/api/community";
@@ -13,19 +27,21 @@ const fetchUpcomingMatches = async () => {
 
     const data = await response.json();
 
-    matches.value = data.map((match) => ({
-      id: match.id,
-      league: match.league,
-      home: match.homeTeam,
-      away: match.awayTeam,
-      startTime: match.startTime,
-      odds: {
-        home: match.odds?.homeWin ?? 2.0,
-        draw: match.odds?.draw ?? 3.0,
-        away: match.odds?.awayWin ?? 2.5,
-      },
-      selected: null,
-    }));
+    matches.value = data
+      .map((match) => ({
+        id: match.id,
+        league: match.league,
+        home: match.homeTeam,
+        away: match.awayTeam,
+        startTime: match.startTime,
+        odds: {
+          home: match.odds?.homeWin ?? 0.0,
+          draw: match.odds?.draw ?? 0.0,
+          away: match.odds?.awayWin ?? 0.0,
+        },
+        selected: null,
+      }))
+      .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
   } catch (error) {
     console.error("Failed to fetch upcoming matches:", error);
     // Fallback dummy data
@@ -35,6 +51,7 @@ const fetchUpcomingMatches = async () => {
         league: "Premier League",
         home: "Man City",
         away: "Liverpool",
+        startTime: new Date().toISOString(),
         odds: { home: 2.1, draw: 3.4, away: 3.1 },
         selected: null,
       },
@@ -96,7 +113,9 @@ onMounted(() => {
           class="bg-dark-surface px-4 py-2 flex items-center justify-between"
         >
           <span class="text-xs text-gray-400">{{ match.league }}</span>
-          <span class="text-xs text-gray-500">11.30 21:30</span>
+          <span class="text-xs text-gray-500">{{
+            formatDateTime(match.startTime)
+          }}</span>
         </div>
 
         <div class="p-4">
