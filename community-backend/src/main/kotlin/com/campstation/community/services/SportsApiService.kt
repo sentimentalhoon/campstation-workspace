@@ -32,8 +32,7 @@ class RealSportsApiService(
 ) : SportsApiService {
 
     companion object {
-        private const val API_BASE_URL = "https://api-football-v1.p.rapidapi.com/v3"
-        private const val API_HOST = "api-football-v1.p.rapidapi.com"
+        private const val API_BASE_URL = "https://v3.football.api-sports.io"
         private const val CACHE_TTL_LIVE = 60 // seconds
         private const val CACHE_TTL_UPCOMING = 600 // seconds
         
@@ -55,8 +54,7 @@ class RealSportsApiService(
             socketTimeoutMillis = 15000
         }
         defaultRequest {
-            header("x-rapidapi-host", API_HOST)
-            header("x-rapidapi-key", apiKey)
+            header("x-apisports-key", apiKey)
         }
     }
 
@@ -92,7 +90,7 @@ class RealSportsApiService(
                 else -> {
                     val errorBody = response.bodyAsText()
                     println("API Error (${response.status}): $errorBody")
-                    println("Note: If 'not subscribed', visit https://rapidapi.com/api-sports/api/api-football and click Subscribe")
+                    println("Note: Get your API key at https://dashboard.api-football.com/")
                     println("Falling back to mock data for live matches")
                     return@withContext mockService.getLiveMatches()
                 }
@@ -137,7 +135,7 @@ class RealSportsApiService(
                 else -> {
                     val errorBody = response.bodyAsText()
                     println("API Error (${response.status}): $errorBody")
-                    println("Note: If 'not subscribed', visit https://rapidapi.com/api-sports/api/api-football and click Subscribe")
+                    println("Note: Get your API key at https://dashboard.api-football.com/")
                     println("Falling back to mock data for upcoming matches")
                     return@withContext mockService.getUpcomingMatches()
                 }

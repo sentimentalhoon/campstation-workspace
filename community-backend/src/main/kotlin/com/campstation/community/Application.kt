@@ -47,15 +47,16 @@ fun Application.module() {
     }
 
     // 3. Services
-    // API Key는 환경변수에서 가져오거나 하드코딩 (보안상 환경변수 권장)
+    // API Football Direct API Key (환경변수에서 가져오거나 기본값 사용)
     // 빈 문자열("")로 넘어오는 경우를 대비해 takeIf { it.isNotBlank() } 추가
-    val rapidApiKey = System.getenv("RAPID_API_KEY")?.takeIf { it.isNotBlank() } 
+    val apiFootballKey = System.getenv("API_FOOTBALL_KEY")?.takeIf { it.isNotBlank() } 
+        ?: System.getenv("RAPID_API_KEY")?.takeIf { it.isNotBlank() }
         ?: "c2f10b511emshde4ac22de2dc144p15df88jsnd27c9691ecc9"
     val redisHost = System.getenv("REDIS_HOST")?.takeIf { it.isNotBlank() } ?: "redis"
     val redisPort = System.getenv("REDIS_PORT")?.toIntOrNull() ?: 6379
 
     val sportsService: SportsApiService = try {
-        RealSportsApiService(rapidApiKey, redisHost, redisPort)
+        RealSportsApiService(apiFootballKey, redisHost, redisPort)
     } catch (e: Exception) {
         println("Failed to initialize RealSportsApiService, falling back to Mock: ${e.message}")
         MockSportsApiService()
