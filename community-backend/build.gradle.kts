@@ -56,6 +56,12 @@ dependencies {
     implementation("software.amazon.awssdk:s3:2.25.11")
     implementation("software.amazon.awssdk:apache-client:2.25.11")
     
+    // WebP support
+    implementation("org.sejda.imageio:webp-imageio:0.1.6")
+    
+    // EXIF metadata handling
+    implementation("com.drewnoakes:metadata-extractor:2.19.0")
+    
     // Multipart file upload
     implementation("io.ktor:ktor-server-status-pages")
     implementation("io.ktor:ktor-server-multipart")
