@@ -11,7 +11,7 @@ export async function uploadImage(file, folder = "blacklists") {
   formData.append("file", file);
   formData.append("folder", folder);
 
-  const response = await fetch(`${API_BASE_URL}/api/upload/image`, {
+  const response = await fetch(`${API_BASE_URL}/upload/image`, {
     method: "POST",
     body: formData,
   });
@@ -38,7 +38,7 @@ export async function deleteImage(originalUrl, thumbnailUrl) {
   if (originalUrl) params.append("originalUrl", originalUrl);
   if (thumbnailUrl) params.append("thumbnailUrl", thumbnailUrl);
 
-  const response = await fetch(`${API_BASE_URL}/api/upload/image`, {
+  const response = await fetch(`${API_BASE_URL}/upload/image`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
