@@ -135,6 +135,16 @@ services:
       - /app/.gradle
     environment:
       - PORT=8081
+      - DB_URL=jdbc:postgresql://db:5432/community
+      - DB_USER=campstation
+      - DB_PASSWORD=F1tpM76EB+Bv0E2sA/axb0AYw92bT7W65WwWdRkO4ms=
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - campstation-network
     restart: unless-stopped
