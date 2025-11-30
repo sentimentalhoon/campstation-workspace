@@ -10,16 +10,26 @@ import {
   TrendingUp,
   UserX,
 } from "lucide-vue-next";
-import { computed, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import { fetchBlacklists, fetchStats } from "../services/api";
 
 const router = useRouter();
 
-// Filter states
+// State
 const searchQuery = ref("");
 const selectedRegion = ref("전체");
 const selectedSort = ref("latest");
 const showFilters = ref(false);
+const blacklistData = ref([]);
+const stats = ref({
+  total: 0,
+  danger: 0,
+  warning: 0,
+  caution: 0,
+});
+const isLoading = ref(false);
+const error = ref(null);
 
 const regions = [
   "전체",
@@ -48,137 +58,52 @@ const sortOptions = [
   { value: "danger", label: "위험도순" },
 ];
 
-// Mock blacklist data
-const blacklistData = ref([
-  {
-    id: 1,
-    name: "김**",
-    age: 23,
-    gender: "남성",
-    phone: "010-****-1234",
-    region: "서울",
-    pcCafe: "게임존 PC방",
-    dangerLevel: "위험",
-    reason: "기물 파손",
-    description:
-      "키보드와 마우스를 집어던지고 모니터를 주먹으로 때려 파손시킴. 손해배상 거부하고 도주함.",
-    date: "2025-11-28",
-    views: 1234,
-    verified: true,
-    imageCount: 3,
-  },
-  {
-    id: 2,
-    name: "박**",
-    age: 31,
-    gender: "남성",
-    phone: "010-****-5678",
-    region: "경기",
-    pcCafe: "스타 PC방",
-    dangerLevel: "경고",
-    reason: "음식물 쓰레기 방치",
-    description:
-      "배달음식을 시켜먹고 쓰레기를 자리에 그대로 방치. 여러 번 주의를 줬으나 반복적으로 같은 행동 반복.",
-    date: "2025-11-27",
-    views: 856,
-    verified: true,
-    imageCount: 2,
-  },
-  {
-    id: 3,
-    name: "이**",
-    age: 19,
-    gender: "남성",
-    phone: "010-****-9012",
-    region: "부산",
-    pcCafe: "메가 PC방",
-    dangerLevel: "주의",
-    reason: "흡연 및 욕설",
-    description:
-      "금연 구역에서 전자담배 흡연. 제지하자 욕설과 협박. 다른 고객들에게도 불쾌감을 줌.",
-    date: "2025-11-26",
-    views: 623,
-    verified: false,
-    imageCount: 1,
-  },
-  {
-    id: 4,
-    name: "최**",
-    age: 27,
-    gender: "남성",
-    phone: "010-****-3456",
-    region: "서울",
-    pcCafe: "프리미엄 PC방",
-    dangerLevel: "위험",
-    reason: "음란물 시청",
-    description:
-      "성인 PC방임에도 불구하고 음란물을 큰 소리로 시청. 다른 손님들의 항의에도 불구하고 계속 시청. 경찰 신고 후 퇴장.",
-    date: "2025-11-25",
-    views: 2103,
-    verified: true,
-    imageCount: 0,
-  },
-  {
-    id: 5,
-    name: "정**",
-    age: 35,
-    gender: "남성",
-    phone: "010-****-7890",
-    region: "인천",
-    pcCafe: "드림 PC방",
-    dangerLevel: "경고",
-    reason: "요금 미납",
-    description:
-      "12시간 사용 후 요금 결제 거부. CCTV 확인 결과 상습 먹튀범으로 확인됨. 경찰 신고 예정.",
-    date: "2025-11-24",
-    views: 945,
-    verified: true,
-    imageCount: 1,
-  },
-]);
+// Fetch data from API
+async function loadBlacklists() {
+  isLoading.value = true;
+  error.value = null;
 
-// Computed filtered data
-const filteredBlacklist = computed(() => {
-  let result = [...blacklistData.value];
+  try {
+    const filters = {
+      search: searchQuery.value || undefined,
+      region:
+        selectedRegion.value && selectedRegion.value !== "전체"
+          ? selectedRegion.value
+          : undefined,
+      sortBy: selectedSort.value,
+      page: 1,
+      limit: 50,
+    };
 
-  // Search filter
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    result = result.filter(
-      (item) =>
-        item.reason.toLowerCase().includes(query) ||
-        item.description.toLowerCase().includes(query) ||
-        item.pcCafe.toLowerCase().includes(query)
-    );
+    const response = await fetchBlacklists(filters);
+    blacklistData.value = response.items || [];
+  } catch (err) {
+    error.value = err.message || "데이터를 불러오는데 실패했습니다.";
+    console.error(err);
+  } finally {
+    isLoading.value = false;
   }
+}
 
-  // Region filter
-  if (selectedRegion.value !== "전체") {
-    result = result.filter((item) => item.region === selectedRegion.value);
+async function loadStats() {
+  try {
+    const statsData = await fetchStats();
+    stats.value = statsData;
+  } catch (err) {
+    console.error("Failed to load stats:", err);
   }
+}
 
-  // Sorting
-  if (selectedSort.value === "views") {
-    result.sort((a, b) => b.views - a.views);
-  } else if (selectedSort.value === "danger") {
-    const dangerWeight = { 위험: 3, 경고: 2, 주의: 1 };
-    result.sort(
-      (a, b) => dangerWeight[b.dangerLevel] - dangerWeight[a.dangerLevel]
-    );
-  } else {
-    result.sort((a, b) => new Date(b.date) - new Date(a.date));
-  }
-
-  return result;
+// Watch for filter changes
+watch([searchQuery, selectedRegion, selectedSort], () => {
+  loadBlacklists();
 });
 
-// Stats
-const stats = computed(() => ({
-  total: blacklistData.value.length,
-  danger: blacklistData.value.filter((i) => i.dangerLevel === "위험").length,
-  warning: blacklistData.value.filter((i) => i.dangerLevel === "경고").length,
-  caution: blacklistData.value.filter((i) => i.dangerLevel === "주의").length,
-}));
+// Load data on mount
+onMounted(() => {
+  loadBlacklists();
+  loadStats();
+});
 
 const getDangerColor = (level) => {
   switch (level) {
@@ -343,8 +268,41 @@ const navigateToRegister = () => {
 
     <!-- Blacklist Feed -->
     <div class="p-4 space-y-3">
+      <!-- Loading State -->
+      <div v-if="isLoading" class="text-center py-16">
+        <div
+          class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"
+        ></div>
+        <p class="text-gray-400">데이터를 불러오는 중...</p>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="text-center py-16 text-red-500">
+        <AlertTriangle :size="48" class="mx-auto mb-4" />
+        <p class="text-lg font-medium mb-2">오류가 발생했습니다</p>
+        <p class="text-sm text-gray-400">{{ error }}</p>
+        <button
+          @click="loadBlacklists"
+          class="mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+        >
+          다시 시도
+        </button>
+      </div>
+
+      <!-- Empty State -->
       <div
-        v-for="item in filteredBlacklist"
+        v-else-if="blacklistData.length === 0"
+        class="text-center py-16 text-gray-500"
+      >
+        <AlertTriangle :size="48" class="mx-auto mb-4 opacity-50" />
+        <p class="text-lg font-medium mb-2">검색 결과가 없습니다</p>
+        <p class="text-sm">다른 검색어나 필터를 사용해보세요</p>
+      </div>
+
+      <!-- Blacklist Items -->
+      <div
+        v-else
+        v-for="item in blacklistData"
         :key="item.id"
         @click="navigateToDetail(item.id)"
         class="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-red-500/30 transition-all cursor-pointer"
@@ -406,22 +364,15 @@ const navigateToRegister = () => {
               <TrendingUp :size="12" />
               <span>{{ formatViews(item.views) }}</span>
             </div>
-            <span v-if="item.imageCount > 0" class="text-blue-400">
-              📷 {{ item.imageCount }}
+            <span
+              v-if="item.images && item.images.length > 0"
+              class="text-blue-400"
+            >
+              📷 {{ item.images.length }}
             </span>
           </div>
           <div class="text-gray-600">{{ item.phone }}</div>
         </div>
-      </div>
-
-      <!-- Empty State -->
-      <div
-        v-if="filteredBlacklist.length === 0"
-        class="text-center py-16 text-gray-500"
-      >
-        <AlertTriangle :size="48" class="mx-auto mb-4 opacity-50" />
-        <p class="text-lg font-medium mb-2">검색 결과가 없습니다</p>
-        <p class="text-sm">다른 검색어나 필터를 사용해보세요</p>
       </div>
     </div>
 

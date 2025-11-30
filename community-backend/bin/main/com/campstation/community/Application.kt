@@ -1,9 +1,8 @@
 package com.campstation.community
 
+import com.campstation.community.routes.blacklistRoutes
 import com.campstation.community.routes.sportsRoutes
-import com.campstation.community.services.MockSportsApiService
-import com.campstation.community.services.RealSportsApiService
-import com.campstation.community.services.SportsApiService
+import com.campstation.community.services.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -62,6 +61,13 @@ fun Application.module() {
         MockSportsApiService()
     }
 
+    val blacklistService: BlacklistService = try {
+        RealBlacklistService(redisHost, redisPort)
+    } catch (e: Exception) {
+        println("Failed to initialize RealBlacklistService: ${e.message}")
+        RealBlacklistService(redisHost, redisPort) // Still try to use it
+    }
+
     // 4. Routing
     routing {
         get("/") {
@@ -73,5 +79,8 @@ fun Application.module() {
         
         // Sports Routes
         sportsRoutes(sportsService)
+        
+        // Blacklist Routes
+        blacklistRoutes(blacklistService)
     }
 }

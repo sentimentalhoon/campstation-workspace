@@ -11,6 +11,7 @@ import {
 } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
+import { createBlacklist } from "../services/api";
 
 const router = useRouter();
 
@@ -27,6 +28,9 @@ const formData = ref({
   description: "",
   images: [],
 });
+
+const isSubmitting = ref(false);
+const submitError = ref(null);
 
 const regions = [
   "서울",
@@ -170,17 +174,47 @@ const removeImage = (id) => {
   formData.value.images = formData.value.images.filter((img) => img.id !== id);
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!validateForm()) {
     const firstError = Object.values(errors.value)[0];
     alert(firstError);
     return;
   }
 
-  // TODO: API 호출로 데이터 전송
-  console.log("Form submitted:", formData.value);
-  alert("블랙리스트 등록이 완료되었습니다.\n관리자 검토 후 게시됩니다.");
-  router.push("/");
+  isSubmitting.value = true;
+  submitError.value = null;
+
+  try {
+    // Prepare data for API
+    const submitData = {
+      name: formData.value.name,
+      age: parseInt(formData.value.age),
+      gender: formData.value.gender,
+      phone: formData.value.phone,
+      region: formData.value.region,
+      pcCafe: formData.value.pcCafe,
+      dangerLevel: formData.value.dangerLevel,
+      reason: formData.value.reason,
+      description: formData.value.description,
+      images: formData.value.images.map((img) => img.url), // For now, using data URLs
+    };
+
+    const response = await createBlacklist(submitData);
+
+    alert("블랙리스트 등록이 완료되었습니다.\n관리자 검토 후 게시됩니다.");
+
+    // Navigate to detail view or home
+    if (response.id) {
+      router.push(`/detail/${response.id}`);
+    } else {
+      router.push("/");
+    }
+  } catch (error) {
+    submitError.value = error.message || "등록 중 오류가 발생했습니다.";
+    alert(submitError.value);
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 
 const isFormValid = computed(() => {
@@ -432,7 +466,7 @@ const isFormValid = computed(() => {
         <!-- Description -->
         <div>
           <label
-            class="block text-sm text-gray-400 mb-2 flex items-center justify-between"
+            class="text-sm text-gray-400 mb-2 flex items-center justify-between"
           >
             <span> 상세 내용 <span class="text-red-500">*</span> </span>
             <span
@@ -511,17 +545,17 @@ const isFormValid = computed(() => {
       <div class="sticky bottom-20 pt-4">
         <button
           @click="handleSubmit"
-          :disabled="!isFormValid"
+          :disabled="!isFormValid || isSubmitting"
           class="w-full py-4 rounded-xl font-bold text-white transition-all active:scale-95"
           :class="
-            isFormValid
+            isFormValid && !isSubmitting
               ? 'bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30'
               : 'bg-gray-800 text-gray-600 cursor-not-allowed'
           "
         >
-          {{
-            isFormValid ? "블랙리스트 등록" : "필수 항목을 모두 입력해주세요"
-          }}
+          <span v-if="isSubmitting">등록 중...</span>
+          <span v-else-if="isFormValid">블랙리스트 등록</span>
+          <span v-else>필수 항목을 모두 입력해주세요</span>
         </button>
       </div>
     </div>
