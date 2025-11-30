@@ -26,6 +26,26 @@ const getStatusColor = (status) => {
   }
 };
 
+const getCountryFlag = (country) => {
+  const flags = {
+    England: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    Spain: "🇪🇸",
+    Italy: "🇮🇹",
+    Germany: "🇩🇪",
+    France: "🇫🇷",
+    "South Korea": "🇰🇷",
+  };
+  return flags[country] || "⚽";
+};
+
+const formatElapsedTime = (elapsed) => {
+  if (!elapsed) return "";
+  if (elapsed > 45 && elapsed <= 60) {
+    return "HT"; // Half Time
+  }
+  return `${elapsed}'`;
+};
+
 const fetchLiveMatches = async () => {
   try {
     const baseUrl = import.meta.env.VITE_API_URL || "/api/community";
@@ -41,8 +61,8 @@ const fetchLiveMatches = async () => {
         grouped[match.league] = {
           id: match.league,
           name: match.league,
-          country: "World", // 추후 API에서 국가 정보 제공 필요
-          flag: "⚽",
+          country: match.country || "World",
+          flag: getCountryFlag(match.country),
           matches: [],
         };
       }
@@ -58,7 +78,9 @@ const fetchLiveMatches = async () => {
         away: match.awayTeam,
         homeScore: match.homeScore || 0,
         awayScore: match.awayScore || 0,
-        timeElapsed: match.status === "LIVE" ? "LIVE" : "",
+        elapsed: match.elapsed,
+        homeTeamLogo: match.homeTeamLogo,
+        awayTeamLogo: match.awayTeamLogo,
         startTime: match.startTime,
       });
     });
@@ -82,7 +104,7 @@ const fetchLiveMatches = async () => {
         id: 1,
         name: "Premier League",
         country: "England",
-        flag: "🇬🇧",
+        flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
         matches: [
           {
             id: 101,
@@ -92,7 +114,7 @@ const fetchLiveMatches = async () => {
             away: "Liverpool",
             homeScore: 1,
             awayScore: 1,
-            timeElapsed: "34'",
+            elapsed: 34,
             startTime: now.toISOString(),
           },
         ],
@@ -148,51 +170,99 @@ onMounted(() => {
         <div
           v-for="match in league.matches"
           :key="match.id"
-          class="px-4 py-3 border-t border-dark-border first:border-t-0 flex items-center"
+          class="px-4 py-3 border-t border-dark-border first:border-t-0"
         >
-          <!-- Time/Status -->
-          <div class="w-14 flex flex-col items-center justify-center mr-4">
-            <span
-              class="text-xs font-bold mb-1"
-              :class="getStatusColor(match.status)"
-            >
-              {{
-                match.status === "LIVE"
-                  ? match.timeElapsed
-                  : match.status === "END"
-                  ? "종료"
-                  : match.time
-              }}
-            </span>
-            <span
-              v-if="match.status === 'LIVE'"
-              class="w-1.5 h-1.5 rounded-full bg-named-highlight"
-            ></span>
-          </div>
-
-          <!-- Teams & Score -->
-          <div class="flex-1 flex items-center justify-between">
-            <div class="flex items-center space-x-3 flex-1 justify-end">
+          <div class="flex items-center">
+            <!-- Time/Status Column -->
+            <div class="w-16 flex flex-col items-center justify-center mr-3">
               <span
-                class="text-sm text-gray-200 font-medium text-right truncate"
-                >{{ match.home }}</span
+                class="text-xs font-bold mb-1"
+                :class="getStatusColor(match.status)"
               >
+                {{
+                  match.status === "LIVE"
+                    ? formatElapsedTime(match.elapsed)
+                    : match.status === "FINISHED"
+                    ? "종료"
+                    : match.time
+                }}
+              </span>
+              <span
+                v-if="match.status === 'LIVE'"
+                class="w-1.5 h-1.5 rounded-full bg-named-highlight animate-pulse"
+              ></span>
             </div>
 
-            <div class="px-3 flex items-center justify-center w-16">
-              <span class="text-lg font-bold text-white">{{
-                match.homeScore
-              }}</span>
-              <span class="text-gray-500 mx-1">:</span>
-              <span class="text-lg font-bold text-white">{{
-                match.awayScore
-              }}</span>
-            </div>
+            <!-- Match Details -->
+            <div class="flex-1">
+              <!-- Home Team -->
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2 flex-1">
+                  <img
+                    v-if="match.homeTeamLogo"
+                    :src="match.homeTeamLogo"
+                    :alt="match.home"
+                    class="w-5 h-5 object-contain"
+                    @error="(e) => (e.target.style.display = 'none')"
+                  />
+                  <span
+                    class="text-sm font-medium text-gray-200 truncate"
+                    :class="{ 'font-bold': match.homeScore > match.awayScore }"
+                  >
+                    {{ match.home }}
+                  </span>
+                </div>
+                <span
+                  class="text-lg font-bold text-white ml-3 min-w-[24px] text-right"
+                  :class="{ 'text-named-highlight': match.homeScore > match.awayScore }"
+                >
+                  {{ match.homeScore }}
+                </span>
+              </div>
 
-            <div class="flex items-center space-x-3 flex-1">
-              <span class="text-sm text-gray-200 font-medium truncate">{{
-                match.away
-              }}</span>
+              <!-- Away Team -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2 flex-1">
+                  <img
+                    v-if="match.awayTeamLogo"
+                    :src="match.awayTeamLogo"
+                    :alt="match.away"
+                    class="w-5 h-5 object-contain"
+                    @error="(e) => (e.target.style.display = 'none')"
+                  />
+                  <span
+                    class="text-sm font-medium text-gray-200 truncate"
+                    :class="{ 'font-bold': match.awayScore > match.homeScore }"
+                  >
+                    {{ match.away }}
+                  </span>
+                </div>
+                <span
+                  class="text-lg font-bold text-white ml-3 min-w-[24px] text-right"
+                  :class="{ 'text-named-highlight': match.awayScore > match.homeScore }"
+                >
+                  {{ match.awayScore }}
+                </span>
+              </div>
+
+              <!-- Match Status Info (for live games) -->
+              <div
+                v-if="match.status === 'LIVE' && match.elapsed"
+                class="mt-2 pt-2 border-t border-gray-800 flex items-center justify-between text-xs"
+              >
+                <span class="text-gray-500">
+                  {{
+                    match.elapsed <= 45
+                      ? "전반전"
+                      : match.elapsed <= 60
+                      ? "하프타임"
+                      : "후반전"
+                  }}
+                </span>
+                <span class="text-named-highlight font-bold">
+                  {{ formatElapsedTime(match.elapsed) }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
