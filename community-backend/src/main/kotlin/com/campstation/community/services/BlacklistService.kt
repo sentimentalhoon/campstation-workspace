@@ -93,7 +93,7 @@ class RealBlacklistService(
                 }
 
                 BlacklistResponse(
-                    blacklists = pagedBlacklists,
+                    items = pagedBlacklists,
                     total = total,
                     page = filter.page,
                     totalPages = totalPages
@@ -105,7 +105,7 @@ class RealBlacklistService(
             // Return mock data as fallback
             val mockBlacklists = getMockBlacklists()
             BlacklistResponse(
-                blacklists = mockBlacklists,
+                items = mockBlacklists,
                 total = mockBlacklists.size,
                 page = 1,
                 totalPages = 1
