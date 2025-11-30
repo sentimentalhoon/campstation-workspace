@@ -116,7 +116,6 @@ services:
     build:
       context: ./community-backend
       dockerfile: Dockerfile
-      target: runtime
     container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-backend
     environment:
       - PORT=8081
