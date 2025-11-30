@@ -333,7 +333,7 @@ const handleReport = () => {
       </div>
 
       <!-- Evidence Images -->
-      <div v-if="blacklist.images.length > 0" class="px-4 pb-4">
+      <div v-if="blacklist.images && blacklist.images.length > 0" class="px-4 pb-4">
         <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center space-x-2">
