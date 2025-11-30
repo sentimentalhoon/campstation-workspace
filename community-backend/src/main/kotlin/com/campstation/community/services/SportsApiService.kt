@@ -390,7 +390,11 @@ class RealSportsApiService(
             status = mappedStatus,
             homeScore = this.goals.home ?: 0,
             awayScore = this.goals.away ?: 0,
-            odds = mockOdds
+            odds = mockOdds,
+            elapsed = this.fixture.status.elapsed,
+            country = this.league.country,
+            homeTeamLogo = this.teams.home.logo,
+            awayTeamLogo = this.teams.away.logo
         )
     }
 }
@@ -420,7 +424,9 @@ class MockSportsApiService : SportsApiService {
                 status = "LIVE",
                 homeScore = 1,
                 awayScore = 1,
-                odds = MatchOdds(2.10, 3.50, 3.20)
+                odds = MatchOdds(2.10, 3.50, 3.20),
+                elapsed = 34,
+                country = "England"
             ),
             Match(
                 id = "live_2",
@@ -431,7 +437,9 @@ class MockSportsApiService : SportsApiService {
                 status = "LIVE",
                 homeScore = 0,
                 awayScore = 0,
-                odds = MatchOdds(2.50, 3.40, 2.80)
+                odds = MatchOdds(2.50, 3.40, 2.80),
+                elapsed = 12,
+                country = "Spain"
             ),
             Match(
                 id = "live_3",
@@ -442,7 +450,9 @@ class MockSportsApiService : SportsApiService {
                 status = "LIVE",
                 homeScore = 2,
                 awayScore = 1,
-                odds = MatchOdds(1.85, 3.60, 4.20)
+                odds = MatchOdds(1.85, 3.60, 4.20),
+                elapsed = 67,
+                country = "England"
             ),
             Match(
                 id = "live_4",
@@ -453,7 +463,9 @@ class MockSportsApiService : SportsApiService {
                 status = "LIVE",
                 homeScore = 1,
                 awayScore = 0,
-                odds = MatchOdds(2.20, 3.30, 3.40)
+                odds = MatchOdds(2.20, 3.30, 3.40),
+                elapsed = 45,
+                country = "Italy"
             ),
             Match(
                 id = "live_5",
@@ -464,7 +476,9 @@ class MockSportsApiService : SportsApiService {
                 status = "LIVE",
                 homeScore = 3,
                 awayScore = 2,
-                odds = MatchOdds(1.75, 3.80, 4.50)
+                odds = MatchOdds(1.75, 3.80, 4.50),
+                elapsed = 82,
+                country = "Germany"
             ),
             Match(
                 id = "live_6",
@@ -475,7 +489,9 @@ class MockSportsApiService : SportsApiService {
                 status = "LIVE",
                 homeScore = 2,
                 awayScore = 0,
-                odds = MatchOdds(1.60, 4.00, 5.50)
+                odds = MatchOdds(1.60, 4.00, 5.50),
+                elapsed = 56,
+                country = "France"
             )
         )
     }

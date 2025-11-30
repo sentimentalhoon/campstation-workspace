@@ -13,7 +13,11 @@ data class Match(
     val status: String, // "SCHEDULED", "LIVE", "FINISHED"
     val homeScore: Int? = null,
     val awayScore: Int? = null,
-    val odds: MatchOdds? = null
+    val odds: MatchOdds? = null,
+    val elapsed: Int? = null, // Minutes elapsed (for LIVE matches)
+    val country: String? = null, // League country
+    val homeTeamLogo: String? = null, // Home team logo URL
+    val awayTeamLogo: String? = null // Away team logo URL
 )
 
 @Serializable
