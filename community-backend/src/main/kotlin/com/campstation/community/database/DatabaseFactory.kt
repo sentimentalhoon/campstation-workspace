@@ -14,17 +14,17 @@ object DatabaseFactory {
     
     fun init(
         jdbcUrl: String = dotenv["DB_URL"] ?: System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/community",
-        dbUser: String = dotenv["DB_USER"] ?: System.getenv("DB_USER") ?: "postgres",
+        dbUser: String = dotenv["DB_USERNAME"] ?: System.getenv("DB_USERNAME") ?: "postgres",
         dbPassword: String = dotenv["DB_PASSWORD"] ?: System.getenv("DB_PASSWORD") ?: "postgres",
         dbDriver: String = "org.postgresql.Driver"
     ) {
         // Log environment variable loading
         println("=== Database Configuration ===")
         println("dotenv['DB_URL']: ${dotenv["DB_URL"]}")
-        println("dotenv['DB_USER']: ${dotenv["DB_USER"]}")
+        println("dotenv['DB_USERNAME']: ${dotenv["DB_USERNAME"]}")
         println("dotenv['DB_PASSWORD']: ${if (dotenv["DB_PASSWORD"] != null) "****" else "null"}")
         println("System.getenv('DB_URL'): ${System.getenv("DB_URL")}")
-        println("System.getenv('DB_USER'): ${System.getenv("DB_USER")}")
+        println("System.getenv('DB_USERNAME'): ${System.getenv("DB_USERNAME")}")
         println("Final jdbcUrl: $jdbcUrl")
         println("Final dbUser: $dbUser")
         println("Final dbPassword: ${if (dbPassword.isNotEmpty()) "****" else "empty"}")
