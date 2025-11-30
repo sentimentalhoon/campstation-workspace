@@ -41,7 +41,6 @@ object DatabaseFactory {
         // Connect Exposed to database
         Database.connect(dataSource!!)
     }
-    }
 
     private fun createHikariDataSource(
         url: String,
