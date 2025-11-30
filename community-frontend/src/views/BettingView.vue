@@ -27,6 +27,7 @@ const fetchUpcomingMatches = async () => {
 
     const data = await response.json();
 
+    // Backend already filters for major leagues and valid odds
     matches.value = data
       .map((match) => ({
         id: match.id,
@@ -35,9 +36,9 @@ const fetchUpcomingMatches = async () => {
         away: match.awayTeam,
         startTime: match.startTime,
         odds: {
-          home: match.odds?.homeWin ?? 0.0,
-          draw: match.odds?.draw ?? 0.0,
-          away: match.odds?.awayWin ?? 0.0,
+          home: match.odds?.homeWin ?? 2.0,
+          draw: match.odds?.draw ?? 3.0,
+          away: match.odds?.awayWin ?? 2.5,
         },
         selected: null,
       }))
@@ -48,7 +49,7 @@ const fetchUpcomingMatches = async () => {
     matches.value = [
       {
         id: 1,
-        league: "Premier League",
+        league: "프리미어 리그",
         home: "Man City",
         away: "Liverpool",
         startTime: new Date().toISOString(),

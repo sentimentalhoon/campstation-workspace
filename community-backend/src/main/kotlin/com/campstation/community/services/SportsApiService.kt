@@ -185,6 +185,19 @@ class RealSportsApiService(
 
         fun translateTeamName(name: String): String = teamNameKorean[name] ?: name
         fun translateLeagueName(name: String): String = leagueNameKorean[name] ?: name
+        
+        // Major leagues filter
+        private val majorLeagues = setOf(
+            "Premier League",
+            "La Liga",
+            "Serie A",
+            "Bundesliga",
+            "Ligue 1",
+            "K League 1",
+            "K League 2"
+        )
+        
+        fun isMajorLeague(leagueName: String): Boolean = majorLeagues.contains(leagueName)
     }
 
     private val client = HttpClient(CIO) {
@@ -223,8 +236,9 @@ class RealSportsApiService(
                     println("Live Matches API Response received")
                     
                     parseApiResponse(responseText)?.let { matches ->
-                        cacheMatches(cacheKey, matches, CACHE_TTL_LIVE)
-                        return@withContext matches
+                        val filteredMatches = matches.filter { isMajorLeague(it.league) }
+                        cacheMatches(cacheKey, filteredMatches, CACHE_TTL_LIVE)
+                        return@withContext filteredMatches
                     } ?: run {
                         println("Failed to parse API response, falling back to mock data")
                         return@withContext mockService.getLiveMatches()
@@ -268,8 +282,11 @@ class RealSportsApiService(
                     println("Upcoming Matches API Response received")
                     
                     parseApiResponse(responseText)?.let { matches ->
-                        cacheMatches(cacheKey, matches, CACHE_TTL_UPCOMING)
-                        return@withContext matches
+                        val filteredMatches = matches.filter { match ->
+                            isMajorLeague(match.league) && match.odds != null
+                        }
+                        cacheMatches(cacheKey, filteredMatches, CACHE_TTL_UPCOMING)
+                        return@withContext filteredMatches
                     } ?: run {
                         println("Failed to parse API response, falling back to mock data")
                         return@withContext mockService.getUpcomingMatches()
