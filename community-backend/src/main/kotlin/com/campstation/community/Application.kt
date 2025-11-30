@@ -1,5 +1,6 @@
 package com.campstation.community
 
+import com.campstation.community.database.DatabaseFactory
 import com.campstation.community.routes.blacklistRoutes
 import com.campstation.community.routes.sportsRoutes
 import com.campstation.community.services.*
@@ -20,7 +21,10 @@ fun main() {
 }
 
 fun Application.module() {
-    // 1. Serialization (JSON)
+    // 1. Database Initialization
+    DatabaseFactory.init()
+    
+    // 2. Serialization (JSON)
     install(ContentNegotiation) {
         json(Json {
             prettyPrint = true
@@ -28,7 +32,7 @@ fun Application.module() {
         })
     }
 
-    // 2. CORS (Cross-Origin Resource Sharing)
+    // 3. CORS (Cross-Origin Resource Sharing)
     install(CORS) {
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Put)
@@ -45,7 +49,7 @@ fun Application.module() {
         anyHost() // 테스트용 (보안상 나중에 제한 필요)
     }
 
-    // 3. Services
+    // 4. Services
     // API Football Direct API Key (환경변수에서 가져오거나 기본값 사용)
     // 빈 문자열("")로 넘어오는 경우를 대비해 takeIf { it.isNotBlank() } 추가
     val apiFootballKey = System.getenv("API_FOOTBALL_KEY")?.takeIf { it.isNotBlank() } 
@@ -61,14 +65,9 @@ fun Application.module() {
         MockSportsApiService()
     }
 
-    val blacklistService: BlacklistService = try {
-        RealBlacklistService(redisHost, redisPort)
-    } catch (e: Exception) {
-        println("Failed to initialize RealBlacklistService: ${e.message}")
-        RealBlacklistService(redisHost, redisPort) // Still try to use it
-    }
+    val blacklistService: BlacklistService = PostgresBlacklistService()
 
-    // 4. Routing
+    // 5. Routing
     routing {
         get("/") {
             call.respondText("Hello from CampStation Community Backend (Ktor)!")
