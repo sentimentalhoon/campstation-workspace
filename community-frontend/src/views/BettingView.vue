@@ -1,30 +1,30 @@
 <script setup>
 import { Coins, Trophy } from "lucide-vue-next";
-import { ref, onMounted } from "vue";
+import { onMounted, ref } from "vue";
 
 const myPoints = ref(5400);
 const matches = ref([]);
 
 const fetchUpcomingMatches = async () => {
   try {
-    const baseUrl = import.meta.env.VITE_API_URL || '/api/community';
+    const baseUrl = import.meta.env.VITE_API_URL || "/api/community";
     const response = await fetch(`${baseUrl}/api/sports/upcoming`);
-    if (!response.ok) throw new Error('Network response was not ok');
-    
+    if (!response.ok) throw new Error("Network response was not ok");
+
     const data = await response.json();
-    
-    matches.value = data.map(match => ({
+
+    matches.value = data.map((match) => ({
       id: match.id,
       league: match.league,
       home: match.homeTeam,
       away: match.awayTeam,
       startTime: match.startTime,
-      odds: { 
-        home: match.odds.homeWin, 
-        draw: match.odds.draw, 
-        away: match.odds.awayWin 
+      odds: {
+        home: match.odds?.homeWin ?? 2.0,
+        draw: match.odds?.draw ?? 3.0,
+        away: match.odds?.awayWin ?? 2.5,
       },
-      selected: null
+      selected: null,
     }));
   } catch (error) {
     console.error("Failed to fetch upcoming matches:", error);
@@ -37,7 +37,7 @@ const fetchUpcomingMatches = async () => {
         away: "Liverpool",
         odds: { home: 2.1, draw: 3.4, away: 3.1 },
         selected: null,
-      }
+      },
     ];
   }
 };

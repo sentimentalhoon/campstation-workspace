@@ -42,6 +42,149 @@ class RealSportsApiService(
             prettyPrint = false
             coerceInputValues = true
         }
+
+        // Team name translations (English to Korean)
+        private val teamNameKorean = mapOf(
+            // K League 1
+            "Ulsan" to "울산 HD",
+            "Ulsan HD" to "울산 HD",
+            "Pohang Steelers" to "포항 스틸러스",
+            "Jeonbuk Motors" to "전북 현대",
+            "Jeonbuk Hyundai Motors" to "전북 현대",
+            "Gwangju FC" to "광주 FC",
+            "Daegu FC" to "대구 FC",
+            "Suwon FC" to "수원 FC",
+            "Jeju United" to "제주 유나이티드",
+            "FC Seoul" to "FC 서울",
+            "Gangwon FC" to "강원 FC",
+            "Incheon United" to "인천 유나이티드",
+            "Daejeon Hana Citizen" to "대전 하나 시티즌",
+            "Suwon Bluewings" to "수원 삼성",
+            "Suwon Samsung Bluewings" to "수원 삼성",
+            
+            // K League 2
+            "Busan I'Park" to "부산 아이파크",
+            "Bucheon FC" to "부천 FC",
+            "Gimpo FC" to "김포 FC",
+            "Seoul E-Land" to "서울 이랜드",
+            "Chungnam Asan" to "충남 아산",
+            "Ansan Greeners" to "안산 그리너스",
+            "Gyeongnam FC" to "경남 FC",
+            "Jeonnam Dragons" to "전남 드래곤즈",
+            "Cheonan City" to "천안 시티",
+            "Seongnam FC" to "성남 FC",
+            "Asan Mugunghwa" to "아산 무궁화",
+            
+            // Premier League
+            "Arsenal" to "아스널",
+            "Liverpool" to "리버풀",
+            "Manchester City" to "맨체스터 시티",
+            "Manchester United" to "맨체스터 유나이티드",
+            "Chelsea" to "첼시",
+            "Tottenham" to "토트넘",
+            "Newcastle" to "뉴캐슬",
+            "Aston Villa" to "애스턴 빌라",
+            "West Ham" to "웨스트햄",
+            "Brighton" to "브라이턴",
+            "Fulham" to "풀럼",
+            "Brentford" to "브렌트포드",
+            "Crystal Palace" to "크리스탈 팰리스",
+            "Wolves" to "울버햄튼",
+            "Everton" to "에버튼",
+            "Nottingham Forest" to "노팅엄 포레스트",
+            "Leicester" to "레스터",
+            "Leeds" to "리즈",
+            "Southampton" to "사우샘프턴",
+            "Bournemouth" to "본머스",
+            
+            // La Liga
+            "Real Madrid" to "레알 마드리드",
+            "Barcelona" to "바르셀로나",
+            "Atletico Madrid" to "아틀레티코 마드리드",
+            "Sevilla" to "세비야",
+            "Valencia" to "발렌시아",
+            "Real Sociedad" to "레알 소시에다드",
+            "Athletic Club" to "아틀레틱 빌바오",
+            "Villarreal" to "비야레알",
+            "Real Betis" to "레알 베티스",
+            "Celta Vigo" to "셀타 비고",
+            "Osasuna" to "오사수나",
+            "Girona" to "지로나",
+            "Mallorca" to "마요르카",
+            "Getafe" to "헤타페",
+            "Rayo Vallecano" to "라요 바예카노",
+            
+            // Serie A
+            "Juventus" to "유벤투스",
+            "AC Milan" to "AC 밀란",
+            "Inter Milan" to "인테르 밀란",
+            "Napoli" to "나폴리",
+            "AS Roma" to "AS 로마",
+            "Lazio" to "라치오",
+            "Atalanta" to "아탈란타",
+            "Fiorentina" to "피오렌티나",
+            "Torino" to "토리노",
+            "Bologna" to "볼로냐",
+            "Udinese" to "우디네세",
+            "Sassuolo" to "사수올로",
+            "Monza" to "몬자",
+            "Lecce" to "레체",
+            
+            // Bundesliga
+            "Bayern Munich" to "바이에른 뮌헨",
+            "Borussia Dortmund" to "보루시아 도르트문트",
+            "RB Leipzig" to "RB 라이프치히",
+            "Bayer Leverkusen" to "바이어 레버쿠젠",
+            "Union Berlin" to "우니온 베를린",
+            "Freiburg" to "프라이부르크",
+            "Eintracht Frankfurt" to "프랑크푸르트",
+            "Wolfsburg" to "볼프스부르크",
+            "Borussia Monchengladbach" to "보루시아 묀헨글라트바흐",
+            "Mainz" to "마인츠",
+            "Hoffenheim" to "호펜하임",
+            "Cologne" to "쾰른",
+            "Augsburg" to "아우크스부르크",
+            "Stuttgart" to "슈투트가르트",
+            "Hertha Berlin" to "헤르타 베를린",
+            
+            // Ligue 1
+            "PSG" to "파리 생제르맹",
+            "Paris Saint Germain" to "파리 생제르맹",
+            "Marseille" to "마르세유",
+            "Lyon" to "리옹",
+            "Monaco" to "모나코",
+            "Lille" to "릴",
+            "Rennes" to "렌",
+            "Nice" to "니스",
+            "Lens" to "랑스",
+            "Strasbourg" to "스트라스부르",
+            "Nantes" to "낭트",
+            "Montpellier" to "몽펠리에",
+            "Reims" to "랭스",
+            "Brest" to "브레스트",
+            "Toulouse" to "툴루즈"
+        )
+
+        // League name translations
+        private val leagueNameKorean = mapOf(
+            "K League 1" to "K리그1",
+            "K League 2" to "K리그2",
+            "Premier League" to "프리미어 리그",
+            "La Liga" to "라리가",
+            "Serie A" to "세리에 A",
+            "Bundesliga" to "분데스리가",
+            "Ligue 1" to "리그 1",
+            "UEFA Champions League" to "UEFA 챔피언스 리그",
+            "UEFA Europa League" to "UEFA 유로파 리그",
+            "FA Cup" to "FA컵",
+            "Copa del Rey" to "코파 델 레이",
+            "DFB Pokal" to "DFB 포칼",
+            "Coppa Italia" to "코파 이탈리아",
+            "Coupe de France" to "쿠프 드 프랑스"
+        )
+
+        fun translateTeamName(name: String): String = teamNameKorean[name] ?: name
+        fun translateLeagueName(name: String): String = leagueNameKorean[name] ?: name
     }
 
     private val client = HttpClient(CIO) {
@@ -224,9 +367,9 @@ class RealSportsApiService(
 
         return Match(
             id = this.fixture.id.toString(),
-            league = this.league.name,
-            homeTeam = this.teams.home.name,
-            awayTeam = this.teams.away.name,
+            league = translateLeagueName(this.league.name),
+            homeTeam = translateTeamName(this.teams.home.name),
+            awayTeam = translateTeamName(this.teams.away.name),
             startTime = this.fixture.date,
             status = mappedStatus,
             homeScore = this.goals.home ?: 0,
@@ -254,9 +397,9 @@ class MockSportsApiService : SportsApiService {
         return listOf(
             Match(
                 id = "live_1",
-                league = "Premier League",
-                homeTeam = "Arsenal",
-                awayTeam = "Liverpool",
+                league = "프리미어 리그",
+                homeTeam = "아스널",
+                awayTeam = "리버풀",
                 startTime = "2024-11-30T21:30:00",
                 status = "LIVE",
                 homeScore = 1,
@@ -265,9 +408,9 @@ class MockSportsApiService : SportsApiService {
             ),
             Match(
                 id = "live_2",
-                league = "La Liga",
-                homeTeam = "Real Madrid",
-                awayTeam = "Barcelona",
+                league = "라리가",
+                homeTeam = "레알 마드리드",
+                awayTeam = "바르셀로나",
                 startTime = "2024-11-30T22:00:00",
                 status = "LIVE",
                 homeScore = 0,
@@ -276,9 +419,9 @@ class MockSportsApiService : SportsApiService {
             ),
             Match(
                 id = "live_3",
-                league = "Premier League",
-                homeTeam = "Manchester City",
-                awayTeam = "Chelsea",
+                league = "프리미어 리그",
+                homeTeam = "맨체스터 시티",
+                awayTeam = "첼시",
                 startTime = "2024-11-30T19:00:00",
                 status = "LIVE",
                 homeScore = 2,
@@ -287,9 +430,9 @@ class MockSportsApiService : SportsApiService {
             ),
             Match(
                 id = "live_4",
-                league = "Serie A",
-                homeTeam = "Inter Milan",
-                awayTeam = "Napoli",
+                league = "세리에 A",
+                homeTeam = "인테르 밀란",
+                awayTeam = "나폴리",
                 startTime = "2024-11-30T20:45:00",
                 status = "LIVE",
                 homeScore = 1,
@@ -298,9 +441,9 @@ class MockSportsApiService : SportsApiService {
             ),
             Match(
                 id = "live_5",
-                league = "Bundesliga",
-                homeTeam = "Bayern Munich",
-                awayTeam = "Borussia Dortmund",
+                league = "분데스리가",
+                homeTeam = "바이에른 뮌헨",
+                awayTeam = "보루시아 도르트문트",
                 startTime = "2024-11-30T18:30:00",
                 status = "LIVE",
                 homeScore = 3,
@@ -309,9 +452,9 @@ class MockSportsApiService : SportsApiService {
             ),
             Match(
                 id = "live_6",
-                league = "Ligue 1",
-                homeTeam = "PSG",
-                awayTeam = "Marseille",
+                league = "리그 1",
+                homeTeam = "파리 생제르맹",
+                awayTeam = "마르세유",
                 startTime = "2024-11-30T20:00:00",
                 status = "LIVE",
                 homeScore = 2,
@@ -325,72 +468,72 @@ class MockSportsApiService : SportsApiService {
         return listOf(
             Match(
                 id = "upcoming_1",
-                league = "Serie A",
-                homeTeam = "Juventus",
-                awayTeam = "AC Milan",
+                league = "세리에 A",
+                homeTeam = "유벤투스",
+                awayTeam = "AC 밀란",
                 startTime = "2024-12-01T04:00:00",
                 status = "SCHEDULED",
                 odds = MatchOdds(2.30, 3.10, 3.00)
             ),
             Match(
                 id = "upcoming_2",
-                league = "Premier League",
-                homeTeam = "Manchester United",
-                awayTeam = "Tottenham",
+                league = "프리미어 리그",
+                homeTeam = "맨체스터 유나이티드",
+                awayTeam = "토트넘",
                 startTime = "2024-12-01T06:30:00",
                 status = "SCHEDULED",
                 odds = MatchOdds(2.80, 3.20, 2.60)
             ),
             Match(
                 id = "upcoming_3",
-                league = "La Liga",
-                homeTeam = "Atletico Madrid",
-                awayTeam = "Sevilla",
+                league = "라리가",
+                homeTeam = "아틀레티코 마드리드",
+                awayTeam = "세비야",
                 startTime = "2024-12-01T08:00:00",
                 status = "SCHEDULED",
                 odds = MatchOdds(1.95, 3.40, 3.90)
             ),
             Match(
                 id = "upcoming_4",
-                league = "Bundesliga",
-                homeTeam = "RB Leipzig",
-                awayTeam = "Bayer Leverkusen",
+                league = "분데스리가",
+                homeTeam = "RB 라이프치히",
+                awayTeam = "바이어 레버쿠젠",
                 startTime = "2024-12-01T10:30:00",
                 status = "SCHEDULED",
                 odds = MatchOdds(2.40, 3.30, 2.90)
             ),
             Match(
                 id = "upcoming_5",
-                league = "Ligue 1",
-                homeTeam = "Lyon",
-                awayTeam = "Monaco",
+                league = "리그 1",
+                homeTeam = "리옹",
+                awayTeam = "모나코",
                 startTime = "2024-12-01T12:00:00",
                 status = "SCHEDULED",
                 odds = MatchOdds(2.70, 3.10, 2.70)
             ),
             Match(
                 id = "upcoming_6",
-                league = "Premier League",
-                homeTeam = "Newcastle",
-                awayTeam = "Aston Villa",
+                league = "프리미어 리그",
+                homeTeam = "뉴캐슬",
+                awayTeam = "애스턴 빌라",
                 startTime = "2024-12-02T04:00:00",
                 status = "SCHEDULED",
                 odds = MatchOdds(2.20, 3.30, 3.30)
             ),
             Match(
                 id = "upcoming_7",
-                league = "Serie A",
-                homeTeam = "AS Roma",
-                awayTeam = "Lazio",
+                league = "세리에 A",
+                homeTeam = "AS 로마",
+                awayTeam = "라치오",
                 startTime = "2024-12-02T06:45:00",
                 status = "SCHEDULED",
                 odds = MatchOdds(2.50, 3.20, 2.90)
             ),
             Match(
                 id = "upcoming_8",
-                league = "La Liga",
-                homeTeam = "Valencia",
-                awayTeam = "Real Sociedad",
+                league = "라리가",
+                homeTeam = "발렌시아",
+                awayTeam = "레알 소시에다드",
                 startTime = "2024-12-02T09:00:00",
                 status = "SCHEDULED",
                 odds = MatchOdds(2.60, 3.00, 2.80)
