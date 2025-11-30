@@ -220,6 +220,7 @@ const handleSubmit = async () => {
       dangerLevel: formData.value.dangerLevel,
       reason: formData.value.reason,
       description: formData.value.description,
+      // TODO: Replace with logged-in user ID after authentication is implemented
       reportedBy: "anonymous", // Required field
       images: formData.value.images.map((img) => img.originalUrl),
     };
