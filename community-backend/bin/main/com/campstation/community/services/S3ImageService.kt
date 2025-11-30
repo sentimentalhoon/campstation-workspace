@@ -25,6 +25,9 @@ class S3ImageService(private val s3Client: S3Client = S3Config.createS3Client())
     companion object {
         const val THUMBNAIL_WIDTH = 400
         const val THUMBNAIL_HEIGHT = 300
+        const val ORIGINAL_MAX_WIDTH = 1920  // Full HD 너비
+        const val ORIGINAL_MAX_HEIGHT = 1080 // Full HD 높이
+        const val JPEG_QUALITY = 0.85f       // JPEG 압축 품질 (0.0 ~ 1.0)
         
         private val ALLOWED_EXTENSIONS = setOf("jpg", "jpeg", "png", "gif", "webp")
     }
@@ -46,12 +49,13 @@ class S3ImageService(private val s3Client: S3Client = S3Config.createS3Client())
         
         val uniqueId = UUID.randomUUID().toString()
         
-        // 1. 원본 업로드
+        // 1. 원본 최적화 및 업로드 (1920x1080 이내로 리사이즈)
+        val optimizedOriginalBytes = optimizeOriginal(imageBytes, extension)
         val originalKey = "$folder/original/$uniqueId$extension"
-        uploadToS3(originalKey, imageBytes, getContentType(extension))
+        uploadToS3(originalKey, optimizedOriginalBytes, getContentType(extension))
         val originalUrl = "$publicEndpoint/$originalKey"
         
-        // 2. 썸네일 생성 및 업로드
+        // 2. 썸네일 생성 및 업로드 (400x300)
         val thumbnailBytes = createThumbnail(imageBytes, extension)
         val thumbnailKey = "$folder/thumbnail/$uniqueId$extension"
         uploadToS3(thumbnailKey, thumbnailBytes, getContentType(extension))
@@ -63,6 +67,72 @@ class S3ImageService(private val s3Client: S3Client = S3Config.createS3Client())
             originalUrl = originalUrl,
             thumbnailUrl = thumbnailUrl
         )
+    }
+
+    /**
+     * 원본 이미지 최적화 (1920x1080 이내로 리사이즈 + 품질 압축)
+     */
+    private fun optimizeOriginal(imageBytes: ByteArray, extension: String): ByteArray {
+        val inputStream = ByteArrayInputStream(imageBytes)
+        val originalImage = ImageIO.read(inputStream)
+            ?: throw IllegalArgumentException("Invalid image format")
+
+        // 이미 최적 크기 이하면 JPEG 재압축만 수행
+        if (originalImage.width <= ORIGINAL_MAX_WIDTH && originalImage.height <= ORIGINAL_MAX_HEIGHT) {
+            return compressImage(originalImage, extension)
+        }
+
+        // 비율 유지하며 리사이즈
+        val (newWidth, newHeight) = calculateThumbnailSize(
+            originalImage.width,
+            originalImage.height,
+            ORIGINAL_MAX_WIDTH,
+            ORIGINAL_MAX_HEIGHT
+        )
+
+        val scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH)
+        val optimized = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB)
+        
+        val g2d = optimized.createGraphics()
+        g2d.drawImage(scaledImage, 0, 0, null)
+        g2d.dispose()
+
+        return compressImage(optimized, extension)
+    }
+
+    /**
+     * 이미지 압축 (JPEG 품질 적용)
+     */
+    private fun compressImage(image: BufferedImage, extension: String): ByteArray {
+        val outputStream = ByteArrayOutputStream()
+        val format = when (extension.lowercase()) {
+            ".jpg", ".jpeg" -> "jpg"
+            ".png" -> "png"
+            ".gif" -> "gif"
+            ".webp" -> "webp"
+            else -> "jpg"
+        }
+
+        // JPEG의 경우 품질 설정 적용
+        if (format == "jpg") {
+            val writers = ImageIO.getImageWritersByFormatName("jpg")
+            if (writers.hasNext()) {
+                val writer = writers.next()
+                val writeParam = writer.defaultWriteParam
+                writeParam.compressionMode = javax.imageio.ImageWriteParam.MODE_EXPLICIT
+                writeParam.compressionQuality = JPEG_QUALITY
+                
+                writer.output = javax.imageio.ImageIO.createImageOutputStream(outputStream)
+                writer.write(null, javax.imageio.IIOImage(image, null, null), writeParam)
+                writer.dispose()
+            } else {
+                ImageIO.write(image, format, outputStream)
+            }
+        } else {
+            ImageIO.write(image, format, outputStream)
+        }
+        
+        return outputStream.toByteArray()
     }
 
     /**
