@@ -1,17 +1,17 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import {
-  Search,
   AlertTriangle,
-  Filter,
-  ChevronDown,
-  MapPin,
   Calendar,
+  ChevronDown,
+  Filter,
+  MapPin,
+  Search,
+  Shield,
   TrendingUp,
   UserX,
-  Shield,
 } from "lucide-vue-next";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 
@@ -225,7 +225,9 @@ const navigateToRegister = () => {
 <template>
   <div class="min-h-screen bg-black pb-20">
     <!-- Hero Section -->
-    <div class="bg-gradient-to-br from-red-900/20 to-orange-900/20 p-6 border-b border-red-900/30">
+    <div
+      class="bg-gradient-to-br from-red-900/20 to-orange-900/20 p-6 border-b border-red-900/30"
+    >
       <div class="flex items-center space-x-3 mb-4">
         <div class="p-3 bg-red-500/20 rounded-xl">
           <Shield :size="32" class="text-red-500" />
@@ -238,21 +240,33 @@ const navigateToRegister = () => {
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-4 gap-2 mt-4">
-        <div class="bg-black/30 backdrop-blur-sm rounded-lg p-3 border border-gray-800">
+        <div
+          class="bg-black/30 backdrop-blur-sm rounded-lg p-3 border border-gray-800"
+        >
           <div class="text-xs text-gray-400 mb-1">전체</div>
           <div class="text-xl font-bold text-white">{{ stats.total }}</div>
         </div>
-        <div class="bg-red-500/10 backdrop-blur-sm rounded-lg p-3 border border-red-500/30">
+        <div
+          class="bg-red-500/10 backdrop-blur-sm rounded-lg p-3 border border-red-500/30"
+        >
           <div class="text-xs text-red-400 mb-1">위험</div>
           <div class="text-xl font-bold text-red-500">{{ stats.danger }}</div>
         </div>
-        <div class="bg-orange-500/10 backdrop-blur-sm rounded-lg p-3 border border-orange-500/30">
+        <div
+          class="bg-orange-500/10 backdrop-blur-sm rounded-lg p-3 border border-orange-500/30"
+        >
           <div class="text-xs text-orange-400 mb-1">경고</div>
-          <div class="text-xl font-bold text-orange-500">{{ stats.warning }}</div>
+          <div class="text-xl font-bold text-orange-500">
+            {{ stats.warning }}
+          </div>
         </div>
-        <div class="bg-yellow-500/10 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/30">
+        <div
+          class="bg-yellow-500/10 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/30"
+        >
           <div class="text-xs text-yellow-400 mb-1">주의</div>
-          <div class="text-xl font-bold text-yellow-500">{{ stats.caution }}</div>
+          <div class="text-xl font-bold text-yellow-500">
+            {{ stats.caution }}
+          </div>
         </div>
       </div>
     </div>
@@ -293,7 +307,11 @@ const navigateToRegister = () => {
           v-model="selectedSort"
           class="flex-1 px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg text-sm text-white focus:outline-none focus:border-red-500/50 transition-colors"
         >
-          <option v-for="opt in sortOptions" :key="opt.value" :value="opt.value">
+          <option
+            v-for="opt in sortOptions"
+            :key="opt.value"
+            :value="opt.value"
+          >
             {{ opt.label }}
           </option>
         </select>
@@ -340,7 +358,9 @@ const navigateToRegister = () => {
             <div class="flex-1 min-w-0">
               <div class="flex items-center space-x-2 mb-1">
                 <h3 class="text-white font-bold">{{ item.name }}</h3>
-                <span class="text-xs text-gray-500">{{ item.age }}세 · {{ item.gender }}</span>
+                <span class="text-xs text-gray-500"
+                  >{{ item.age }}세 · {{ item.gender }}</span
+                >
                 <span
                   v-if="item.verified"
                   class="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full"

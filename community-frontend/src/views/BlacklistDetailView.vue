@@ -1,23 +1,23 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
 import {
-  ArrowLeft,
-  MapPin,
-  Calendar,
-  Eye,
-  Share2,
-  Flag,
-  UserX,
   AlertTriangle,
-  Phone,
+  ArrowLeft,
   Building2,
-  Clock,
-  ImageIcon,
+  Calendar,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Clock,
+  Eye,
+  Flag,
+  ImageIcon,
+  MapPin,
+  Phone,
+  Share2,
+  UserX,
 } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
 const route = useRoute();
@@ -37,7 +37,8 @@ const blacklist = ref({
   reason: "기물 파손",
   description:
     "2025년 11월 28일 오후 3시경, 게임에서 졌다는 이유로 키보드와 마우스를 집어던지고 모니터를 주먹으로 여러 차례 때려 파손시켰습니다.\n\n파손된 장비:\n- 삼성 모니터 27인치 (약 35만원)\n- 로지텍 키보드 (약 15만원)\n- 로지텍 마우스 (약 8만원)\n\n손해배상 요구에 욕설과 협박을 하며 거부하였고, 경찰 신고 예고하자 도주하였습니다. CCTV에 모든 장면이 녹화되어 있으며 현재 경찰 수사 진행 중입니다.",
-  detailedInfo: "게임 패배 후 분노 조절 장애 의심. 주변 손님들에게도 위협적인 언행을 보였음.",
+  detailedInfo:
+    "게임 패배 후 분노 조절 장애 의심. 주변 손님들에게도 위협적인 언행을 보였음.",
   date: "2025-11-28",
   views: 1234,
   verified: true,
@@ -87,7 +88,9 @@ const getDangerColor = (level) => {
   }
 };
 
-const dangerColors = computed(() => getDangerColor(blacklist.value.dangerLevel));
+const dangerColors = computed(() =>
+  getDangerColor(blacklist.value.dangerLevel)
+);
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
@@ -115,7 +118,8 @@ const closeImageModal = () => {
 };
 
 const nextImage = () => {
-  currentImageIndex.value = (currentImageIndex.value + 1) % blacklist.value.images.length;
+  currentImageIndex.value =
+    (currentImageIndex.value + 1) % blacklist.value.images.length;
 };
 
 const prevImage = () => {
@@ -151,17 +155,28 @@ onMounted(() => {
 <template>
   <div class="min-h-screen bg-black pb-20">
     <!-- Header -->
-    <div class="sticky top-0 z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800 px-4 py-3">
+    <div
+      class="sticky top-0 z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800 px-4 py-3"
+    >
       <div class="flex items-center justify-between">
-        <button @click="router.back()" class="p-2 -ml-2 text-gray-400 hover:text-white">
+        <button
+          @click="router.back()"
+          class="p-2 -ml-2 text-gray-400 hover:text-white"
+        >
           <ArrowLeft :size="24" />
         </button>
         <h1 class="text-lg font-bold text-white">상세 정보</h1>
         <div class="flex items-center space-x-2">
-          <button @click="handleShare" class="p-2 text-gray-400 hover:text-white">
+          <button
+            @click="handleShare"
+            class="p-2 text-gray-400 hover:text-white"
+          >
             <Share2 :size="20" />
           </button>
-          <button @click="handleReport" class="p-2 text-gray-400 hover:text-white">
+          <button
+            @click="handleReport"
+            class="p-2 text-gray-400 hover:text-white"
+          >
             <Flag :size="20" />
           </button>
         </div>
@@ -203,7 +218,9 @@ onMounted(() => {
             <UserX :size="24" class="text-red-500" />
           </div>
           <div class="flex-1">
-            <h2 class="text-2xl font-bold text-white mb-2">{{ blacklist.name }}</h2>
+            <h2 class="text-2xl font-bold text-white mb-2">
+              {{ blacklist.name }}
+            </h2>
             <div class="flex items-center space-x-3 text-sm text-gray-400">
               <span>{{ blacklist.age }}세</span>
               <span>·</span>
@@ -219,7 +236,9 @@ onMounted(() => {
               <Phone :size="14" class="text-gray-500" />
               <span class="text-xs text-gray-500">연락처</span>
             </div>
-            <div class="text-sm font-medium text-white">{{ blacklist.phone }}</div>
+            <div class="text-sm font-medium text-white">
+              {{ blacklist.phone }}
+            </div>
           </div>
 
           <div class="p-3 bg-gray-800 rounded-lg">
@@ -227,7 +246,9 @@ onMounted(() => {
               <MapPin :size="14" class="text-gray-500" />
               <span class="text-xs text-gray-500">지역</span>
             </div>
-            <div class="text-sm font-medium text-white">{{ blacklist.region }}</div>
+            <div class="text-sm font-medium text-white">
+              {{ blacklist.region }}
+            </div>
           </div>
 
           <div class="col-span-2 p-3 bg-gray-800 rounded-lg">
@@ -235,7 +256,9 @@ onMounted(() => {
               <Building2 :size="14" class="text-gray-500" />
               <span class="text-xs text-gray-500">PC방</span>
             </div>
-            <div class="text-sm font-medium text-white">{{ blacklist.pcCafe }}</div>
+            <div class="text-sm font-medium text-white">
+              {{ blacklist.pcCafe }}
+            </div>
           </div>
         </div>
       </div>
@@ -246,21 +269,33 @@ onMounted(() => {
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
         <div class="mb-4">
           <div class="text-xs text-gray-500 mb-2">사유</div>
-          <div class="inline-block px-4 py-2 bg-red-500/20 rounded-lg border border-red-500/30">
-            <span class="text-lg font-bold text-red-400">{{ blacklist.reason }}</span>
+          <div
+            class="inline-block px-4 py-2 bg-red-500/20 rounded-lg border border-red-500/30"
+          >
+            <span class="text-lg font-bold text-red-400">{{
+              blacklist.reason
+            }}</span>
           </div>
         </div>
 
         <div class="mb-4">
           <div class="text-xs text-gray-500 mb-2">상세 내용</div>
-          <div class="text-sm text-gray-300 leading-relaxed whitespace-pre-line">
+          <div
+            class="text-sm text-gray-300 leading-relaxed whitespace-pre-line"
+          >
             {{ blacklist.description }}
           </div>
         </div>
 
-        <div v-if="blacklist.detailedInfo" class="p-3 bg-orange-900/20 border border-orange-500/30 rounded-lg">
+        <div
+          v-if="blacklist.detailedInfo"
+          class="p-3 bg-orange-900/20 border border-orange-500/30 rounded-lg"
+        >
           <div class="flex items-start space-x-2">
-            <AlertTriangle :size="16" class="text-orange-400 mt-0.5 flex-shrink-0" />
+            <AlertTriangle
+              :size="16"
+              class="text-orange-400 mt-0.5 flex-shrink-0"
+            />
             <p class="text-sm text-orange-200">{{ blacklist.detailedInfo }}</p>
           </div>
         </div>
@@ -275,7 +310,9 @@ onMounted(() => {
             <ImageIcon :size="18" class="text-gray-400" />
             <span class="text-sm font-bold text-white">증거 사진</span>
           </div>
-          <span class="text-xs text-gray-500">{{ blacklist.images.length }}장</span>
+          <span class="text-xs text-gray-500"
+            >{{ blacklist.images.length }}장</span
+          >
         </div>
 
         <div class="grid grid-cols-3 gap-2">
@@ -285,7 +322,11 @@ onMounted(() => {
             @click="openImageModal(index)"
             class="aspect-square rounded-lg overflow-hidden bg-gray-800 cursor-pointer hover:opacity-80 transition-opacity"
           >
-            <img :src="image" alt="증거 사진" class="w-full h-full object-cover" />
+            <img
+              :src="image"
+              alt="증거 사진"
+              class="w-full h-full object-cover"
+            />
           </div>
         </div>
       </div>
@@ -299,17 +340,23 @@ onMounted(() => {
         <div class="space-y-3">
           <div class="flex items-center justify-between text-sm">
             <span class="text-gray-400">신고자</span>
-            <span class="text-white font-medium">{{ blacklist.reportedBy }}</span>
+            <span class="text-white font-medium">{{
+              blacklist.reportedBy
+            }}</span>
           </div>
 
           <div class="flex items-center justify-between text-sm">
             <span class="text-gray-400">신고일시</span>
-            <span class="text-white font-medium">{{ blacklist.reportDate }}</span>
+            <span class="text-white font-medium">{{
+              blacklist.reportDate
+            }}</span>
           </div>
 
           <div class="flex items-center justify-between text-sm">
             <span class="text-gray-400">처리 상태</span>
-            <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-medium">
+            <span
+              class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-medium"
+            >
               {{ blacklist.status }}
             </span>
           </div>
@@ -318,7 +365,9 @@ onMounted(() => {
             <span class="text-gray-400">조회수</span>
             <div class="flex items-center space-x-1">
               <Eye :size="14" class="text-gray-500" />
-              <span class="text-white font-medium">{{ formatViews(blacklist.views) }}</span>
+              <span class="text-white font-medium">{{
+                formatViews(blacklist.views)
+              }}</span>
             </div>
           </div>
         </div>
@@ -327,7 +376,9 @@ onMounted(() => {
 
     <!-- Meta Info -->
     <div class="px-4 pb-4">
-      <div class="flex items-center justify-center space-x-4 text-xs text-gray-600">
+      <div
+        class="flex items-center justify-center space-x-4 text-xs text-gray-600"
+      >
         <div class="flex items-center space-x-1">
           <Calendar :size="12" />
           <span>{{ formatDate(blacklist.date) }}</span>

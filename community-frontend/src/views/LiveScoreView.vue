@@ -214,7 +214,9 @@ onMounted(() => {
                 </div>
                 <span
                   class="text-lg font-bold text-white ml-3 min-w-[24px] text-right"
-                  :class="{ 'text-named-highlight': match.homeScore > match.awayScore }"
+                  :class="{
+                    'text-named-highlight': match.homeScore > match.awayScore,
+                  }"
                 >
                   {{ match.homeScore }}
                 </span>
@@ -239,7 +241,9 @@ onMounted(() => {
                 </div>
                 <span
                   class="text-lg font-bold text-white ml-3 min-w-[24px] text-right"
-                  :class="{ 'text-named-highlight': match.awayScore > match.homeScore }"
+                  :class="{
+                    'text-named-highlight': match.awayScore > match.homeScore,
+                  }"
                 >
                   {{ match.awayScore }}
                 </span>

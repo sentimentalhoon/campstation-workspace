@@ -1,18 +1,16 @@
 <script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
 import {
-  ArrowLeft,
-  Camera,
-  X,
   AlertCircle,
-  User,
-  Phone,
-  MapPin,
-  Building2,
   AlertTriangle,
-  FileText,
+  ArrowLeft,
+  Building2,
+  Camera,
+  MapPin,
+  User,
+  X,
 } from "lucide-vue-next";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 
@@ -51,9 +49,21 @@ const regions = [
 ];
 
 const dangerLevels = [
-  { value: "위험", color: "bg-red-500", description: "심각한 기물 파손, 폭력, 범죄 행위" },
-  { value: "경고", color: "bg-orange-500", description: "반복적인 문제 행동, 규칙 위반" },
-  { value: "주의", color: "bg-yellow-500", description: "가벼운 규칙 위반, 주의 필요" },
+  {
+    value: "위험",
+    color: "bg-red-500",
+    description: "심각한 기물 파손, 폭력, 범죄 행위",
+  },
+  {
+    value: "경고",
+    color: "bg-orange-500",
+    description: "반복적인 문제 행동, 규칙 위반",
+  },
+  {
+    value: "주의",
+    color: "bg-yellow-500",
+    description: "가벼운 규칙 위반, 주의 필요",
+  },
 ];
 
 const commonReasons = [
@@ -113,7 +123,10 @@ const formatPhoneNumber = () => {
   if (value.length > 11) value = value.slice(0, 11);
 
   if (value.length > 6) {
-    formData.value.phone = `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7)}`;
+    formData.value.phone = `${value.slice(0, 3)}-${value.slice(
+      3,
+      7
+    )}-${value.slice(7)}`;
   } else if (value.length > 3) {
     formData.value.phone = `${value.slice(0, 3)}-${value.slice(3)}`;
   } else {
@@ -188,7 +201,10 @@ const isFormValid = computed(() => {
     <!-- Header -->
     <div class="sticky top-0 z-50 bg-black border-b border-gray-800 px-4 py-3">
       <div class="flex items-center justify-between">
-        <button @click="router.back()" class="p-2 -ml-2 text-gray-400 hover:text-white">
+        <button
+          @click="router.back()"
+          class="p-2 -ml-2 text-gray-400 hover:text-white"
+        >
           <ArrowLeft :size="24" />
         </button>
         <h1 class="text-lg font-bold text-white">블랙리스트 등록</h1>
@@ -197,7 +213,9 @@ const isFormValid = computed(() => {
     </div>
 
     <!-- Warning Notice -->
-    <div class="m-4 p-4 bg-orange-900/20 border border-orange-500/30 rounded-xl">
+    <div
+      class="m-4 p-4 bg-orange-900/20 border border-orange-500/30 rounded-xl"
+    >
       <div class="flex items-start space-x-3">
         <AlertCircle :size="20" class="text-orange-500 mt-0.5 flex-shrink-0" />
         <div class="text-sm text-orange-200">
@@ -230,7 +248,9 @@ const isFormValid = computed(() => {
             class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-red-500/50"
             :class="{ 'border-red-500/50': errors.name }"
           />
-          <p v-if="errors.name" class="text-xs text-red-400 mt-1">{{ errors.name }}</p>
+          <p v-if="errors.name" class="text-xs text-red-400 mt-1">
+            {{ errors.name }}
+          </p>
         </div>
 
         <!-- Age & Gender -->
@@ -247,7 +267,9 @@ const isFormValid = computed(() => {
               class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-red-500/50"
               :class="{ 'border-red-500/50': errors.age }"
             />
-            <p v-if="errors.age" class="text-xs text-red-400 mt-1">{{ errors.age }}</p>
+            <p v-if="errors.age" class="text-xs text-red-400 mt-1">
+              {{ errors.age }}
+            </p>
           </div>
 
           <div>
@@ -277,8 +299,12 @@ const isFormValid = computed(() => {
             class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-red-500/50"
             :class="{ 'border-red-500/50': errors.phone }"
           />
-          <p v-if="errors.phone" class="text-xs text-red-400 mt-1">{{ errors.phone }}</p>
-          <p class="text-xs text-gray-500 mt-1">중간 4자리는 자동으로 가려집니다</p>
+          <p v-if="errors.phone" class="text-xs text-red-400 mt-1">
+            {{ errors.phone }}
+          </p>
+          <p class="text-xs text-gray-500 mt-1">
+            중간 4자리는 자동으로 가려집니다
+          </p>
         </div>
       </div>
 
@@ -304,7 +330,9 @@ const isFormValid = computed(() => {
               {{ region }}
             </option>
           </select>
-          <p v-if="errors.region" class="text-xs text-red-400 mt-1">{{ errors.region }}</p>
+          <p v-if="errors.region" class="text-xs text-red-400 mt-1">
+            {{ errors.region }}
+          </p>
         </div>
 
         <!-- PC Cafe Name -->
@@ -313,7 +341,10 @@ const isFormValid = computed(() => {
             PC방 이름 <span class="text-red-500">*</span>
           </label>
           <div class="relative">
-            <Building2 :size="20" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" />
+            <Building2
+              :size="20"
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600"
+            />
             <input
               v-model="formData.pcCafe"
               type="text"
@@ -322,7 +353,9 @@ const isFormValid = computed(() => {
               :class="{ 'border-red-500/50': errors.pcCafe }"
             />
           </div>
-          <p v-if="errors.pcCafe" class="text-xs text-red-400 mt-1">{{ errors.pcCafe }}</p>
+          <p v-if="errors.pcCafe" class="text-xs text-red-400 mt-1">
+            {{ errors.pcCafe }}
+          </p>
         </div>
       </div>
 
@@ -391,16 +424,25 @@ const isFormValid = computed(() => {
             class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-red-500/50"
             :class="{ 'border-red-500/50': errors.reason }"
           />
-          <p v-if="errors.reason" class="text-xs text-red-400 mt-1">{{ errors.reason }}</p>
+          <p v-if="errors.reason" class="text-xs text-red-400 mt-1">
+            {{ errors.reason }}
+          </p>
         </div>
 
         <!-- Description -->
         <div>
-          <label class="block text-sm text-gray-400 mb-2 flex items-center justify-between">
-            <span>
-              상세 내용 <span class="text-red-500">*</span>
-            </span>
-            <span class="text-xs" :class="formData.description.length >= 20 ? 'text-green-400' : 'text-gray-600'">
+          <label
+            class="block text-sm text-gray-400 mb-2 flex items-center justify-between"
+          >
+            <span> 상세 내용 <span class="text-red-500">*</span> </span>
+            <span
+              class="text-xs"
+              :class="
+                formData.description.length >= 20
+                  ? 'text-green-400'
+                  : 'text-gray-600'
+              "
+            >
               {{ formData.description.length }} / 최소 20자
             </span>
           </label>
@@ -411,7 +453,9 @@ const isFormValid = computed(() => {
             class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-red-500/50 resize-none"
             :class="{ 'border-red-500/50': errors.description }"
           ></textarea>
-          <p v-if="errors.description" class="text-xs text-red-400 mt-1">{{ errors.description }}</p>
+          <p v-if="errors.description" class="text-xs text-red-400 mt-1">
+            {{ errors.description }}
+          </p>
         </div>
       </div>
 
@@ -428,7 +472,9 @@ const isFormValid = computed(() => {
             class="w-full h-32 border-2 border-dashed border-gray-700 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-red-500/50 transition-colors"
           >
             <Camera :size="32" class="text-gray-600 mb-2" />
-            <span class="text-sm text-gray-500">사진 추가 (최대 5장, 5MB 이하)</span>
+            <span class="text-sm text-gray-500"
+              >사진 추가 (최대 5장, 5MB 이하)</span
+            >
             <input
               type="file"
               accept="image/*"
@@ -446,7 +492,11 @@ const isFormValid = computed(() => {
             :key="image.id"
             class="relative aspect-square rounded-lg overflow-hidden bg-gray-800"
           >
-            <img :src="image.url" alt="증거 사진" class="w-full h-full object-cover" />
+            <img
+              :src="image.url"
+              alt="증거 사진"
+              class="w-full h-full object-cover"
+            />
             <button
               @click="removeImage(image.id)"
               class="absolute top-1 right-1 w-6 h-6 bg-black/70 rounded-full flex items-center justify-center text-white hover:bg-red-500 transition-colors"
@@ -469,7 +519,9 @@ const isFormValid = computed(() => {
               : 'bg-gray-800 text-gray-600 cursor-not-allowed'
           "
         >
-          {{ isFormValid ? "블랙리스트 등록" : "필수 항목을 모두 입력해주세요" }}
+          {{
+            isFormValid ? "블랙리스트 등록" : "필수 항목을 모두 입력해주세요"
+          }}
         </button>
       </div>
     </div>

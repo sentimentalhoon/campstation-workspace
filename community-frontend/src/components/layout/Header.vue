@@ -1,5 +1,5 @@
 <script setup>
-import { Shield, Menu } from "lucide-vue-next";
+import { Menu, Shield } from "lucide-vue-next";
 </script>
 
 <template>
@@ -11,7 +11,9 @@ import { Shield, Menu } from "lucide-vue-next";
         <div class="p-2 bg-red-500/20 rounded-lg">
           <Shield :size="20" class="text-red-500" />
         </div>
-        <h1 class="text-xl font-bold tracking-tight text-white">PC방 블랙리스트</h1>
+        <h1 class="text-xl font-bold tracking-tight text-white">
+          PC방 블랙리스트
+        </h1>
       </div>
 
       <button class="text-gray-400 hover:text-white p-2">

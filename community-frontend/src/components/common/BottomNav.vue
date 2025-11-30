@@ -1,5 +1,5 @@
 <script setup>
-import { Shield, Home, Search, Bell, User } from "lucide-vue-next";
+import { Bell, Home, Search, User } from "lucide-vue-next";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
@@ -34,7 +34,9 @@ const isActive = (path) => route.path === path;
         to="/register"
         class="flex flex-col items-center justify-center w-16 h-16 -mt-8"
       >
-        <div class="w-14 h-14 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center shadow-lg transition-all active:scale-95">
+        <div
+          class="w-14 h-14 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center shadow-lg transition-all active:scale-95"
+        >
           <span class="text-2xl font-bold text-white">+</span>
         </div>
       </RouterLink>
