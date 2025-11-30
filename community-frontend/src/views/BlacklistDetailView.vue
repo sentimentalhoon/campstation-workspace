@@ -84,9 +84,10 @@ const getDangerColor = (level) => {
   }
 };
 
-const dangerColors = computed(() =>
-  getDangerColor(blacklist.value.dangerLevel)
-);
+const dangerColors = computed(() => {
+  if (!blacklist.value) return getDangerColor("");
+  return getDangerColor(blacklist.value.dangerLevel);
+});
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
@@ -141,11 +142,6 @@ const handleReport = () => {
     alert("신고가 접수되었습니다. 검토 후 조치하겠습니다.");
   }
 };
-
-onMounted(() => {
-  // Increment view count
-  blacklist.value.views++;
-});
 </script>
 
 <template>
