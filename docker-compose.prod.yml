@@ -116,12 +116,14 @@ services:
     build:
       context: ./community-backend
       dockerfile: Dockerfile
+      target: runtime
     container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-backend
     environment:
       - PORT=8081
-      - DB_URL=jdbc:postgresql://db:5432/community
+      - DB_URL=${DB_URL:-jdbc:postgresql://db:5432/community}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - DB_POOL_SIZE=${DB_POOL_SIZE:-20}
       - REDIS_HOST=${REDIS_HOST:-redis}
       - REDIS_PORT=${REDIS_PORT:-6379}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
@@ -145,6 +147,7 @@ services:
     build:
       context: ./community-frontend
       dockerfile: Dockerfile
+      target: production
     container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-frontend
     restart: always
     logging:

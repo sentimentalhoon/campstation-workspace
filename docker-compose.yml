@@ -160,6 +160,7 @@ services:
     build:
       context: ./community-backend
       dockerfile: Dockerfile
+      target: production
     container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-backend
     networks:
       - campstation-network
@@ -178,6 +179,7 @@ services:
     build:
       context: ./community-frontend
       dockerfile: Dockerfile
+      target: production
     container_name: ${COMPOSE_PROJECT_NAME:-campstation}-community-frontend
     depends_on:
       - community-backend
