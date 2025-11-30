@@ -5,13 +5,17 @@
 ## 📁 Projects
 
 ### 🏕️ [Campground](./campground/)
+
 캠프장 예약 시스템
+
 - **Tech Stack**: Spring Boot + Next.js
 - **Domain**: mycamp.duckdns.org
 - **Ports**: 3000 (frontend), 8080 (backend)
 
 ### 👥 [Community](./community/)
+
 PC방 블랙리스트 커뮤니티
+
 - **Tech Stack**: Ktor + Vue 3
 - **Domain**: mycommunity.duckdns.org
 - **Ports**: 3001 (frontend), 8081 (backend)
@@ -19,6 +23,7 @@ PC방 블랙리스트 커뮤니티
 ## 🚀 Infrastructure
 
 공유 인프라 설정은 [`infrastructure/`](./infrastructure/) 폴더에 있습니다.
+
 - Nginx 리버스 프록시 설정
 - SSL 인증서 관리
 - 도메인 라우팅
