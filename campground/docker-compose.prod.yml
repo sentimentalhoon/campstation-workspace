@@ -116,6 +116,11 @@ services:
     networks:
       - campstation-network
       - web-proxy-net
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
 
 
@@ -130,8 +135,14 @@ services:
     environment:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_DB=${DB_USERNAME}
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: always
     logging:
       driver: "json-file"
