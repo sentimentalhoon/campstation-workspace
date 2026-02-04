@@ -24,11 +24,17 @@ export async function GET(request: NextRequest) {
   console.log("clientSecret:", clientSecret);
   console.log("=====================");
 
-  if (!clientId || !clientSecret) {
     console.error("네이버 맵 API 키가 설정되지 않았습니다.");
-    console.error("clientId:", clientId ? "설정됨" : "없음");
-    console.error("clientSecret:", clientSecret ? "설정됨" : "없음");
-    return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
+    return NextResponse.json(
+      { 
+        error: "서버 설정 오류: 네이버 맵 API 키가 없습니다.",
+        debug: {
+          hasClientId: !!clientId,
+          hasClientSecret: !!clientSecret
+        }
+      }, 
+      { status: 503 } // 503 Service Unavailable to indicate config missing
+    );
   }
 
   console.log("Geocoding API 요청:", query);
@@ -53,9 +59,10 @@ export async function GET(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("네이버 API 에러 응답:", errorText);
+      console.error("네이버 API 에러 응답:", errorText);
       return NextResponse.json(
-        { error: "네이버 API 호출 실패", details: errorText },
-        { status: response.status }
+        { error: "네이버 API 호출 실패 (Bad Gateway)", details: errorText },
+        { status: 502 } // 502 Bad Gateway
       );
     }
 
