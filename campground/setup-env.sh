@@ -19,6 +19,11 @@ if [ -f .env ]; then
     fi
 fi
 
+# 랜덤 비밀번호 생성 함수
+generate_password() {
+    openssl rand -hex 16
+}
+
 echo ""
 echo -e "${BLUE}[1. 기본 설정]${NC}"
 read -p "배포 도메인 (예: mycamp.duckdns.org): " DOMAIN_NAME
@@ -28,22 +33,23 @@ NEXT_PUBLIC_API_URL="https://${DOMAIN_NAME}/api"
 AWS_S3_PUBLIC_ENDPOINT="https://${DOMAIN_NAME}/storage"
 
 echo ""
-echo -e "${BLUE}[2. 데이터베이스 설정]${NC}"
-read -p "데이터베이스 비밀번호 (DB_PASSWORD): " DB_PASSWORD
-read -p "Redis 비밀번호 (REDIS_PASSWORD): " REDIS_PASSWORD
+echo -e "${BLUE}[2. 데이터베이스 설정 (자동 생성)]${NC}"
+DB_PASSWORD=$(generate_password)
+REDIS_PASSWORD=$(generate_password)
+echo "DB Password: (generated)"
+echo "Redis Password: (generated)"
 
 echo ""
-echo -e "${BLUE}[3. 보안 설정]${NC}"
-# JWT Secret 자동 생성 제안
-GEN_JWT=$(openssl rand -hex 32)
-echo "자동 생성된 JWT Secret: $GEN_JWT"
-read -p "사용하시겠습니까? (Enter=Yes, or 입력): " JWT_INPUT
-JWT_SECRET=${JWT_INPUT:-$GEN_JWT}
+echo -e "${BLUE}[3. 보안 설정 (자동 생성)]${NC}"
+JWT_SECRET=$(generate_password)
+echo "JWT Secret: (generated)"
 
 echo ""
 echo -e "${BLUE}[4. 관리자 계정 설정]${NC}"
 read -p "관리자 이메일: " ADMIN_EMAIL
-read -p "관리자 비밀번호: " ADMIN_PASSWORD
+ADMIN_PASSWORD=$(generate_password)
+echo "관리자 비밀번호가 자동으로 생성되었습니다: $ADMIN_PASSWORD"
+echo "설치 후 이 비밀번호로 로그인해주세요."
 
 echo ""
 echo -e "${BLUE}[5. 외부 서비스 API 키 (선택 사항 - Enter 건너뛰기)]${NC}"
@@ -129,5 +135,7 @@ EOL
 
 echo ""
 echo -e "${GREEN}설정 파일(.env) 생성이 완료되었습니다!${NC}"
+echo "관리자 비밀번호: ${ADMIN_PASSWORD}"
+echo "---------------------------------------"
 echo "이제 다음 명령어로 서비스를 실행할 수 있습니다:"
 echo "docker compose -f docker-compose.prod.yml up -d --build"
