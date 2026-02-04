@@ -34,7 +34,10 @@ export const announcementApi = {
    * ```
    */
   getAll: (params: AnnouncementSearchParams) =>
-    get<Announcement[]>("/v1/announcements", { params }),
+    get<Announcement[]>("/v1/announcements", {
+      params,
+      skipAuthRefresh: true,
+    }),
 
   /**
    * 공지사항 상세 조회
@@ -121,5 +124,5 @@ export const announcementApi = {
    * ```
    */
   incrementViewCount: (id: number) =>
-    post<Announcement>(`/v1/announcements/${id}/views`, {}),
+    post<Announcement>(`/v1/announcements/${id}/views`, {}, { skipAuthRefresh: true }),
 };

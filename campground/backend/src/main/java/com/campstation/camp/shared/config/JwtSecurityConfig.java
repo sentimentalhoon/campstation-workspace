@@ -104,6 +104,10 @@ public class JwtSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/banners/*/view").permitAll() // 조회수 집계
                         .requestMatchers(HttpMethod.POST, "/api/v1/banners/*/click").permitAll() // 클릭수 집계
 
+                        // 공지사항 조회 및 조회수 증가 인증 불필요 (누락된 부분 추가)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/announcements/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/announcements/*/views").permitAll()
+
                         // 캠핑장 조회수/체류시간 로깅 (누락된 부분 추가)
                         .requestMatchers(HttpMethod.POST, "/api/v1/campgrounds/*/view-log").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/campgrounds/*/view-duration").permitAll()
