@@ -42,7 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-@Profile("!prod") // 프로덕션이 아닌 환경(dev, test 등)에서만 실행
+// @Profile("!prod") // User requested to run in prod as well (via count check
+// safety)
 public class DataInitializer {
 
     private final UserRepository userRepository;
