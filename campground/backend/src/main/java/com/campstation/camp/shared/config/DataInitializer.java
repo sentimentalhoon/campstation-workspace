@@ -49,6 +49,7 @@ public class DataInitializer {
     private final UserRepository userRepository;
     private final CampgroundRepository campgroundRepository;
     private final BannerRepository bannerRepository;
+    private final com.campstation.camp.campground.repository.SiteRepository siteRepository; // Inject SiteRepository
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -142,14 +143,14 @@ public class DataInitializer {
         seoulCamp.addImage(createCampgroundImage(seoulCamp,
                 "https://images.unsplash.com/photo-1537905569824-f89f14cceb68", false, 2));
 
+        // Save Campground FIRST to get ID
+        seoulCamp = campgroundRepository.save(seoulCamp);
+
         // Sites
         Site siteA = createSite(seoulCamp, "A-1", SiteType.AUTO_CAMPING, 4, "넓은 데크 사이트", 100);
         Site siteB = createSite(seoulCamp, "B-1", SiteType.AUTO_CAMPING, 4, "파쇄석 사이트", 100);
 
-        seoulCamp.addSite(siteA);
-        seoulCamp.addSite(siteB);
-
-        campgroundRepository.save(seoulCamp);
+        siteRepository.saveAll(List.of(siteA, siteB));
 
         // 2. Jeju Ocean View (Glamping)
         Campground jejuCamp = Campground.builder()
@@ -173,13 +174,13 @@ public class DataInitializer {
         jejuCamp.addImage(createCampgroundImage(jejuCamp,
                 "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d", false, 2));
 
+        // Save Campground FIRST to get ID
+        jejuCamp = campgroundRepository.save(jejuCamp);
+
         Site glamping1 = createSite(jejuCamp, "G-101", SiteType.GLAMPING, 2, "오션뷰 커플 글램핑", 150);
         Site glamping2 = createSite(jejuCamp, "G-102", SiteType.GLAMPING, 4, "패밀리 글램핑", 200);
 
-        jejuCamp.addSite(glamping1);
-        jejuCamp.addSite(glamping2);
-
-        campgroundRepository.save(jejuCamp);
+        siteRepository.saveAll(List.of(glamping1, glamping2));
     }
 
     private Site createSite(Campground campground, String number, SiteType type, int capacity, String desc, int price) {
@@ -190,6 +191,7 @@ public class DataInitializer {
                 .description(desc)
                 .status(SiteStatus.AVAILABLE)
                 .campground(campground)
+                .campgroundId(campground.getId()) // ✅ Explicitly set ID
                 .build();
 
         // Add Amenities (Bitmask logic needs AmenityType enum, assuming some values)
