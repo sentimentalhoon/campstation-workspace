@@ -32,14 +32,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "localhost",
       },
-      {
+      // Dynamic domain from env
+      ...(process.env.NEXT_PUBLIC_API_URL ? [{
         protocol: "http",
-        hostname: "mycamp.duckdns.org",
-      },
-      {
+        hostname: new URL(process.env.NEXT_PUBLIC_API_URL).hostname,
+      }, {
         protocol: "https",
-        hostname: "mycamp.duckdns.org",
-      },
+        hostname: new URL(process.env.NEXT_PUBLIC_API_URL).hostname,
+      }] as const : []),
       {
         protocol: "https",
         hostname: "**.campstation.com",
@@ -59,6 +59,12 @@ const nextConfig: NextConfig = {
 
   // 보안 헤더 설정
   async headers() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    const domain = new URL(apiUrl).hostname;
+    const protocol = new URL(apiUrl).protocol; // 'http:' or 'https:'
+    const port = new URL(apiUrl).port;
+    const origin = `${protocol}//${domain}${port ? `:${port}` : ''}`;
+    
     return [
       {
         source: "/:path*",
@@ -97,7 +103,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'", // Tailwind CSS 허용
               "img-src 'self' data: blob: http: https:",
               "font-src 'self' data:",
-              "connect-src 'self' http://localhost:* https://localhost:* http://mycamp.duckdns.org https://mycamp.duckdns.org https://naveropenapi.apigw.ntruss.com https://kr-col-ext.nelo.navercorp.com https://api.tosspayments.com https://event.tosspayments.com https://log.tosspayments.com https://apigw-sandbox.tosspayments.com", // Naver Maps, Toss Payments API + Sandbox
+              `connect-src 'self' http://localhost:* https://localhost:* ${origin} https://${domain} https://naveropenapi.apigw.ntruss.com https://kr-col-ext.nelo.navercorp.com https://api.tosspayments.com https://event.tosspayments.com https://log.tosspayments.com https://apigw-sandbox.tosspayments.com`, // Dynamic API origin
               "frame-src 'self' https://payment-widget.tosspayments.com https://payment-gateway-sandbox.tosspayments.com", // Toss Payments Widget iframe + Sandbox
               "frame-ancestors 'self'",
               "base-uri 'self'",
