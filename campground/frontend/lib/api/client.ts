@@ -136,6 +136,16 @@ export async function apiClient<T>(
         !url.pathname.includes("/auth/me") &&
         !options._isRetry;
 
+      if (error.status === 401) {
+        console.log("[ApiClient] 401 Error:", {
+          path: url.pathname,
+          skipAuthRefresh,
+          isRetry: options._isRetry,
+          containsAuthMe: url.pathname.includes("/auth/me"),
+          shouldRefreshToken,
+        });
+      }
+
       if (shouldRefreshToken) {
         try {
           // ✅ Promise 캐싱: 동시 다발적 401 에러 시 토큰 갱신은 1번만 수행
