@@ -33,7 +33,7 @@ spring:
     multipart:
       enabled: true # 멀티파트 업로드 활성화
       max-file-size: ${MULTIPART_MAX_FILE_SIZE:10MB} # 개별 파일 최대 크기 (10MB)
-      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:50MB} # 요청당 최대 크기 (50MB)
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:300MB} # 요청당 최대 크기 (300MB)
       file-size-threshold: ${MULTIPART_FILE_SIZE_THRESHOLD:1MB} # 메모리 임계값 (1MB 이상은 디스크에 저장)
       location: ${MULTIPART_LOCATION:${java.io.tmpdir}} # 임시 파일 저장 위치
 
@@ -222,7 +222,7 @@ file:
     path: ${FILE_UPLOAD_PATH:s3://campstation/} # 파일 저장 경로 (S3 버킷 또는 로컬 경로)
     allowed-extensions: jpg,jpeg,png,gif,webp # 허용할 파일 확장자
     max-size: ${FILE_MAX_SIZE_BYTES:52428800} # 개별 파일 최대 크기 (50MB)
-    max-request-size: ${FILE_MAX_REQUEST_SIZE:52428800} # 요청당 최대 크기 (50MB)
+    max-request-size: ${FILE_MAX_REQUEST_SIZE:314572800} # 요청당 최대 크기 (300MB)
 
 # ================================
 # AWS S3 Configuration

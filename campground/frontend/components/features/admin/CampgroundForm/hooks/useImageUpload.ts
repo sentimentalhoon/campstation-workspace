@@ -38,7 +38,7 @@ export function useImageUpload(
   const [isPending, startTransition] = useTransition();
 
   const totalImages = existingImages.length + imageFiles.length;
-  const MAX_IMAGES = 10;
+  const MAX_IMAGES = 50;
 
   const addImages = useCallback(
     async (fileList: FileList | null) => {

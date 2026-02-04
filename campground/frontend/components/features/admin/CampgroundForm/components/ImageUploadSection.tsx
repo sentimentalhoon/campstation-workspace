@@ -49,7 +49,7 @@ export function ImageUploadSection({
       {/* Upload Button */}
       <div>
         <label className="mb-2 block text-sm font-medium text-gray-700">
-          이미지 업로드 ({totalImages}/10)
+          이미지 업로드 ({totalImages}/50)
         </label>
         <input
           type="file"
@@ -60,7 +60,7 @@ export function ImageUploadSection({
           className="block w-full rounded-lg border border-gray-300 p-2 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-50"
         />
         <p className="mt-1 text-xs text-gray-500">
-          최대 10개, 각 5MB 이하 (JPEG, PNG, WebP)
+          최대 50개, 각 5MB 이하 (JPEG, PNG, WebP)
         </p>
       </div>
 

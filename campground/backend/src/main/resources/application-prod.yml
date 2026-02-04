@@ -23,7 +23,7 @@ spring:
     multipart:
       enabled: true
       max-file-size: ${MULTIPART_MAX_FILE_SIZE:50MB} # 개별 파일 최대 크기 (50MB - 프로덕션용 확대)
-      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:100MB} # 요청당 최대 크기 (100MB)
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:300MB} # 요청당 최대 크기 (300MB)
       file-size-threshold: ${MULTIPART_FILE_SIZE_THRESHOLD:2MB} # 메모리 임계값
       location: ${MULTIPART_LOCATION:/tmp/uploads}
 
@@ -215,7 +215,7 @@ file:
   upload:
     path: ${FILE_UPLOAD_PATH:s3://campstation-prod/}
     max-size: ${FILE_MAX_SIZE_BYTES:52428800} # 50MB
-    max-request-size: ${FILE_MAX_REQUEST_SIZE:52428800}
+    max-request-size: ${FILE_MAX_REQUEST_SIZE:314572800}
 
 # ================================
 # AWS S3 Configuration (Production)
