@@ -56,7 +56,9 @@ export const campgroundApi = {
    * ```
    */
   getById: (id: number) =>
-    get<Campground>(API_ENDPOINTS.CAMPGROUNDS.DETAIL(id)),
+    get<Campground>(API_ENDPOINTS.CAMPGROUNDS.DETAIL(id), {
+      skipAuthRefresh: true,
+    }),
 
   /**
    * 캠핑장 사이트 목록 조회
@@ -71,7 +73,9 @@ export const campgroundApi = {
    * ```
    */
   getSites: (id: number) =>
-    get<PageResponse<Site>>(API_ENDPOINTS.CAMPGROUNDS.SITES(id)),
+    get<PageResponse<Site>>(API_ENDPOINTS.CAMPGROUNDS.SITES(id), {
+      skipAuthRefresh: true,
+    }),
 
   /**
    * 캠핑장 검색
