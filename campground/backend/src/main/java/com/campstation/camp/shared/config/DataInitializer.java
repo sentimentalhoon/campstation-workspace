@@ -49,7 +49,8 @@ public class DataInitializer {
     private final UserRepository userRepository;
     private final CampgroundRepository campgroundRepository;
     private final BannerRepository bannerRepository;
-    private final com.campstation.camp.campground.repository.SiteRepository siteRepository; // Inject SiteRepository
+    private final com.campstation.camp.campground.repository.SiteRepository siteRepository;
+    private final com.campstation.camp.pricing.repository.SitePricingRepository sitePricingRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -147,10 +148,14 @@ public class DataInitializer {
         seoulCamp = campgroundRepository.save(seoulCamp);
 
         // Sites
-        Site siteA = createSite(seoulCamp, "A-1", SiteType.AUTO_CAMPING, 4, "넓은 데크 사이트", 100);
-        Site siteB = createSite(seoulCamp, "B-1", SiteType.AUTO_CAMPING, 4, "파쇄석 사이트", 100);
+        Site siteA = createSite(seoulCamp, "A-1", SiteType.AUTO_CAMPING, 4, "넓은 데크 사이트");
+        Site siteB = createSite(seoulCamp, "B-1", SiteType.AUTO_CAMPING, 4, "파쇄석 사이트");
 
-        siteRepository.saveAll(List.of(siteA, siteB));
+        List<Site> savedSeoulSites = siteRepository.saveAll(List.of(siteA, siteB));
+
+        // Pricing
+        createSitePricing(savedSeoulSites.get(0), 50000);
+        createSitePricing(savedSeoulSites.get(1), 40000);
 
         // 2. Jeju Ocean View (Glamping)
         Campground jejuCamp = Campground.builder()
@@ -177,13 +182,17 @@ public class DataInitializer {
         // Save Campground FIRST to get ID
         jejuCamp = campgroundRepository.save(jejuCamp);
 
-        Site glamping1 = createSite(jejuCamp, "G-101", SiteType.GLAMPING, 2, "오션뷰 커플 글램핑", 150);
-        Site glamping2 = createSite(jejuCamp, "G-102", SiteType.GLAMPING, 4, "패밀리 글램핑", 200);
+        Site glamping1 = createSite(jejuCamp, "G-101", SiteType.GLAMPING, 2, "오션뷰 커플 글램핑");
+        Site glamping2 = createSite(jejuCamp, "G-102", SiteType.GLAMPING, 4, "패밀리 글램핑");
 
-        siteRepository.saveAll(List.of(glamping1, glamping2));
+        List<Site> savedJejuSites = siteRepository.saveAll(List.of(glamping1, glamping2));
+
+        // Pricing
+        createSitePricing(savedJejuSites.get(0), 150000);
+        createSitePricing(savedJejuSites.get(1), 200000);
     }
 
-    private Site createSite(Campground campground, String number, SiteType type, int capacity, String desc, int price) {
+    private Site createSite(Campground campground, String number, SiteType type, int capacity, String desc) {
         Site site = Site.builder()
                 .siteNumber(number)
                 .siteType(type)
@@ -208,6 +217,22 @@ public class DataInitializer {
         site.addImage(image);
 
         return site;
+    }
+
+    private void createSitePricing(Site site, int price) {
+        com.campstation.camp.pricing.domain.SitePricing pricing = com.campstation.camp.pricing.domain.SitePricing
+                .builder()
+                .site(site)
+                .pricingName("기본 요금")
+                .ruleType(com.campstation.camp.pricing.domain.PricingRuleType.BASE)
+                .basePrice(BigDecimal.valueOf(price))
+                .baseGuests(2)
+                .maxGuests(site.getCapacity())
+                .extraGuestFee(BigDecimal.valueOf(10000))
+                .isActive(true)
+                .build();
+
+        sitePricingRepository.save(pricing);
     }
 
     private CampgroundImage createCampgroundImage(Campground campground, String url, boolean isMain, int order) {
