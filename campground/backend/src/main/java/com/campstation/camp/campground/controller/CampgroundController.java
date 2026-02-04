@@ -61,39 +61,40 @@ public class CampgroundController {
     @Operation(summary = "새 캠핑장 생성", description = "새로운 캠핑장 정보를 생성합니다. 소유자 또는 관리자만 가능합니다.")
     @PostMapping
     @OwnerOrAdmin
-    public ResponseEntity<CommonResponse<CampgroundResponse>> createCampground(@Valid @RequestBody CreateCampgroundRequest request) {
+    public ResponseEntity<CommonResponse<CampgroundResponse>> createCampground(
+            @Valid @RequestBody CreateCampgroundRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        
+
         // username으로부터 user ID 조회
-        Long ownerId = userService.findByUsername(username)
-            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."))
-            .getId();
+        Long ownerId = userService.findByEmail(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."))
+                .getId();
 
         // 입력 데이터 검증
         if (!inputValidator.isValidTextLength(request.name(), 1, 100)) {
             return ResponseEntity.badRequest()
-                .body(CommonResponse.error("캠핑장 이름은 1-100자 사이여야 합니다."));
+                    .body(CommonResponse.error("캠핑장 이름은 1-100자 사이여야 합니다."));
         }
 
-    if (!inputValidator.isValidTextLength(request.description(), 10, 10000)) {
+        if (!inputValidator.isValidTextLength(request.description(), 10, 10000)) {
             return ResponseEntity.badRequest()
-        .body(CommonResponse.error("캠핑장 설명은 10-10000자 사이여야 합니다."));
+                    .body(CommonResponse.error("캠핑장 설명은 10-10000자 사이여야 합니다."));
         }
 
         if (!inputValidator.isValidTextLength(request.address(), 1, 200)) {
             return ResponseEntity.badRequest()
-                .body(CommonResponse.error("주소는 1-200자 사이여야 합니다."));
+                    .body(CommonResponse.error("주소는 1-200자 사이여야 합니다."));
         }
 
         if (request.phone() != null && !inputValidator.isValidPhoneNumber(request.phone())) {
             return ResponseEntity.badRequest()
-                .body(CommonResponse.error("유효하지 않은 전화번호 형식입니다."));
+                    .body(CommonResponse.error("유효하지 않은 전화번호 형식입니다."));
         }
 
         if (request.email() != null && !inputValidator.isValidEmail(request.email())) {
             return ResponseEntity.badRequest()
-                .body(CommonResponse.error("유효하지 않은 이메일 형식입니다."));
+                    .body(CommonResponse.error("유효하지 않은 이메일 형식입니다."));
         }
 
         CampgroundResponse campground = campgroundService.createCampground(
@@ -104,9 +105,9 @@ public class CampgroundController {
                 request.businessOwnerName(), request.businessName(), request.businessAddress(),
                 request.businessEmail(), request.businessRegistrationNumber(), request.tourismBusinessNumber(),
                 request.operationType(), request.certification(),
-                ownerId
-        );
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("캠핑장이 성공적으로 생성되었습니다.", campground));
+                ownerId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CommonResponse.success("캠핑장이 성공적으로 생성되었습니다.", campground));
     }
 
     @Operation(summary = "캠핑장 ID로 조회", description = "특정 캠핑장 정보를 ID로 조회합니다.")
@@ -139,7 +140,8 @@ public class CampgroundController {
             @RequestParam(required = false) List<CampgroundOperationType> operationTypes,
             @RequestParam(required = false) List<CampgroundCertification> certifications,
             Pageable pageable) {
-        Page<CampgroundResponse> campgrounds = campgroundService.searchCampgrounds(keyword, minPrice, maxPrice, amenities, operationTypes, certifications, pageable);
+        Page<CampgroundResponse> campgrounds = campgroundService.searchCampgrounds(keyword, minPrice, maxPrice,
+                amenities, operationTypes, certifications, pageable);
         return ResponseEntity.ok(CommonResponse.success("캠핑장 검색 성공", campgrounds));
     }
 
@@ -168,8 +170,7 @@ public class CampgroundController {
             @RequestParam BigDecimal neLat,
             @RequestParam BigDecimal neLng) {
         List<CampgroundResponse> campgrounds = campgroundService.getCampgroundsByMapBounds(
-                swLat, swLng, neLat, neLng
-        );
+                swLat, swLng, neLat, neLng);
         return ResponseEntity.ok(CommonResponse.success("지도 영역 내 캠핑장 조회 성공", campgrounds));
     }
 
@@ -177,48 +178,48 @@ public class CampgroundController {
     @PutMapping("/{id}")
     @OwnerOrAdmin
     public ResponseEntity<CommonResponse<CampgroundResponse>> updateCampground(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @Valid @RequestBody UpdateCampgroundRequest request,
             Authentication authentication) {
 
         // 입력 데이터 검증
         if (!inputValidator.isValidTextLength(request.name(), 1, 100)) {
             return ResponseEntity.badRequest()
-                .body(CommonResponse.error("캠핑장 이름은 1-100자 사이여야 합니다."));
+                    .body(CommonResponse.error("캠핑장 이름은 1-100자 사이여야 합니다."));
         }
 
-    if (!inputValidator.isValidTextLength(request.description(), 10, 10000)) {
+        if (!inputValidator.isValidTextLength(request.description(), 10, 10000)) {
             return ResponseEntity.badRequest()
-        .body(CommonResponse.error("캠핑장 설명은 10-10000자 사이여야 합니다."));
+                    .body(CommonResponse.error("캠핑장 설명은 10-10000자 사이여야 합니다."));
         }
 
         if (!inputValidator.isValidTextLength(request.address(), 1, 200)) {
             return ResponseEntity.badRequest()
-                .body(CommonResponse.error("주소는 1-200자 사이여야 합니다."));
+                    .body(CommonResponse.error("주소는 1-200자 사이여야 합니다."));
         }
 
         if (request.phone() != null && !inputValidator.isValidPhoneNumber(request.phone())) {
             return ResponseEntity.badRequest()
-                .body(CommonResponse.error("유효하지 않은 전화번호 형식입니다."));
+                    .body(CommonResponse.error("유효하지 않은 전화번호 형식입니다."));
         }
 
         if (request.email() != null && !inputValidator.isValidEmail(request.email())) {
             return ResponseEntity.badRequest()
-                .body(CommonResponse.error("유효하지 않은 이메일 형식입니다."));
+                    .body(CommonResponse.error("유효하지 않은 이메일 형식입니다."));
         }
 
         // 권한 체크: 실제 소유자인지 확인 (ADMIN은 모든 캠핑장 수정 가능)
         String email = authentication.getName();
         var user = userService.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-        
+
         // 캠핑장 조회
         var campground = campgroundService.getCampgroundEntityById(id);
-        
+
         // SecurityUtils를 사용한 권한 체크
         if (!com.campstation.camp.shared.security.SecurityUtils.isOwnerOrAdmin(user, campground.getOwner().getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(CommonResponse.error("이 캠핑장을 수정할 권한이 없습니다."));
+                    .body(CommonResponse.error("이 캠핑장을 수정할 권한이 없습니다."));
         }
 
         CampgroundResponse updatedCampground = campgroundService.updateCampground(
@@ -228,8 +229,7 @@ public class CampgroundController {
                 request.checkInTime(), request.checkOutTime(),
                 request.businessOwnerName(), request.businessName(), request.businessAddress(),
                 request.businessEmail(), request.businessRegistrationNumber(), request.tourismBusinessNumber(),
-                request.operationType(), request.certification()
-        );
+                request.operationType(), request.certification());
         return ResponseEntity.ok(CommonResponse.success("캠핑장이 성공적으로 업데이트되었습니다.", updatedCampground));
     }
 
@@ -239,21 +239,21 @@ public class CampgroundController {
     public ResponseEntity<CommonResponse<Void>> deleteCampground(
             @PathVariable Long id,
             Authentication authentication) {
-        
+
         // 권한 체크: 실제 소유자인지 확인 (ADMIN은 모든 캠핑장 삭제 가능)
         String email = authentication.getName();
         var user = userService.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-        
+
         // 캠핑장 조회
         var campground = campgroundService.getCampgroundEntityById(id);
-        
+
         // SecurityUtils를 사용한 권한 체크
         if (!com.campstation.camp.shared.security.SecurityUtils.isOwnerOrAdmin(user, campground.getOwner().getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(CommonResponse.error("이 캠핑장을 삭제할 권한이 없습니다."));
+                    .body(CommonResponse.error("이 캠핑장을 삭제할 권한이 없습니다."));
         }
-        
+
         campgroundService.deleteCampground(id);
         return ResponseEntity.ok(CommonResponse.success("캠핑장이 성공적으로 삭제되었습니다.", null));
     }
