@@ -78,7 +78,10 @@ export const authApi = {
    * const newToken = await authApi.refresh();
    * ```
    */
-  refresh: () => post<JwtResponse>(API_ENDPOINTS.AUTH.REFRESH),
+  refresh: () =>
+    post<JwtResponse>(API_ENDPOINTS.AUTH.REFRESH, undefined, {
+      skipAuthRefresh: true,
+    }),
 
   /**
    * 현재 로그인한 사용자 정보 조회
@@ -93,5 +96,5 @@ export const authApi = {
    * console.log(user.name, user.email);
    * ```
    */
-  me: () => get<User>(API_ENDPOINTS.AUTH.ME),
+  me: () => get<User>(API_ENDPOINTS.AUTH.ME, { skipAuthRefresh: true }),
 };

@@ -23,6 +23,8 @@ type RequestOptions = {
   signal?: AbortSignal;
   /** @internal 토큰 갱신 후 재시도 여부 (내부용, 무한루프 방지) */
   _isRetry?: boolean;
+  /** 401 에러 시 토큰 갱신 및 리다이렉트 방지 여부 */
+  skipAuthRefresh?: boolean;
 };
 
 /**
@@ -43,6 +45,7 @@ export async function apiClient<T>(
     params,
     timeout = API_CONFIG.TIMEOUT,
     signal,
+    skipAuthRefresh = false,
   } = options;
 
   // URL 생성
@@ -125,10 +128,10 @@ export async function apiClient<T>(
 
     // ApiError - 401 에러 시 토큰 갱신 시도
     if (error instanceof ApiError) {
-      // ✅ 조건: 401 에러 && /auth/refresh가 아님 && /auth/me가 아님 && 이미 재시도한 요청이 아님
-      // ⚠️ /auth/me는 초기 인증 상태 확인용이므로 401이 정상 응답일 수 있음 (비로그인 상태)
+      // ✅ 조건: 401 에러 && skipAuthRefresh가 아님 && /auth/refresh가 아님 && /auth/me가 아님 && 이미 재시도한 요청이 아님
       const shouldRefreshToken =
         error.status === 401 &&
+        !skipAuthRefresh &&
         !url.pathname.includes("/auth/refresh") &&
         !url.pathname.includes("/auth/me") &&
         !options._isRetry;
