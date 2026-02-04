@@ -44,7 +44,7 @@ CampStation은 캠핑장 운영자와 캠퍼를 연결하는 종합 예약 플�
 
 ### Backend
 
-- **Framework**: [Spring Boot 3.5.6](https://spring.io/projects/spring-boot)
+- **Framework**: [Spring Boot 3.5.10](https://spring.io/projects/spring-boot)
 - **Language**: Java 21
 - **Security**: Spring Security (JWT, OAuth2 Client)
 - **Database**: JPA (Hibernate), PostgreSQL
