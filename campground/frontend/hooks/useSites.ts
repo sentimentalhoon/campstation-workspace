@@ -19,6 +19,7 @@ export function useSites(
         API_ENDPOINTS.CAMPGROUNDS.SITES(campgroundId),
         {
           params: { page, size },
+          skipAuthRefresh: true,
         }
       );
       return response;

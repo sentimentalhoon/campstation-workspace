@@ -104,6 +104,10 @@ public class JwtSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/banners/*/view").permitAll() // 조회수 집계
                         .requestMatchers(HttpMethod.POST, "/api/v1/banners/*/click").permitAll() // 클릭수 집계
 
+                        // 캠핑장 조회수/체류시간 로깅 (누락된 부분 추가)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/campgrounds/*/view-log").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/campgrounds/*/view-duration").permitAll()
+
                         // 캠핑장 생성/수정/삭제는 인증 필요
                         .requestMatchers("/api/v1/campgrounds/**").authenticated()
 

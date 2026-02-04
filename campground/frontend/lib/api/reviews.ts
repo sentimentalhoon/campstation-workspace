@@ -27,6 +27,7 @@ export const reviewApi = {
   ) =>
     get<PageResponse<Review>>(API_ENDPOINTS.REVIEWS.LIST(campgroundId), {
       params,
+      skipAuthRefresh: true,
     }),
 
   /**

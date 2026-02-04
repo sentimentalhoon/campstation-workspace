@@ -35,7 +35,9 @@ export const statsApi = {
    * ```
    */
   recordView: (campgroundId: number, data: RecordViewRequest) =>
-    post<void>(API_ENDPOINTS.STATS.RECORD_VIEW(campgroundId), data),
+    post<void>(API_ENDPOINTS.STATS.RECORD_VIEW(campgroundId), data, {
+      skipAuthRefresh: true,
+    }),
 
   /**
    * 캠핑장 페이지 체류 시간 기록
@@ -53,7 +55,9 @@ export const statsApi = {
    * ```
    */
   recordDuration: (campgroundId: number, data: RecordDurationRequest) =>
-    post<void>(API_ENDPOINTS.STATS.RECORD_DURATION(campgroundId), data),
+    post<void>(API_ENDPOINTS.STATS.RECORD_DURATION(campgroundId), data, {
+      skipAuthRefresh: true,
+    }),
 
   /**
    * 캠핑장 통계 조회 (Owner Dashboard용)

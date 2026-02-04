@@ -48,7 +48,9 @@ export const favoriteApi = {
    * 찜 상태 확인
    */
   checkStatus: (campgroundId: number) =>
-    get<boolean>(API_ENDPOINTS.FAVORITES.STATUS(campgroundId)),
+    get<boolean>(API_ENDPOINTS.FAVORITES.STATUS(campgroundId), {
+      skipAuthRefresh: true,
+    }),
 
   /**
    * 찜 개수 조회

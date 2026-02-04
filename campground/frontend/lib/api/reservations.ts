@@ -51,7 +51,8 @@ export const reservationApi = {
    */
   getSiteReservedDates: (siteId: number) =>
     get<{ checkInDate: string; checkOutDate: string }[]>(
-      API_ENDPOINTS.RESERVATIONS.SITE_RESERVED_DATES(siteId)
+      API_ENDPOINTS.RESERVATIONS.SITE_RESERVED_DATES(siteId),
+      { skipAuthRefresh: true }
     ),
 
   /**
@@ -59,6 +60,7 @@ export const reservationApi = {
    */
   getCampgroundReservedDates: (campgroundId: number) =>
     get<Record<number, { checkInDate: string; checkOutDate: string }[]>>(
-      API_ENDPOINTS.RESERVATIONS.CAMPGROUND_RESERVED_DATES(campgroundId)
+      API_ENDPOINTS.RESERVATIONS.CAMPGROUND_RESERVED_DATES(campgroundId),
+      { skipAuthRefresh: true }
     ),
 };
