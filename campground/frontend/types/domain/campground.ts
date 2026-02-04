@@ -205,4 +205,6 @@ export type CreateCampgroundDto = {
   certification?: CampgroundCertification; // 인증/등급
 };
 
-export type UpdateCampgroundDto = Partial<CreateCampgroundDto>;
+export type UpdateCampgroundDto = Partial<CreateCampgroundDto> & {
+  imagesToDelete?: string[];
+};
