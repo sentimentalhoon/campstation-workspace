@@ -167,8 +167,8 @@ services:
     image: minio/minio:latest
     container_name: ${COMPOSE_PROJECT_NAME:-campstation}-minio
     ports:
-      - "${MINIO_API_PORT:-9000}:9000"
-      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+      - "${MINIO_API_PORT:-9002}:9000"
+      - "${MINIO_CONSOLE_PORT:-9003}:9001"
     volumes:
       - minio_data_prod:/data
     environment:
