@@ -29,6 +29,7 @@ export async function getActiveBanners(params?: {
 }): Promise<Banner[]> {
   return get<Banner[]>(API_ENDPOINTS.BANNERS.LIST, {
     params,
+    skipAuthRefresh: true, // ✅ 401 에러(비로그인) 시 로그인 페이지로 튕기지 않음
   });
 }
 
