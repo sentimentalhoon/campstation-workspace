@@ -57,11 +57,10 @@ public class JwtSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .headers(headers -> headers
-                    .frameOptions(frameOptions -> frameOptions.sameOrigin()) // H2 콘솔을 위한 frame 허용
+                        .frameOptions(frameOptions -> frameOptions.sameOrigin()) // H2 콘솔을 위한 frame 허용
                 )
                 .exceptionHandling(exception -> exception
-                    .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                )
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         // 인증 불필요한 경로
@@ -78,59 +77,64 @@ public class JwtSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/campgrounds/search").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/campgrounds/popular").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/campgrounds/map").permitAll()
-                        
+
                         // 리뷰 조회는 인증 불필요
                         .requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
-                        
+
                         // 파일 조회는 인증 불필요
                         .requestMatchers(HttpMethod.GET, "/api/v1/files/**").permitAll()
-                        
+
                         // 비회원 예약 API는 인증 불필요
                         .requestMatchers("/api/v1/reservations/guest/**").permitAll()
-                        
+
                         // sites 조회는 인증 불필요
                         .requestMatchers(HttpMethod.GET, "/api/v1/sites/**").permitAll()
-                        
+
                         // 사이트 예약 날짜 조회는 인증 불필요 (개별 조회)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/reservations/sites/{siteId}/reserved-dates").permitAll()
-                        
+                        .requestMatchers(HttpMethod.GET, "/api/v1/reservations/sites/{siteId}/reserved-dates")
+                        .permitAll()
+
                         // 캠핑장 예약 날짜 조회는 인증 불필요 (일괄 조회)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/reservations/campgrounds/{campgroundId}/reserved-dates").permitAll()
-                        
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/reservations/campgrounds/{campgroundId}/reserved-dates")
+                        .permitAll()
+
+                        // 배너 조회는 인증 불필요 (누락된 부분 추가)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/banners/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/banners/*/view").permitAll() // 조회수 집계
+                        .requestMatchers(HttpMethod.POST, "/api/v1/banners/*/click").permitAll() // 클릭수 집계
+
                         // 캠핑장 생성/수정/삭제는 인증 필요
                         .requestMatchers("/api/v1/campgrounds/**").authenticated()
-                        
+
                         // 리뷰 작성/수정/삭제는 인증 필요
                         .requestMatchers("/api/v1/reviews/**").authenticated()
-                        
+
                         // 예약 관련 API는 인증 필요
                         .requestMatchers("/api/v1/reservations/**").authenticated()
-                        
+
                         // 결제 관련 API는 인증 필요
                         .requestMatchers("/api/v1/payments/**").authenticated()
-                        
+
                         // 관리자 API는 ADMIN 권한 필요
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        
+
                         // Owner API는 OWNER 권한 필요
                         .requestMatchers("/api/v1/owner/**").hasAnyRole("OWNER", "ADMIN")
-                        
+
                         // OWNER 또는 ADMIN 권한 필요
                         .requestMatchers("/owner/**").hasAnyRole("OWNER", "ADMIN")
-                        
+
                         // OAuth2 로그인 엔드포인트 허용
-                        .requestMatchers("/oauth2/**").permitAll()  // OAuth2 로그인 경로 허용
-                        
+                        .requestMatchers("/oauth2/**").permitAll() // OAuth2 로그인 경로 허용
+
                         // 나머지는 인증 필요
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
-                    .userInfoEndpoint(userInfo -> userInfo
-                        .userService(customOAuth2UserService)
-                    )
-                    .successHandler(oAuth2AuthenticationSuccessHandler)
-                );
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler));
 
         return http.build();
     }
@@ -145,7 +149,7 @@ public class JwtSecurityConfig {
 
     /**
      * 인증 매니저 (Spring Security 6.x 권장 방식)
-     * DaoAuthenticationProvider를 별도로 생성하지 않고 
+     * DaoAuthenticationProvider를 별도로 생성하지 않고
      * AuthenticationManagerBuilder를 통해 자동 구성
      */
     @Bean
