@@ -165,7 +165,7 @@ services:
   # ================================
   minio:
     image: minio/minio:latest
-    container_name: ${COMPOSE_PROJECT_NAME:-campstation}-minio
+    container_name: campstation-minio
     ports:
       - "${MINIO_API_PORT:-9002}:9000"
       - "${MINIO_CONSOLE_PORT:-9003}:9001"
@@ -210,7 +210,7 @@ services:
   # ================================
   minio-setup:
     image: minio/mc:latest
-    container_name: ${COMPOSE_PROJECT_NAME:-campstation}-minio-setup
+    container_name: campstation-minio-setup
     depends_on:
       minio:
         condition: service_healthy
