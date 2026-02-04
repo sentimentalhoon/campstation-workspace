@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
   console.log("clientSecret:", clientSecret);
   console.log("=====================");
 
+  if (!clientId || !clientSecret) {
     console.error("네이버 맵 API 키가 설정되지 않았습니다.");
     return NextResponse.json(
       { 
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("네이버 API 에러 응답:", errorText);
+
       console.error("네이버 API 에러 응답:", errorText);
       return NextResponse.json(
         { error: "네이버 API 호출 실패 (Bad Gateway)", details: errorText },
