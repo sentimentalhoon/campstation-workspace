@@ -129,8 +129,8 @@ public class DataInitializer {
                 .latitude(new BigDecimal("37.5443"))
                 .longitude(new BigDecimal("127.0374"))
                 .status(CampgroundStatus.ACTIVE)
-                .operationType(CampgroundOperationType.MUNICIPAL)
-                .certification(CampgroundCertification.REGISTERED)
+                .operationType(CampgroundOperationType.DIRECT)
+                .certification(CampgroundCertification.CERTIFIED)
                 .checkInTime(LocalTime.of(14, 0))
                 .checkOutTime(LocalTime.of(11, 0))
                 .owner(owner)
@@ -162,7 +162,7 @@ public class DataInitializer {
                 .longitude(new BigDecimal("126.3183"))
                 .status(CampgroundStatus.ACTIVE)
                 .operationType(CampgroundOperationType.PRIVATE)
-                .certification(CampgroundCertification.TOURISM)
+                .certification(CampgroundCertification.PREMIUM)
                 .checkInTime(LocalTime.of(15, 0))
                 .checkOutTime(LocalTime.of(11, 0))
                 .owner(owner)
@@ -197,8 +197,10 @@ public class DataInitializer {
 
         // Add Site Images
         SiteImage image = SiteImage.builder()
-                .imageUrl("https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7")
+                .originalUrl("https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7")
                 .thumbnailUrl("https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7")
+                .fileName("sample-site-image.jpg")
+                .fileSize(1024L)
                 .displayOrder(1)
                 .build();
         site.addImage(image);
@@ -208,7 +210,7 @@ public class DataInitializer {
 
     private CampgroundImage createCampgroundImage(Campground campground, String url, boolean isMain, int order) {
         return CampgroundImage.builder()
-                .imageUrl(url)
+                .originalUrl(url)
                 .thumbnailUrl(url)
                 .isMain(isMain)
                 .displayOrder(order)
