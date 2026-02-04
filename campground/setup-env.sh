@@ -30,7 +30,8 @@ read -p "배포 도메인 (예: mycamp.duckdns.org): " DOMAIN_NAME
 
 # 포트 설정 (기본값)
 NEXT_PUBLIC_API_URL="https://${DOMAIN_NAME}/api"
-AWS_S3_PUBLIC_ENDPOINT="https://${DOMAIN_NAME}/storage"
+# MinIO Public URL (버킷명 포함 필수)
+AWS_S3_PUBLIC_ENDPOINT="https://${DOMAIN_NAME}/storage/campstation-prod"
 
 echo ""
 echo -e "${BLUE}[2. 데이터베이스 설정 (자동 생성)]${NC}"
