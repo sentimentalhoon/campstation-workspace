@@ -10,6 +10,7 @@ export function useRecentReviews(limit: number = APP_CONFIG.DEFAULT_PAGE_SIZE) {
       // ✅ API 클라이언트가 CommonResponse.data를 unwrap하므로 response는 직접 Review[]
       const response = await get<Review[]>(API_ENDPOINTS.REVIEWS.RECENT, {
         params: { limit },
+        skipAuthRefresh: true, // ✅ 401 에러(비로그인) 시 로그인 페이지로 튕기지 않음
       });
       return response;
     },

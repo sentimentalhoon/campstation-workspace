@@ -14,6 +14,7 @@ export function usePopularCampgrounds(
         API_ENDPOINTS.CAMPGROUNDS_EXT.POPULAR,
         {
           params: { limit },
+          skipAuthRefresh: true, // ✅ 401 에러(비로그인) 시 로그인 페이지로 튕기지 않음
         }
       );
       return response;
