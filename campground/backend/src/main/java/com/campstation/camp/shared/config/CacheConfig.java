@@ -40,79 +40,88 @@ public class CacheConfig {
     @Primary
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        
+
+        // 배너 목록 캐시 (10분) - 자주 조회되지만 변경은 적음
+        cacheManager.registerCustomCache("activeBanners",
+                Caffeine.newBuilder()
+                        .initialCapacity(10)
+                        .maximumSize(100)
+                        .expireAfterWrite(10, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
         // 평균 평점 캐시 (10분)
         cacheManager.registerCustomCache("averageRatings",
-            Caffeine.newBuilder()
-                .initialCapacity(100)
-                .maximumSize(1000)
-                .expireAfterWrite(10, TimeUnit.MINUTES)
-                .recordStats()
-                .build());
-        
+                Caffeine.newBuilder()
+                        .initialCapacity(100)
+                        .maximumSize(1000)
+                        .expireAfterWrite(10, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
         // 리뷰 수 캐시 (10분)
         cacheManager.registerCustomCache("reviewCounts",
-            Caffeine.newBuilder()
-                .initialCapacity(100)
-                .maximumSize(1000)
-                .expireAfterWrite(10, TimeUnit.MINUTES)
-                .recordStats()
-                .build());
-        
+                Caffeine.newBuilder()
+                        .initialCapacity(100)
+                        .maximumSize(1000)
+                        .expireAfterWrite(10, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
         // 대시보드 통계 캐시 (1분) - Admin Dashboard
         cacheManager.registerCustomCache("dashboardStats",
-            Caffeine.newBuilder()
-                .initialCapacity(10)
-                .maximumSize(100)
-                .expireAfterWrite(1, TimeUnit.MINUTES)
-                .recordStats()
-                .build());
-        
+                Caffeine.newBuilder()
+                        .initialCapacity(10)
+                        .maximumSize(100)
+                        .expireAfterWrite(1, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
         // Owner 대시보드 통계 캐시 (1분)
         cacheManager.registerCustomCache("ownerDashboardStats",
-            Caffeine.newBuilder()
-                .initialCapacity(10)
-                .maximumSize(100)
-                .expireAfterWrite(1, TimeUnit.MINUTES)
-                .recordStats()
-                .build());
-        
+                Caffeine.newBuilder()
+                        .initialCapacity(10)
+                        .maximumSize(100)
+                        .expireAfterWrite(1, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
         // 리뷰 통계 캐시 (5분) - L1 캐시
         cacheManager.registerCustomCache("reviewStats",
-            Caffeine.newBuilder()
-                .initialCapacity(50)
-                .maximumSize(500)
-                .expireAfterWrite(5, TimeUnit.MINUTES)
-                .recordStats()
-                .build());
-        
+                Caffeine.newBuilder()
+                        .initialCapacity(50)
+                        .maximumSize(500)
+                        .expireAfterWrite(5, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
         // 캠핑장 이미지 캐시 (30분) - 이미지는 자주 변경되지 않음
         cacheManager.registerCustomCache("campgroundImages",
-            Caffeine.newBuilder()
-                .initialCapacity(100)
-                .maximumSize(1000)
-                .expireAfterWrite(30, TimeUnit.MINUTES)
-                .recordStats()
-                .build());
-        
+                Caffeine.newBuilder()
+                        .initialCapacity(100)
+                        .maximumSize(1000)
+                        .expireAfterWrite(30, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
         // 사용자 즐겨찾기 캐시 (5분)
         cacheManager.registerCustomCache("userFavorites",
-            Caffeine.newBuilder()
-                .initialCapacity(50)
-                .maximumSize(500)
-                .expireAfterWrite(5, TimeUnit.MINUTES)
-                .recordStats()
-                .build());
-        
+                Caffeine.newBuilder()
+                        .initialCapacity(50)
+                        .maximumSize(500)
+                        .expireAfterWrite(5, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
         // 사용자 캐시 (10분)
         cacheManager.registerCustomCache("users",
-            Caffeine.newBuilder()
-                .initialCapacity(100)
-                .maximumSize(1000)
-                .expireAfterWrite(10, TimeUnit.MINUTES)
-                .recordStats()
-                .build());
-        
+                Caffeine.newBuilder()
+                        .initialCapacity(100)
+                        .maximumSize(1000)
+                        .expireAfterWrite(10, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
         return cacheManager;
     }
 }

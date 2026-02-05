@@ -1,10 +1,13 @@
 package com.campstation.camp.banner.service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,19 +51,21 @@ public class BannerService {
      * @return 활성 배너 목록
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "activeBanners", key = "(#type != null ? #type.name() : 'ALL') + '-' + (#size != null ? #size : 10)")
     public List<BannerResponse> getActiveBanners(BannerType type, Integer size) {
         log.info("Get Active Banners: type={}, size={}", type, size);
-        
-        LocalDateTime now = LocalDateTime.now();
+
+        // KST 기준 현재 시간 사용 (DB에 저장된 시간이 KST 기준일 경우)
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         Pageable pageable = PageRequest.of(0, size != null ? size : 10);
-        
+
         List<Banner> banners;
         if (type != null) {
             banners = bannerRepository.findActiveBannersByType(type, now, pageable);
         } else {
             banners = bannerRepository.findActiveBanners(now, pageable);
         }
-        
+
         return banners.stream()
                 .map(BannerResponse::from)
                 .collect(Collectors.toList());
@@ -74,9 +79,9 @@ public class BannerService {
     public void incrementViewCount(Long bannerId) {
         Banner banner = bannerRepository.findById(bannerId)
                 .orElseThrow(() -> new ResourceNotFoundException("배너를 찾을 수 없습니다: " + bannerId));
-        
+
         banner.incrementViewCount();
-        log.debug("Banner view count incremented: bannerId={}, viewCount={}", 
+        log.debug("Banner view count incremented: bannerId={}, viewCount={}",
                 bannerId, banner.getViewCount());
     }
 
@@ -88,25 +93,25 @@ public class BannerService {
     public void incrementClickCount(Long bannerId) {
         Banner banner = bannerRepository.findById(bannerId)
                 .orElseThrow(() -> new ResourceNotFoundException("배너를 찾을 수 없습니다: " + bannerId));
-        
+
         banner.incrementClickCount();
-        log.debug("Banner click count incremented: bannerId={}, clickCount={}", 
+        log.debug("Banner click count incremented: bannerId={}, clickCount={}",
                 bannerId, banner.getClickCount());
     }
 
     /**
      * 관리자용 배너 목록 조회 (검색 및 필터링)
      * 
-     * @param params 검색 파라미터
+     * @param params   검색 파라미터
      * @param pageable 페이징 정보
      * @return 배너 페이지
      */
     @Transactional(readOnly = true)
     public Page<BannerResponse> searchBanners(BannerSearchParams params, Pageable pageable) {
         log.info("Search Banners: params={}, page={}", params, pageable);
-        
+
         Page<Banner> banners;
-        
+
         // 검색 조건에 따라 적절한 Repository 메서드 호출
         if (params.getTitle() != null && params.getType() != null && params.getStatus() != null) {
             banners = bannerRepository.findByTitleAndTypeAndStatus(
@@ -126,7 +131,7 @@ public class BannerService {
         } else {
             banners = bannerRepository.findAllNotDeleted(pageable);
         }
-        
+
         return banners.map(BannerResponse::from);
     }
 
@@ -140,7 +145,7 @@ public class BannerService {
     public BannerResponse getBanner(Long bannerId) {
         Banner banner = bannerRepository.findById(bannerId)
                 .orElseThrow(() -> new ResourceNotFoundException("배너를 찾을 수 없습니다: " + bannerId));
-        
+
         return BannerResponse.from(banner);
     }
 
@@ -150,9 +155,10 @@ public class BannerService {
      * @param request 생성 요청
      * @return 생성된 배너 정보
      */
+    @CacheEvict(value = "activeBanners", allEntries = true)
     public BannerResponse createBanner(CreateBannerRequest request) {
         log.info("Create Banner: title={}, type={}", request.getTitle(), request.getType());
-        
+
         Banner banner = Banner.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -166,10 +172,10 @@ public class BannerService {
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .build();
-        
+
         Banner savedBanner = bannerRepository.save(banner);
         log.info("Banner created: bannerId={}", savedBanner.getId());
-        
+
         return BannerResponse.from(savedBanner);
     }
 
@@ -177,15 +183,16 @@ public class BannerService {
      * 배너 수정
      * 
      * @param bannerId 배너 ID
-     * @param request 수정 요청
+     * @param request  수정 요청
      * @return 수정된 배너 정보
      */
+    @CacheEvict(value = "activeBanners", allEntries = true)
     public BannerResponse updateBanner(Long bannerId, UpdateBannerRequest request) {
         log.info("Update Banner: bannerId={}", bannerId);
-        
+
         Banner banner = bannerRepository.findById(bannerId)
                 .orElseThrow(() -> new ResourceNotFoundException("배너를 찾을 수 없습니다: " + bannerId));
-        
+
         banner.update(
                 request.getTitle(),
                 request.getDescription(),
@@ -195,9 +202,8 @@ public class BannerService {
                 request.getLinkUrl(),
                 request.getLinkTarget(),
                 request.getStartDate(),
-                request.getEndDate()
-        );
-        
+                request.getEndDate());
+
         log.info("Banner updated: bannerId={}", bannerId);
         return BannerResponse.from(banner);
     }
@@ -207,25 +213,26 @@ public class BannerService {
      * 
      * @param bannerId 배너 ID
      */
+    @CacheEvict(value = "activeBanners", allEntries = true)
     public void deleteBanner(Long bannerId) {
         Banner banner = bannerRepository.findById(bannerId)
                 .orElseThrow(() -> new ResourceNotFoundException("배너를 찾을 수 없습니다: " + bannerId));
-        
+
         // 소프트 삭제
         banner.markAsDeleted();
         log.info("Banner deleted: bannerId={}", bannerId);
-        
+
         // S3에서 이미지 파일 삭제
         try {
             List<String> imagePaths = new ArrayList<>();
-            
+
             if (banner.getThumbnailUrl() != null) {
                 imagePaths.add(banner.getThumbnailUrl());
             }
             if (banner.getImageUrl() != null && !banner.getImageUrl().equals(banner.getThumbnailUrl())) {
                 imagePaths.add(banner.getImageUrl());
             }
-            
+
             if (!imagePaths.isEmpty()) {
                 s3FileService.deleteFiles(imagePaths);
                 log.info("Deleted banner images from S3: bannerId={}, paths={}", bannerId, imagePaths);
@@ -239,10 +246,11 @@ public class BannerService {
     /**
      * 배너 순서 변경
      *
-     * @param bannerId 배너 ID
+     * @param bannerId     배너 ID
      * @param displayOrder 새로운 순서
      * @return 수정된 배너 정보
      */
+    @CacheEvict(value = "activeBanners", allEntries = true)
     public BannerResponse updateBannerOrder(Long bannerId, Integer displayOrder) {
         log.info("Update Banner Order: bannerId={}, displayOrder={}", bannerId, displayOrder);
 
@@ -261,6 +269,7 @@ public class BannerService {
      * @param request 순서 변경 요청 목록
      * @return 업데이트된 배너 개수
      */
+    @CacheEvict(value = "activeBanners", allEntries = true)
     public int updateBannerOrderBulk(BulkUpdateBannerOrderRequest request) {
         log.info("Bulk Update Banner Order: {} banners", request.getOrders().size());
 
@@ -291,17 +300,18 @@ public class BannerService {
      * 배너 상태 변경
      * 
      * @param bannerId 배너 ID
-     * @param status 새로운 상태
+     * @param status   새로운 상태
      * @return 수정된 배너 정보
      */
+    @CacheEvict(value = "activeBanners", allEntries = true)
     public BannerResponse updateBannerStatus(Long bannerId, BannerStatus status) {
         log.info("Update Banner Status: bannerId={}, status={}", bannerId, status);
-        
+
         Banner banner = bannerRepository.findById(bannerId)
                 .orElseThrow(() -> new ResourceNotFoundException("배너를 찾을 수 없습니다: " + bannerId));
-        
+
         banner.updateStatus(status);
-        
+
         return BannerResponse.from(banner);
     }
 
@@ -313,11 +323,11 @@ public class BannerService {
     @Transactional(readOnly = true)
     public BannerStats getBannerStats() {
         LocalDateTime now = LocalDateTime.now();
-        
+
         long activeBanners = bannerRepository.countActiveBanners(now);
         long totalViews = bannerRepository.sumViewCount();
         long totalClicks = bannerRepository.sumClickCount();
-        
+
         return BannerStats.of(activeBanners, totalViews, totalClicks);
     }
 }
